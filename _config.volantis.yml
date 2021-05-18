@@ -21,20 +21,20 @@ navbar:
     - name: 更多
       icon: fad fa-ellipsis-v
       rows:
-        - name: 埃拉正在想办法填充呢...
+        - name: 米拉克还在思考这里应该有啥呢...
   search: 搜索
 
 cover:
   height_scheme: full
   layout_scheme: search # search (搜索), dock (坞), featured (精选), focus (焦点)
-  title: '埃拉の个人博客'
+  title: '米拉克的博客'
   subtitle: ''
   background: https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper-minimalist/2020/016.jpg
   display:
     home: true
     archive: true
     others: false # can be written in front-matter'cover: true'      
-  search: 天呐，埃了爱了
+  search: 害怕.jpg
   features:
     - name: 主页
       icon: #
@@ -44,18 +44,10 @@ cover:
       icon: #
       img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f516.svg
       url: /archives
-    - name: 维基
-      icon: #
-      img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f516.svg
-      url: /wiki
-    - name: 项目
-      icon: #
-      img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f516.svg
-      url: /projects   
     - name: Github
       icon: #
       img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f9ec.svg
-      url: https://github.com/ElaBosak233
+      url: hhttps://github.com/MerakWalker
 
 article:
   preview:
@@ -119,9 +111,9 @@ article:
       # 默认文章作者（可在 _data/author.yaml 中增加其他作者，并在 front-matter 中设置）
       # https://volantis.js.org/advanced-settings/#多人协同
       author:
-        avatar: https://i.loli.net/2021/03/13/RSLyWDlwuci1atf.jpg
-        name: 埃拉拉
-        url: https://github.com/ElaBosak233
+        avatar: https://sm.ms/image/CFSRkIYNMmwQV7e
+        name: 米拉克
+        url: https://github.com/MerakWalker
       # 文章创建日期
       date:
         icon: fas fa-calendar-alt
@@ -181,20 +173,20 @@ sidebar:
     blogger:
       class: blogger
       display: [desktop] # [desktop, mobile]
-      avatar: https://i.loli.net/2021/03/13/RSLyWDlwuci1atf.jpg
+      avatar: https://sm.ms/image/CFSRkIYNMmwQV7e
       shape: circle
-      title: 埃拉拉
-      subtitle: Null Girl Friend Exception
+      title: 米拉克
+      subtitle: Nothing here.
       jinrishici: false # Poetry Today. You can set a string, and it will be displayed when loading fails.
       social: 
         - icon: fab fa-github
-          url: https://github.com/ElaBosak233
+          url: https://github.com/MerakWalker
         - icon: fab fa-facebook 
-          url: https://www.facebook.com/e23.in
+          url: https://www.facebook.com/
         - icon: fab fa-twitter
-          url: https://twitter.com/ElaBosakCN
+          url: https://twitter.com/
         - icon: fas fa-bolt
-          url: http://afdian.net/@ElaBosak233
+          url: 
     toc:
       class: toc
       display: [desktop, mobile] # [desktop, mobile]
@@ -245,10 +237,6 @@ sidebar:
         - name: 博客文章
           icon: fas fa-file-alt
           url: /archives/
-        - name: 更新日志
-          icon: fas fa-tags
-          url: https://github.com/ElaBosak233/ElaBosak233.github.io/releases
-          target: _blank
     docs-api:
       class: group
       display: [desktop, mobile]
@@ -290,14 +278,14 @@ sidebar:
 
 site_footer:
   layout: [aplayer, social, source, analytics, copyright]
-  copyright: '[Copyright © 2019-2021 埃拉の个人博客](https://github.com/ElaBosak233/)'
+  copyright: '[Copyright © 2019-2021 米拉克](https://github.com/MerakWalker/)'
   social:
     - img: https://cdn.jsdelivr.net/gh/volantis-x/cdn-org@1.1/icon/1322024-social-media/029-github.svg
-      url: https://github.com/ElaBosak233
+      url: https://github.com/MerakWalker
     - img: https://cdn.jsdelivr.net/gh/volantis-x/cdn-org@1.1/icon/1322024-social-media/010-facebook.svg
-      url: https://www.facebook.com/e23.in
+      url: https://www.facebook.com/
     - img: https://cdn.jsdelivr.net/gh/volantis-x/cdn-org@1.1/icon/1322024-social-media/018-twitter.svg
-      url: https://twitter.com/ElaBosakCN
+      url: https://twitter.com/
 
 
 tag_plugins:

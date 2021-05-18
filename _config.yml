@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: 埃拉の个人博客
+title: 米拉克的博客
 subtitle: ''
 description: ''
 keywords:
-author: ElaBosak233
+author: Merak
 language: zh-CN
 timezone: ''
 
@@ -15,7 +15,7 @@ favicon: /fav.svg
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: https://e23.in
+url: https://merakt.cn
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
