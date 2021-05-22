@@ -44,10 +44,14 @@ cover:
       icon: #
       img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f516.svg
       url: /archives
-    - name: Github
+    - name: 关于
       icon: #
       img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f9ec.svg
-      url: hhttps://github.com/MerakW
+      url: /about
+    - name: B站
+      icon: #
+      img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f9ec.svg
+      url: https://b23.tv/h0yQ0i
 
 article:
   preview:
@@ -316,7 +320,7 @@ plugins:
     # id: 4917524698 # vol blue
     # id: 76244489 # vol white
     # id: 5135845906 # for Volantis 3.0
-    id: 5062959861 # TOP 30
+    id: 6768797227 # mybloglist
   darkmodejs:
     enable: true
 
