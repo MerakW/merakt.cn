@@ -18,9 +18,9 @@ navbar:
     - name: 关于
       icon: fad fa-play-circle faa-tada
       url: /about  
-    - name: 更多
-      icon: fad fa-ellipsis-v
-      url: /
+    - name: 小空调
+      icon: https://z3.ax1x.com/2021/05/22/gL8SSJ.png
+      url: http://blog.merakt.cn/2021/05/22/%E6%9D%A5%E5%90%B9%E5%90%B9%E7%A9%BA%E8%B0%83%E5%90%A7%EF%BC%81/
   search: 搜索
 
 cover:
