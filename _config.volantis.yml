@@ -29,7 +29,7 @@ cover:
   layout_scheme: search # search (搜索), dock (坞), featured (精选), focus (焦点)
   title: '米拉克的博客'
   subtitle: ''
-  background: https://cdn.jsdelivr.net/gh/volantis-x/cdn-wallpaper-minimalist/2020/016.jpg
+  background: https://z3.ax1x.com/2021/05/22/gqrRts.jpg
   display:
     home: true
     archive: true
@@ -47,7 +47,7 @@ cover:
     - name: Github
       icon: #
       img: #https://cdn.jsdelivr.net/gh/twitter/twemoji@13.0/assets/svg/1f9ec.svg
-      url: hhttps://github.com/MerakWalker
+      url: hhttps://github.com/MerakW
 
 article:
   preview:
@@ -173,18 +173,18 @@ sidebar:
     blogger:
       class: blogger
       display: [desktop] # [desktop, mobile]
-      avatar: https://sm.ms/image/CFSRkIYNMmwQV7e
+      avatar: https://z3.ax1x.com/2021/05/22/gLPrFK.jpg
       shape: circle
       title: 米拉克
-      subtitle: Nothing here.
+      subtitle: 無限進步
       jinrishici: false # Poetry Today. You can set a string, and it will be displayed when loading fails.
       social: 
         - icon: fab fa-github
-          url: https://github.com/MerakWalker
+          url: https://github.com/MerakW
         - icon: fab fa-facebook 
-          url: https://www.facebook.com/
+          url: https://www.facebook.com/profile.php?id=100068235464035
         - icon: fab fa-twitter
-          url: https://twitter.com/
+          url: https://twitter.com/real_merakw
         - icon: fas fa-bolt
           url: 
     toc:
