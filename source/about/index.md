@@ -11,12 +11,13 @@ sidebar: []
 
 一个普普通通的高中生。十六岁，浙江杭州人。
 
-网名是 **米拉克**，或许你会见到**Merak_W**,**Merak**,**real_MerakW**这些名字，但都是我哦！
+网名是 **米拉克**，或许你会见到**Merak_W**，**Merak**，**real_MerakW**这些名字，但都是我哦！
 
 只会一点点**Python**。最喜欢玩的游戏是 [**Minecraft**](https://minecraft.net/)，其次是 [**Fall Guys**]( https://www.mediatonicgames.com/game/fall-guys)。
 
+我的**Minecraft** ID是Merak_W(国际服)
 
-Bilibili UP主，粉丝很少所以快来关注我and快来给我三连qwq
+Bilibili UP主，粉丝很少所以快来关注我/doge
 
 [**B站空间**](https://b23.tv/h0yQ0i)。
 
@@ -32,7 +33,7 @@ And我还是网易云音乐人哦，不过是用库乐队随便敲敲拔了（�
 
 个人的主要精力还是放在了视频制作上，所以我发视频肯定会比写博客勤一点（？
 
-我的视频更新平台包括但不限于[**B站空间**](https://b23.tv/h0yQ0i)，**视频号**等。
+我的视频更新平台包括但不限于[**B站**](https://b23.tv/h0yQ0i)，**视频号**等。
 
 ## 关于 **merakt.cn**
 

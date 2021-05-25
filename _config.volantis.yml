@@ -163,11 +163,11 @@ comments:
   title: <i class='fas fa-comments'></i> 评论区
   service: gitalk  
   gitalk:
-    clientID: 8687afbf31f0041f005d
-    clientSecret: 9949b2971fa855443467af73220daa9e8c0612fd
-    repo: e23.in
-    owner: ElaBosak233
-    admin: [ElaBosak233]
+    clientID: 331e1979aab018129988
+    clientSecret: 839b3edd092d236b244a62fe979c91eeeeae15dc
+    repo: merakt.cn
+    owner: MerakW
+    admin: [MerakW]
 
 sidebar:
   for_page: [blogger, news, guide, category, tagcloud]
