@@ -1,0 +1,859 @@
+---
+// Merak Airways - 虚拟航空公司品牌页面
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Merak Airways - Follow the trail, reach the stars">
+  <section class="airways-hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-badge">✈️ VIRTUAL AIRLINE</div>
+      <h1 class="hero-title">Merak Airways</h1>
+      <p class="hero-code">MK</p>
+      <p class="hero-slogan">Follow the trail, reach the stars.</p>
+      <p class="hero-slogan-cn">追随狐迹，触及星辰。</p>
+      <div class="hero-info">
+        <span>主基地：杭州萧山国际机场 (HGH)</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="brand-section">
+    <div class="container">
+      <h2 class="section-title">品牌核心</h2>
+      
+      <div class="brand-grid">
+        <div class="brand-card">
+          <h3>设计哲学</h3>
+          <p class="philosophy">近未来工业风</p>
+          <p class="desc">
+            Industrial Futurism — 拒绝过度修饰，推崇 Apple 式的极简留白与高度拟真的物理质感。
+          </p>
+          <p class="desc">
+            "高级 AI 管家"式口吻，精准、冷峻，但在关键触点保留人文温情。
+          </p>
+          <div class="access-badge">ACCESS GRANTED | 权限已准</div>
+        </div>
+
+        <div class="brand-card totem-card">
+          <h3>双星图腾</h3>
+          <div class="totems">
+            <div class="totem">
+              <span class="totem-icon">🦊</span>
+              <div>
+                <strong>Merak 米拉克</strong>
+                <p>品牌的引领者与化身</p>
+                <span class="totem-usage">广泛应用于日常视觉</span>
+              </div>
+            </div>
+            <div class="totem astronix">
+              <span class="totem-icon">🐉</span>
+              <div>
+                <strong>Astronix 璇迹</strong>
+                <p>品牌的守护者</p>
+                <span class="totem-usage">仅显现于顶级空间与高奢场景</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="color-section">
+    <div class="container">
+      <h2 class="section-title">色彩矩阵</h2>
+      <div class="color-grid">
+        <div class="color-card primary">
+          <div class="color-swatch" style="background: #FADDB6;"></div>
+          <div class="color-info">
+            <span class="color-name">Horizon Yellow</span>
+            <span class="color-hex">#FADDB6</span>
+            <span class="color-role">主色调 · 米拉克设定主色</span>
+          </div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #A7D3F0;"></div>
+          <div class="color-info">
+            <span class="color-name">Horizon Blue</span>
+            <span class="color-hex">#A7D3F0</span>
+            <span class="color-role">主色调 · 高空纯净感</span>
+          </div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #2B3744;"></div>
+          <div class="color-info">
+            <span class="color-name">Deep Blue-Black</span>
+            <span class="color-hex">#2B3744</span>
+            <span class="color-role">技术参数底色</span>
+          </div>
+        </div>
+        <div class="color-card">
+          <div class="color-swatch" style="background: #FF667B;"></div>
+          <div class="color-info">
+            <span class="color-name">Pulse Red</span>
+            <span class="color-hex">#FF667B</span>
+            <span class="color-role">核心点缀与警示色</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="loyalty-section">
+    <div class="container">
+      <h2 class="section-title">Foxway 常旅客计划</h2>
+      <p class="section-subtitle">积分货币：Stardust (星尘)</p>
+      
+      <div class="tier-grid">
+        <div class="tier-card nebula">
+          <div class="tier-header">
+            <span class="tier-icon">🌌</span>
+            <h3>Nebula</h3>
+            <span class="tier-level">星云卡 · 基础</span>
+          </div>
+          <div class="tier-visual">
+            <p class="tier-desc">淡紫色卡面，狐狸在云雾中若隐若现。</p>
+            <p class="tier-meaning">象征旅程起点与无限可能。</p>
+          </div>
+        </div>
+
+        <div class="tier-card nova">
+          <div class="tier-header">
+            <span class="tier-icon">⭐</span>
+            <h3>Nova</h3>
+            <span class="tier-level">新星卡 · 银卡</span>
+          </div>
+          <div class="tier-visual">
+            <p class="tier-desc">亮白色卡面，狐尾尖端闪烁光芒。</p>
+            <p class="tier-meaning">初露锋芒，享受优先候补。</p>
+          </div>
+        </div>
+
+        <div class="tier-card supernova">
+          <div class="tier-header">
+            <span class="tier-icon">💫</span>
+            <h3>Supernova</h3>
+            <span class="tier-level">超新星卡 · 金卡</span>
+          </div>
+          <div class="tier-visual">
+            <p class="tier-desc">璀璨金色，狐狸呈跃迁姿态。</p>
+            <p class="tier-meaning">爆发式能量，解锁商务舱休息室准入。</p>
+          </div>
+        </div>
+
+        <div class="tier-card pulsar">
+          <div class="tier-header">
+            <span class="tier-icon">🔮</span>
+            <h3>Pulsar</h3>
+            <span class="tier-level">脉冲星卡 · 顶级黑卡</span>
+          </div>
+          <div class="tier-visual">
+            <p class="tier-desc">深邃极夜黑与冷调蓝，极简无装饰。</p>
+            <p class="tier-meaning">代表宇宙中最精准的永恒节奏。</p>
+            <p class="tier-perk">享受极致跨界特权（如与万豪旅享家白金会籍无缝匹配）。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="spaces-section">
+    <div class="container">
+      <h2 class="section-title">旗舰空间</h2>
+      
+      <div class="space-grid">
+        <div class="space-card lounge">
+          <div class="space-header">
+            <span class="space-type">休息室</span>
+            <h3>Astronix Pivot</h3>
+            <p class="space-name-cn">璇迹枢</p>
+          </div>
+          <div class="space-body">
+            <p class="space-location">📍 仅驻扎于主场 HGH</p>
+            <p class="space-desc">
+              定位为嘈杂机场内的"深空停泊港"。
+              一个让旅客暂时脱离地面喧嚣、回归静谧的私密空间。
+            </p>
+            <div class="space-feature">
+              <span class="feature-label">设计基调</span>
+              <span class="feature-value">深空主题 · 冷调蓝 · 极简工业</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-card first-class">
+          <div class="space-header">
+            <span class="space-type">头等舱</span>
+            <h3>THE PAW-LACE SUITE</h3>
+            <p class="space-name-cn">云端爪邸</p>
+          </div>
+          <div class="space-body">
+            <p class="space-desc">
+              兼具皇家官邸私密性与兽族灵动感的云端宫殿。
+              为追求极致体验的旅客打造的专属空间。
+            </p>
+            <div class="space-feature">
+              <span class="feature-label">设计理念</span>
+              <span class="feature-value">皇家私密 · 灵动优雅 · 狐狸元素</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flight-code-section">
+    <div class="container">
+      <div class="flight-code-card">
+        <h2>航班代码</h2>
+        <div class="code-display">
+          <span class="code-prefix">MK</span>
+          <span class="code-number">518</span>
+        </div>
+        <p class="code-desc">
+          MK 来源于 <strong>M</strong>erak airways 的首字母，<br />
+          518 是天璇星（Merak）在中国星官体系中的编号。
+        </p>
+        <p class="code-example">
+          示例航班：MK518 杭州 (HGH) → 北京 (PEK)
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="quote-section">
+    <div class="container">
+      <blockquote class="brand-quote">
+        <p>
+          「在浩瀚的星际航路中，<br />
+          我们追随狐迹，触及星辰。」
+        </p>
+        <cite>— Merak Airways Brand Philosophy</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="disclaimer-section">
+    <div class="container">
+      <div class="disclaimer-card">
+        <h3>⚠️ 免责声明</h3>
+        <p>
+          Merak Airways 是一个虚拟航空公司品牌企划，<br />
+          与任何实际航空公司无关。<br />
+          所有内容均为创意虚构，不构成真实航空服务。
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero 区域 */
+  .airways-hero {
+    position: relative;
+    padding: 6rem 2rem 5rem;
+    text-align: center;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: white;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.2), transparent);
+    background-size: 200px 100px;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .container {
+    position: relative;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: rgba(167, 211, 240, 0.2);
+    border: 1px solid rgba(167, 211, 240, 0.5);
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .hero-title {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #A7D3F0 0%, #FADDB6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-code {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #A7D3F0;
+    letter-spacing: 0.3em;
+    margin-bottom: 1rem;
+  }
+
+  .hero-slogan {
+    font-size: 1.5rem;
+    font-style: italic;
+    color: #FADDB6;
+    margin-bottom: 0.5rem;
+  }
+
+  .hero-slogan-cn {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2rem;
+  }
+
+  .hero-info {
+    font-size: 0.9375rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* 品牌核心 */
+  .brand-section {
+    padding: 5rem 2rem;
+    background-color: var(--color-bg);
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .section-subtitle {
+    text-align: center;
+    color: var(--color-text-secondary);
+    margin-bottom: 3rem;
+  }
+
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .brand-card {
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  .brand-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+  }
+
+  .philosophy {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+  }
+
+  .brand-card .desc {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .access-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, #2B3744 0%, #1a1a2e 100%);
+    color: #A7D3F0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-sm);
+    border: 1px solid #A7D3F0;
+  }
+
+  .totems {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .totem {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+  }
+
+  .totem.astronix {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2B3744 100%);
+  }
+
+  .totem-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .totem strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .totem p {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.25rem;
+  }
+
+  .totem-usage {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .totem.astronix .totem-usage {
+    color: #A7D3F0;
+  }
+
+  /* 色彩矩阵 */
+  .color-section {
+    padding: 5rem 2rem;
+    background-color: var(--color-bg-secondary);
+  }
+
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .color-card {
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+  }
+
+  .color-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .color-swatch {
+    height: 100px;
+  }
+
+  .color-info {
+    padding: 1.25rem;
+  }
+
+  .color-name {
+    display: block;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .color-hex {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .color-role {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary);
+  }
+
+  .color-card.primary .color-name {
+    color: var(--color-primary);
+  }
+
+  /* 常旅客计划 */
+  .loyalty-section {
+    padding: 5rem 2rem;
+    background: linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-secondary) 100%);
+  }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .tier-card {
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .tier-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .tier-header {
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .tier-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .tier-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .tier-level {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  .tier-visual {
+    padding: 1.5rem;
+  }
+
+  .tier-desc {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    margin-bottom: 0.75rem;
+  }
+
+  .tier-meaning {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+  }
+
+  .tier-perk {
+    font-size: 0.8125rem;
+    color: var(--color-primary);
+    font-weight: 500;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--color-border);
+  }
+
+  /* 各等级配色 */
+  .tier-card.nebula .tier-header {
+    background: linear-gradient(135deg, #e8d5f2 0%, #d4b8e8 100%);
+    color: #4a3f5c;
+  }
+
+  .tier-card.nova .tier-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    color: #333;
+  }
+
+  .tier-card.supernova .tier-header {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb800 100%);
+    color: #5c4800;
+  }
+
+  .tier-card.pulsar .tier-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2B3744 100%);
+    color: #A7D3F0;
+  }
+
+  .tier-card.pulsar .tier-level {
+    color: #A7D3F0;
+  }
+
+  /* 旗舰空间 */
+  .spaces-section {
+    padding: 5rem 2rem;
+    background-color: var(--color-bg);
+  }
+
+  .space-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  .space-card {
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+  }
+
+  .space-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .space-header {
+    padding: 2rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .space-type {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 9999px;
+    margin-bottom: 0.75rem;
+  }
+
+  .space-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .space-name-cn {
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+  }
+
+  .space-body {
+    padding: 1.5rem 2rem;
+  }
+
+  .space-location {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .space-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+  }
+
+  .space-feature {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .feature-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .feature-value {
+    font-size: 0.9375rem;
+    color: var(--color-text);
+  }
+
+  .space-card.lounge .space-header {
+    background: linear-gradient(135deg, #2B3744 0%, #1a1a2e 100%);
+    color: #A7D3F0;
+  }
+
+  .space-card.lounge .space-type {
+    background: #A7D3F0;
+    color: #1a1a2e;
+  }
+
+  .space-card.first-class .space-header {
+    background: linear-gradient(135deg, #FADDB6 0%, #e8c896 100%);
+    color: #5c4a3a;
+  }
+
+  .space-card.first-class .space-type {
+    background: #5c4a3a;
+    color: #FADDB6;
+  }
+
+  /* 航班代码 */
+  .flight-code-section {
+    padding: 4rem 2rem;
+    background-color: var(--color-bg-secondary);
+  }
+
+  .flight-code-card {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 3rem;
+    background: var(--color-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .flight-code-card h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+  }
+
+  .code-display {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .code-prefix {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    letter-spacing: 0.1em;
+  }
+
+  .code-number {
+    font-size: 4rem;
+    font-weight: 800;
+    color: var(--color-text);
+  }
+
+  .code-desc {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+  }
+
+  .code-example {
+    font-size: 0.9375rem;
+    color: var(--color-text);
+    font-weight: 500;
+    padding: 1rem;
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+  }
+
+  /* 引用 */
+  .quote-section {
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, #1a1a2e 0%, #2B3744 100%);
+  }
+
+  .brand-quote {
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 3rem;
+    background: rgba(167, 211, 240, 0.1);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(167, 211, 240, 0.3);
+    backdrop-filter: blur(10px);
+  }
+
+  .brand-quote p {
+    font-size: 1.5rem;
+    line-height: 1.8;
+    color: #FADDB6;
+    margin-bottom: 1.5rem;
+  }
+
+  .brand-quote cite {
+    font-size: 1rem;
+    color: #A7D3F0;
+    font-style: italic;
+  }
+
+  /* 免责声明 */
+  .disclaimer-section {
+    padding: 3rem 2rem;
+  }
+
+  .disclaimer-card {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: rgba(255, 107, 123, 0.1);
+    border: 1px solid rgba(255, 107, 123, 0.3);
+    border-radius: var(--radius-lg);
+    text-align: center;
+  }
+
+  .disclaimer-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #FF667B;
+  }
+
+  .disclaimer-card p {
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .airways-hero {
+      padding: 4rem 1rem 3rem;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+    }
+
+    .hero-slogan {
+      font-size: 1.25rem;
+    }
+
+    .brand-grid,
+    .color-grid,
+    .tier-grid,
+    .space-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .code-prefix,
+    .code-number {
+      font-size: 3rem;
+    }
+
+    .brand-quote p {
+      font-size: 1.25rem;
+    }
+  }
+</style>

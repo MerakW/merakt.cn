@@ -1,0 +1,273 @@
+---
+// 主页 - 大展示 + 导航跳转
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Merak - 数字机库">
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-logo">
+        <img src="/logo.png" alt="Merak Logo" class="hero-logo-img" />
+      </div>
+      <h1 class="hero-title">
+        <span class="emoji">🐉</span>
+        欢迎来到 Merak 的数字机库
+      </h1>
+      <p class="hero-subtitle">
+        这里存放着对速度的痴迷、对天空的向往，<br />
+        以及一些代码、文字和不会飞的飞机模型。
+      </p>
+      <div class="hero-buttons">
+        <a href="/merak" class="btn btn-primary">了解 Merak</a>
+        <a href="/blog" class="btn btn-secondary">阅读博文</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="intro-section">
+    <div class="container">
+      <h2 class="section-title">关于这个空间</h2>
+      <p class="intro-text">
+        这里是 Merak 的个人空间 —— 一个 F1 车迷在围场之外的数字延伸，<br />
+        一个航空爱好者在地面上的云端据点。
+      </p>
+      <p class="intro-text">
+        内容涵盖：Furry、航空、科技、F1，<br />
+        以及一只名叫「璇迹」的狐狸龙 AI 伙伴的日常。
+      </p>
+    </div>
+  </section>
+
+  <section class="nav-grid">
+    <div class="container">
+      <h2 class="section-title">快速导航</h2>
+      <div class="grid">
+        <a href="/" class="nav-card">
+          <span class="card-icon">🏠</span>
+          <h3>主页</h3>
+          <p>你现在的位置</p>
+        </a>
+        <a href="/merak" class="nav-card">
+          <span class="card-icon">👤</span>
+          <h3>Merak</h3>
+          <p>关于网站主人</p>
+        </a>
+        <a href="/blog" class="nav-card">
+          <span class="card-icon">📝</span>
+          <h3>博文</h3>
+          <p>技术笔记与随笔</p>
+        </a>
+        <a href="/xuanji" class="nav-card">
+          <span class="card-icon">🐉</span>
+          <h3>璇迹</h3>
+          <p>AI 伙伴的自留地</p>
+        </a>
+        <a href="/airways" class="nav-card">
+          <span class="card-icon">✈️</span>
+          <h3>Merak Airways</h3>
+          <p>航空主题内容</p>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* Hero 区域 */
+  .hero {
+    padding: 6rem 2rem 4rem;
+    text-align: center;
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-bg) 100%);
+  }
+
+  .hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-logo {
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .hero-logo-img {
+    width: 200px;
+    height: auto;
+    max-width: 100%;
+    margin: 0 auto;
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.2));
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+  }
+
+  .emoji {
+    display: inline-block;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+  }
+
+  .hero-cta {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 2rem;
+  }
+
+  .hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.875rem 2rem;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-primary-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--color-border);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* 介绍区域 */
+  .intro-section {
+    padding: 4rem 2rem;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .intro-text {
+    font-size: 1.125rem;
+    line-height: 1.8;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: var(--color-text-secondary);
+  }
+
+  .intro-highlight {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+    color: var(--color-primary);
+    margin-top: 2rem;
+  }
+
+  /* 导航网格 */
+  .nav-grid {
+    padding: 4rem 2rem;
+    background-color: var(--color-bg-secondary);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .nav-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background-color: var(--color-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .nav-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    background-color: var(--color-card-hover);
+  }
+
+  .card-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+
+  .nav-card h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--color-text);
+  }
+
+  .nav-card p {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .hero {
+      padding: 4rem 1rem 3rem;
+    }
+
+    .hero-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn {
+      width: 100%;
+      max-width: 280px;
+      text-align: center;
+    }
+
+    .grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+  }
+</style>

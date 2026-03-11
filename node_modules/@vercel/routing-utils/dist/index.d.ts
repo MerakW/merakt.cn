@@ -1,0 +1,13 @@
+import { GetRoutesProps, NormalizedRoutes, Route, RouteWithHandle } from './types';
+export { appendRoutesToPhase } from './append';
+export { mergeRoutes } from './merge';
+export { getOwnershipGuard, normalizeRoutePrefix, scopeRouteSourceToOwnership, } from './service-route-ownership';
+export * from './schemas';
+export { getCleanUrls, sourceToRegex } from './superstatic';
+export * from './types';
+declare const VALID_HANDLE_VALUES: readonly ["filesystem", "hit", "miss", "rewrite", "error", "resource"];
+export type HandleValue = (typeof VALID_HANDLE_VALUES)[number];
+export declare function isHandler(route: Route): route is RouteWithHandle;
+export declare function isValidHandleValue(handle: string): handle is HandleValue;
+export declare function normalizeRoutes(inputRoutes: Route[] | null): NormalizedRoutes;
+export declare function getTransformedRoutes(vercelConfig: GetRoutesProps): NormalizedRoutes;

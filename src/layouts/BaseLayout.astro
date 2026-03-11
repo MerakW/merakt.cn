@@ -1,0 +1,476 @@
+---
+// 基础布局 - 包含头部导航和页脚
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "Merak 的个人空间 - F1 车迷 | 航空爱好者 | Ubuntu 用户" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <div class="site-wrapper">
+      <header class="site-header">
+        <nav class="nav-container">
+          <!-- Logo -->
+          <a href="/" class="logo">
+            <img src="/logo.png" alt="Merak" class="logo-img" />
+          </a>
+          
+          <!-- 汉堡菜单按钮（手机端显示） -->
+          <button class="menu-toggle" id="menuToggle" aria-label="打开菜单">
+            <span class="hamburger"></span>
+          </button>
+          
+          <!-- 导航链接（桌面端在顶部，手机端在侧边栏） -->
+          <ul class="nav-links" id="navLinks">
+            <li><a href="/">主页</a></li>
+            <li><a href="/merak">Merak</a></li>
+            <li><a href="/blog">博文</a></li>
+            <li><a href="/xuanji">璇迹</a></li>
+            <li><a href="/airways">Merak Airways</a></li>
+          </ul>
+          
+          <!-- 主题切换按钮 -->
+          <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+            <span class="sun-icon">☀️</span>
+            <span class="moon-icon">🌙</span>
+          </button>
+        </nav>
+      </header>
+
+      <main class="main-content">
+        <slot />
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-content">
+          <p class="footer-copyright">© 2026 Merak. All rights reserved.</p>
+          <p class="footer-icp">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">浙ICP备2023006729号-1</a>
+          </p>
+          <p class="footer-powered">
+            Proudly Powered By <strong>Astronix</strong> 🐉
+          </p>
+          <p class="footer-tagline">Be genuinely helpful, not performatively helpful.</p>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      // 暗色模式切换逻辑
+      const themeToggle = document.getElementById('themeToggle');
+      const html = document.documentElement;
+      
+      // 检查本地存储或系统偏好
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        html.classList.add('dark');
+      }
+      
+      themeToggle?.addEventListener('click', () => {
+        html.classList.toggle('dark');
+        const isDark = html.classList.contains('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+
+      // 侧边栏控制
+      const menuToggle = document.getElementById('menuToggle');
+      const navLinks = document.getElementById('navLinks');
+      
+      // 创建遮罩层
+      const overlay = document.createElement('div');
+      overlay.className = 'overlay';
+      document.body.appendChild(overlay);
+      
+      menuToggle?.addEventListener('click', () => {
+        menuToggle.classList.toggle('open');
+        navLinks.classList.toggle('open');
+        overlay.classList.toggle('show');
+      });
+      
+      overlay.addEventListener('click', () => {
+        menuToggle.classList.remove('open');
+        navLinks.classList.remove('open');
+        overlay.classList.remove('show');
+      });
+      
+      // 点击链接后关闭侧边栏
+      navLinks?.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          menuToggle.classList.remove('open');
+          navLinks.classList.remove('open');
+          overlay.classList.remove('show');
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  /* CSS 变量 - 支持暗色模式 */
+  :root {
+    --color-bg: #ffffff;
+    --color-bg-secondary: #f5f5f5;
+    --color-text: #1a1a1a;
+    --color-text-secondary: #666666;
+    --color-primary: #2563eb;
+    --color-primary-hover: #1d4ed8;
+    --color-border: #e5e5e5;
+    --color-card: #ffffff;
+    --color-card-hover: #f9f9f9;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 1rem;
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Fira Code', 'Courier New', monospace;
+  }
+
+  .dark {
+    --color-bg: #0f0f0f;
+    --color-bg-secondary: #1a1a1a;
+    --color-text: #f5f5f5;
+    --color-text-secondary: #a0a0a0;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #60a5fa;
+    --color-border: #333333;
+    --color-card: #1a1a1a;
+    --color-card-hover: #252525;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  a:hover {
+    color: var(--color-primary-hover);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+</style>
+
+<style>
+  .site-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* 头部导航 */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  .logo-img {
+    height: 2.5rem;
+    width: auto;
+  }
+
+  .logo:hover {
+    color: var(--color-text);
+  }
+
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+  }
+
+  .nav-links a {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--color-primary);
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-bg-secondary);
+    transition: background-color 0.2s ease;
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--color-border);
+  }
+
+  .sun-icon { display: none; }
+  .moon-icon { display: inline; }
+  
+  .dark .sun-icon { display: inline; }
+  .dark .moon-icon { display: none; }
+
+  /* 汉堡菜单按钮 */
+  .menu-toggle {
+    display: none;
+    width: 2.5rem;
+    height: 2.5rem;
+    background: var(--color-bg-secondary);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    position: relative;
+  }
+
+  .hamburger,
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+    width: 1.25rem;
+    height: 2px;
+    background: var(--color-text);
+    left: 50%;
+    transform: translateX(-50%);
+    transition: all 0.3s ease;
+  }
+
+  .hamburger {
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .hamburger::before {
+    top: -6px;
+  }
+
+  .hamburger::after {
+    top: 6px;
+  }
+
+  /* 打开状态 */
+  .menu-toggle.open .hamburger {
+    background: transparent;
+  }
+
+  .menu-toggle.open .hamburger::before {
+    top: 0;
+    transform: rotate(45deg);
+  }
+
+  .menu-toggle.open .hamburger::after {
+    top: 0;
+    transform: rotate(-45deg);
+  }
+
+  /* 遮罩层 */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 999;
+  }
+
+  .overlay.show {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* 主内容区 */
+  .main-content {
+    flex: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    width: 100%;
+  }
+
+  /* 页脚 */
+  .site-footer {
+    border-top: 1px solid var(--color-border);
+    padding: 2rem;
+    background-color: var(--color-bg-secondary);
+  }
+
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .footer-copyright {
+    color: var(--color-text);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-icp {
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-icp a {
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    transition: color 0.2s ease;
+  }
+
+  .footer-icp a:hover {
+    color: var(--color-primary);
+  }
+
+  .footer-powered {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-powered strong {
+    color: var(--color-primary);
+  }
+
+  .footer-tagline {
+    margin-top: 1rem;
+    font-style: italic;
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    opacity: 0.8;
+  }
+
+  /* 响应式设计 */
+  /* 桌面端：保持原有顶部导航 */
+  @media (min-width: 769px) {
+    .menu-toggle {
+      display: none;
+    }
+    
+    .nav-links {
+      display: flex;
+    }
+  }
+
+  /* 手机端：侧边栏 */
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: block;
+    }
+
+    .nav-container {
+      padding: 1rem;
+    }
+
+    /* 导航链接变成侧边栏 */
+    .nav-links {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100vh;
+      background: var(--color-bg);
+      flex-direction: column;
+      padding: 5rem 2rem 2rem;
+      gap: 1rem;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-links.open {
+      left: 0;
+    }
+
+    .nav-links li {
+      width: 100%;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 1rem;
+      font-size: 1.125rem;
+      border-radius: var(--radius-md);
+    }
+
+    .nav-links a:hover {
+      background: var(--color-bg-secondary);
+    }
+
+    .main-content {
+      padding: 1rem;
+    }
+  }
+</style>

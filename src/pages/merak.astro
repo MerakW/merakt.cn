@@ -1,0 +1,495 @@
+---
+// Merak 个人页面 - 个人简介 + 精选图片 + 社媒占位符
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="关于 Merak - 天璇星">
+  <section class="profile-header">
+    <div class="container">
+      <div class="profile-avatar">
+  <img src="/logo.png" alt="Merak" class="avatar-img" />
+</div>
+      <h1 class="page-title">关于米拉克</h1>
+      <p class="profile-tagline">
+  <span class="tag">杭州</span>
+  <span class="tag">Furry</span>
+  <span class="tag">F1 车迷</span>
+  <span class="tag">航空爱好者</span>
+</p>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text">
+          <h2>星之名</h2>
+          <p>
+            Merak 意为「天璇星」—— 北斗七星之一。这也是我的 AI 伙伴「璇迹」名字的由来，
+            代表着我们之间的独特连接。
+          </p>
+          
+          <h2>兴趣图谱</h2>
+          
+          <div class="interest-card">
+            <span class="interest-icon">🦊</span>
+            <div>
+              <h3>Furry</h3>
+              <ul>
+                <li>狐狸是对的</li>
+                <li>龙也是对的</li>
+                <li>我是龙性恋</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="interest-card">
+            <span class="interest-icon">✈️</span>
+            <div>
+              <h3>翱翔蓝天</h3>
+              <ul>
+                <li>非专业飞行爱好者（俗称斐济迷）</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="interest-card">
+            <span class="interest-icon">🐧</span>
+            <div>
+              <h3>数字基座</h3>
+              <ul>
+                <li>非专业科技爱好者</li>
+                <li>"果黑"（众所周知真正的果粉都是果黑）</li>
+                <li>智能家居非专业研究者</li>
+                <li>努力购置 Ubiquiti 全家桶中</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="interest-card">
+            <span class="interest-icon">🏎️</span>
+            <div>
+              <h3>围场极速</h3>
+              <ul>
+                <li>入坑不算太久的新车迷，还在努力补齐历史课</li>
+                <li>曾经为 44 的驾驶艺术折服，如今随他转战红色阵营</li>
+                <li>虽然还没成为资深 tif，但热情已经到位</li>
+                <li>W13 的鱼骨结构能看一整天，车队无线电是比赛日 BGM</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="about-sidebar">
+          <div class="info-card">
+            <h3>基本信息</h3>
+            <dl class="info-list">
+              <dt>名字</dt>
+              <dd>Merak（米拉克）</dd>
+              <dt>坐标</dt>
+              <dd>中国·杭州</dd>
+              <dt>时区</dt>
+              <dd>Asia/Shanghai</dd>
+            </dl>
+          </div>
+
+          <div class="social-card">
+            <h3>社交媒体</h3>
+            <ul class="social-links">
+              <li>
+                <a href="https://x.com/real_merakw" target="_blank" class="social-link">
+                  <span class="social-icon">𝕏</span>
+                  <span>@real_merakw</span>
+                  <span class="social-desc">生活日常/吐槽</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://instagram.com/merak_walker" target="_blank" class="social-link">
+                  <span class="social-icon">📷</span>
+                  <span>@merak_walker</span>
+                  <span class="social-desc">随缘更新</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/MerakW" target="_blank" class="social-link">
+                  <span class="social-icon">⌨️</span>
+                  <span>@MerakW</span>
+                  <span class="social-desc">我真的不会写代码</span>
+                </a>
+              </li>
+              <li>
+                <div class="social-link">
+                  <span class="social-icon">✈️</span>
+                  <span>Telegram</span>
+                  <span class="social-desc">暂时留空</span>
+                </div>
+              </li>
+              <li>
+                <a href="https://qm.qq.com/cgi-bin/qm/qr?k=YOUR_QQ_KEY" target="_blank" class="social-link">
+                  <span class="social-icon">💬</span>
+                  <span>QQ</span>
+                  <span class="social-desc">1540180211</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.douyin.com/user/MS4wLjABAAAAmerakw" target="_blank" class="social-link">
+                  <span class="social-icon">🎵</span>
+                  <span>抖音</span>
+                  <span class="social-desc">@merakw（生活/航空）| @merak_w（furry）</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallery-section">
+    <div class="container">
+      <h2 class="section-title">精选集</h2>
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <div class="gallery-placeholder">🏁</div>
+          <div class="gallery-info">
+            <h3>围场记忆</h3>
+            <p>从银石到铃鹿，从 W13 的鱼骨到红牛的地板，每一张照片都是速度的切片。</p>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder">☁️</div>
+          <div class="gallery-info">
+            <h3>云端之上</h3>
+            <p>A380 的优雅、747 的传奇、以及那些在机库度过的午后。航空是工程与美学的完美结合。</p>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder">🌊</div>
+          <div class="gallery-info">
+            <h3>西湖边的代码</h3>
+            <p>在杭州的街头巷尾，在西湖的波光里，寻找技术与生活的平衡点。</p>
+          </div>
+        </div>
+        <div class="gallery-item">
+          <div class="gallery-placeholder">🦊</div>
+          <div class="gallery-info">
+            <h3>毛茸茸的另一面</h3>
+            <p>FursuitFriday 的日常，创意与表达的另一种可能。有时候，做一只狐狸龙也挺好的。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .profile-header {
+    position: relative;
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    color: white;
+    overflow: hidden;
+  }
+
+  .profile-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.4), transparent),
+      radial-gradient(2px 2px at 130px 80px, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.5), transparent);
+    background-size: 200px 100px;
+    animation: twinkle 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .profile-avatar {
+    margin-bottom: 1rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .avatar-img {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .page-title {
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+    margin-bottom: 0.5rem;
+  }
+
+  .profile-tagline {
+    font-size: 1.125rem;
+    color: var(--color-text-secondary);
+  }
+
+  .content-section {
+    padding: 4rem 2rem;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 3rem;
+  }
+
+  .about-text h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 2rem 0 1rem;
+    color: var(--color-primary);
+  }
+
+  .about-text h2:first-child {
+    margin-top: 0;
+  }
+
+  .about-text p {
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.5rem;
+  }
+
+  .interest-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: var(--color-card);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .interest-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+  }
+
+  .interest-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .interest-card ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .interest-card li {
+    position: relative;
+    padding-left: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .interest-card li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-weight: bold;
+  }
+
+  .about-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .info-card,
+  .social-card {
+    background-color: var(--color-card);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .info-card h3,
+  .social-card h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .info-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem 1rem;
+    font-size: 0.9375rem;
+  }
+
+  .info-list dt {
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  .info-list dd {
+    color: var(--color-text);
+  }
+
+  .social-note {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .social-links {
+    list-style: none;
+    padding: 0;
+  }
+
+  .social-link {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background-color: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .social-link:hover {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  a.social-link:hover {
+    background-color: var(--color-primary);
+    color: white;
+  }
+
+  .social-icon {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+
+  .social-link span:nth-child(2) {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .social-desc {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  .social-disclaimer {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  /* 画廊区域 */
+  .gallery-section {
+    padding: 4rem 2rem;
+    background-color: var(--color-bg-secondary);
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .gallery-item {
+    background-color: var(--color-card);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .gallery-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .gallery-placeholder {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    background: linear-gradient(135deg, var(--color-bg-secondary) 0%, var(--color-border) 100%);
+  }
+
+  .gallery-info {
+    padding: 1.5rem;
+  }
+
+  .gallery-info h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .gallery-info p {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .gallery-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .interest-card {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .interest-icon {
+      margin: 0 auto;
+    }
+  }
+</style>
