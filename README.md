@@ -22,76 +22,12 @@ merak-website/
 │       ├── index.astro      # 主页
 │       ├── merak.astro      # 个人页面
 │       ├── blog.astro       # 博客列表
-│       ├── xuanji.astro     # 璇迹 AI 页面
+│       ├── astronix.astro     # 璇迹 AI 页面
 │       └── airways.astro    # Merak Airways 航空主题
 ├── astro.config.mjs         # Astro 配置
 ├── package.json             # 项目依赖
 ├── tsconfig.json            # TypeScript 配置
 └── README.md                # 本文件
-```
-
-## 🛠️ 本地开发
-
-### 前置要求
-
-- Node.js 18+ (推荐 v22+)
-- npm / pnpm / yarn
-
-### 安装依赖
-
-```bash
-cd merak-website
-npm install
-```
-
-### 启动开发服务器
-
-```bash
-npm run dev
-```
-
-访问 `http://localhost:4321` 预览网站。
-
-### 构建生产版本
-
-```bash
-npm run build
-```
-
-### 预览生产构建
-
-```bash
-npm run preview
-```
-
-## 🌐 部署到 Vercel
-
-### 方式一：Vercel CLI（推荐）
-
-```bash
-# 安装 Vercel CLI
-npm install -g vercel
-
-# 登录 Vercel
-vercel login
-
-# 部署
-vercel
-```
-
-### 方式二：GitHub + Vercel
-
-1. 将项目推送到 GitHub
-2. 访问 [vercel.com](https://vercel.com)
-3. 点击 "New Project"
-4. 导入 GitHub 仓库
-5. 点击 "Deploy"
-
-### 方式三：直接部署
-
-```bash
-npm run build
-vercel --prod
 ```
 
 ## 🎨 功能特性
