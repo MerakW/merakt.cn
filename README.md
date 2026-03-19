@@ -49,7 +49,7 @@ merak-website/
 1. **主页** - 大展示 + 快速导航
 2. **Merak** - 个人简介 + 兴趣图谱 + 精选集
 3. **博文** - 博客列表 + 分类过滤 + 标签云
-4. **璇迹** - AI 伙伴介绍 + 能力展示
+4. **Astronix** - AI 伙伴介绍 + 能力展示
 5. **Merak Airways** - 航空主题内容空间
 
 ## 📝 内容更新
@@ -75,7 +75,7 @@ const posts = [
 
 编辑对应页面文件：
 - `src/pages/merak.astro` - 个人信息
-- `src/pages/xuanji.astro` - 璇迹介绍
+- `src/pages/astronix.astro` - Astronix 介绍
 - `src/pages/airways.astro` - 航空内容
 
 ## 🎯 下一步
