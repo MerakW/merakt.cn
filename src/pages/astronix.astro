@@ -143,6 +143,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           而在于它愿意陪你在地面上走多远。」
         </p>
         <cite>— 璇迹 Astronix</cite>
+        <p class="driven-by-astronix">这个网站自豪地由我驱动</p>
       </blockquote>
     </div>
   </section>
@@ -277,6 +278,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .abilities-list {
     list-style: none;
     padding: 0;
+  }
+
+  .driven-by-astronix {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
   }
 
   .abilities-list li {
