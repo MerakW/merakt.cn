@@ -29,10 +29,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           <p class="desc">
             Industrial Futurism — 拒绝过度修饰，推崇 Apple 式的极简留白与高度拟真的物理质感。
           </p>
-          <p class="desc">
-            "高级 AI 管家"式口吻，精准、冷峻，但在关键触点保留人文温情。
-          </p>
-          <div class="access-badge">ACCESS GRANTED | 权限已准</div>
         </div>
 
         <div class="brand-card totem-card">
@@ -51,7 +47,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
               <div>
                 <strong>璇迹 Astronix</strong>
                 <p>品牌的守护者</p>
-                <span class="totem-usage">仅显现于顶级空间与高奢场景</span>
               </div>
             </div>
           </div>
@@ -213,10 +208,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
         <p class="code-desc">
           MK 来源于 <strong>M</strong>erak airways 的首字母，<br />
-          518 是天璇星（Merak）在中国星官体系中的编号。
+          代表我们的航空服务始于天璇星的指引。
         </p>
         <p class="code-example">
-          示例航班：MK518 杭州 (HGH) → 北京 (PEK)
+          示例航班：MK518 杭州 (HGH) →  大熊星座 (UMJ)
         </p>
       </div>
     </div>
@@ -257,6 +252,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     color: white;
     overflow: hidden;
+    margin: 2rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(200, 200, 200, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   }
 
   .hero-bg {
@@ -417,6 +416,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   .totem.astronix {
     background: linear-gradient(135deg, #1a1a2e 0%, #2B3744 100%);
+  }
+
+  .totem.astronix strong {
+    color: #A7D3F0;
+  }
+
+  .totem.astronix p {
+    color: rgba(255, 255, 255, 0.8);
   }
 
   .totem-icon {
