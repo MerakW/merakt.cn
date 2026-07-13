@@ -4,6 +4,8 @@
 
 毛五的每张照片与配文在 `src/content/fursuitfriday/`：一张照片对应一个 JSON 文件，编辑 `caption`、`time`、`tags` 或 `image` 即可。
 
+`src/content/site-settings.ts` 管理暂时隐藏的页面入口。把 `astronix` 或 `airways` 改为 `true`，即可恢复它们在导航和首页中的入口；页面本身的路由没有删除。
+
 改完后：
 
 1. 本地开发时保存文件，页面会自动刷新。

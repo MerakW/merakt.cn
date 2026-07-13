@@ -1,12 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { copy } from '../content/site-copy';
+import { visibility } from '../content/site-settings';
 const page = copy.home;
 const routeHrefs = ['/merak', '/fursuitfriday', '/blog', '/airways', '/astronix'];
+const aboutCards = page.aboutCards.filter((_, index) => index === 0 || visibility.astronix);
+const routes = page.routes
+  .map((route, index) => ({ route, href: routeHrefs[index], feature: index === 3 ? 'airways' : index === 4 ? 'astronix' : undefined }))
+  .filter(({ feature }) => !feature || visibility[feature]);
 ---
 
 <BaseLayout title={page.title} description={page.description}>
   <section class="page-hero"><div class="wrap hero-grid" data-reveal><div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map((line) => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p><div class="actions"><a class="button" href="/merak">{page.primary}</a><a class="button alt" href="/blog">{page.secondary}</a></div></div><div class="orbit"><span>{page.orbit}</span></div></div></section>
-  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.aboutHeading}</h2><p>{page.aboutLead}</p></div><div class="hangar-grid" data-reveal>{page.aboutCards.map(([label, heading, text, action], index) => <article class={`bay ${index === 0 ? 'wide' : 'narrow'}`}><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p><a class="route" href={index === 0 ? '/merak' : '/astronix'}>{action}</a></article>)}</div></div></section>
-  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.routesHeading}</h2><p>{page.routesLead}</p></div><div class="hangar-grid" data-reveal>{page.routes.map(([label, heading, text], index) => <a class={`bay ${index < 3 ? 'third' : index === 3 ? 'wide' : 'narrow'}`} href={routeHrefs[index]}><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p>{index > 2 && <span class="route">{index === 3 ? '查看企划' : '看看 Astronix'}</span>}</a>)}</div></div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.aboutHeading}</h2><p>{page.aboutLead}</p></div><div class="hangar-grid" data-reveal>{aboutCards.map(([label, heading, text, action], index) => <article class={`bay ${aboutCards.length === 1 || index === 0 ? 'wide' : 'narrow'}`}><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p><a class="route" href={index === 0 ? '/merak' : '/astronix'}>{action}</a></article>)}</div></div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.routesHeading}</h2><p>{page.routesLead}</p></div><div class="hangar-grid" data-reveal>{routes.map(({ route: [label, heading, text], href, feature }) => <a class={`bay ${routes.length <= 3 ? 'third' : feature ? 'narrow' : 'third'}`} href={href}><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p>{feature && <span class="route">{feature === 'airways' ? '查看企划' : '看看 Astronix'}</span>}</a>)}</div></div></section>
 </BaseLayout>
