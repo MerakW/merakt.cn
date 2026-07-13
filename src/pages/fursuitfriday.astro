@@ -54,19 +54,19 @@ const isVideo = (path: string) => path.endsWith('.mp4');
   .intro-copy { padding-bottom:clamp(.25rem,2vw,2rem); }
   .intro-copy h1 { margin:.45rem 0 1rem; font-size:clamp(4.4rem,10vw,8.5rem); letter-spacing:-.04em; line-height:.85; }
   .intro-note { margin:1.8rem 0 0; color:var(--muted); font:.75rem/1.5 var(--font-data); }
-  .latest-frame { margin:0; padding:1px; background:var(--line); }
-  .latest-frame :global(img), .latest-frame :global(video) { display:block; width:100%; max-height:min(52vw,41rem); background:var(--surface); object-fit:contain; }
-  .latest-frame figcaption { display:flex; justify-content:space-between; gap:1rem; padding:.7rem .8rem; background:var(--surface); color:var(--muted); font:.72rem/1.4 var(--font-data); }
+  .latest-frame { margin:0; padding:.45rem; overflow:hidden; border-radius:.9rem; background:color-mix(in srgb,var(--surface) 72%,var(--line)); box-shadow:0 .2rem .8rem color-mix(in srgb,var(--ink) 6%,transparent); }
+  .latest-frame :global(img), .latest-frame :global(video) { display:block; width:100%; max-height:min(52vw,41rem); border-radius:.55rem; background:var(--surface); object-fit:contain; }
+  .latest-frame figcaption { display:flex; justify-content:space-between; gap:1rem; padding:.85rem .4rem .3rem; color:var(--muted); font:.72rem/1.4 var(--font-data); }
   .latest-frame figcaption span:last-child { color:var(--ink); }
-  .fursuit-archive { padding:clamp(3.5rem,8vw,7rem) 0 clamp(5rem,10vw,9rem); border-top:1px solid var(--line); }
+  .fursuit-archive { padding:clamp(3.5rem,8vw,7rem) 0 clamp(5rem,10vw,9rem); }
   .archive-head { display:flex; justify-content:space-between; gap:2rem; align-items:baseline; margin-bottom:2rem; }
   .archive-head h2 { margin:0; }
   .archive-head p { max-width:30ch; margin:0; color:var(--muted); }
-  .contact-sheet { columns:3 18rem; column-gap:1px; background:var(--line); border:1px solid var(--line); }
-  .photo-entry { break-inside:avoid; display:block; margin:0 0 1px; padding:0; background:var(--surface); }
-  .photo-media { background:var(--canvas); }
+  .contact-sheet { columns:3 18rem; column-gap:1rem; }
+  .photo-entry { break-inside:avoid; display:block; margin:0 0 1rem; padding:.35rem; overflow:hidden; border-radius:.75rem; background:color-mix(in srgb,var(--surface) 78%,var(--line)); box-shadow:0 .15rem .55rem color-mix(in srgb,var(--ink) 4%,transparent); }
+  .photo-media { overflow:hidden; border-radius:.45rem; background:var(--canvas); }
   .photo-media :global(img), .photo-media :global(video) { display:block; width:100%; height:auto; }
-  .photo-entry figcaption { padding:.8rem .9rem 1rem; }
+  .photo-entry figcaption { padding:.8rem .45rem .45rem; }
   .photo-entry time { display:block; color:var(--signal); font:.7rem/1.4 var(--font-data); }
   .photo-entry figcaption p { margin:.4rem 0 0; color:var(--ink); font-size:.88rem; line-height:1.55; white-space:pre-line; }
   @media (max-width:760px) { .fursuit-intro-grid { grid-template-columns:1fr; gap:2rem; } .intro-copy { padding:0; } .intro-copy h1 { font-size:clamp(4rem,22vw,6rem); } .latest-frame :global(img), .latest-frame :global(video) { max-height:none; } .archive-head { display:block; } .archive-head h2 { margin-bottom:.7rem; } .contact-sheet { columns:1; } }
