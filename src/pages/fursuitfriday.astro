@@ -9,38 +9,38 @@ const isVideo = (path: string) => path.endsWith('.mp4');
 ---
 
 <BaseLayout title="毛五 | Merak" description="Merak 的 FursuitFriday 照片与记录。">
-  <section class="page-hero fursuit-hero">
-    <div class="wrap hero-grid" data-reveal>
-      <div>
-        <p class="eyebrow">FURSUITFRIDAY / PHOTO LOG</p>
-        <h1>毛五，<br />出门见朋友。</h1>
-        <p class="lead">一些毛装照片、合照和现场小事。更新不固定，拍到了就放上来。</p>
-        <div class="hero-count"><strong>{posts.length}</strong><span>条记录<br />从 2025.01 开始</span></div>
+  <section class="page-hero fursuit-intro">
+    <div class="wrap fursuit-intro-grid" data-reveal>
+      <div class="intro-copy">
+        <p class="eyebrow">FURSUITFRIDAY</p>
+        <h1>毛五。</h1>
+        <p class="lead">一些出毛的照片、合照和现场记录。</p>
+        <p class="intro-note">从 2025 年 1 月开始，按时间倒序整理。</p>
       </div>
-      <figure class="latest-shot">
+      <figure class="latest-frame">
         {isVideo(latest.data.image) ? <video controls preload="metadata" src={latest.data.image}></video> : <img src={latest.data.image} alt={latest.data.caption} loading="eager" />}
-        <figcaption><span>最新一条</span>{latest.data.time}</figcaption>
+        <figcaption><span>{latest.data.time}</span><span>最新记录</span></figcaption>
       </figure>
     </div>
   </section>
 
-  <section class="section">
+  <section class="fursuit-archive" aria-labelledby="archive-title">
     <div class="wrap">
-      <div class="section-head">
-        <h2>照片记录</h2>
-        <p>按时间倒序排列。照片保留原始比例，不裁切。</p>
+      <div class="archive-head">
+        <h2 id="archive-title">照片档案</h2>
+        <p>{posts.length} 条记录，保留照片原始比例。</p>
       </div>
-      <div class="fursuit-grid" data-reveal>
-        {posts.map((post, index) => (
-          <article class:list={['fursuit-card', { 'is-featured': index === 0 || index === 6 }]}>
-            <div class="fursuit-media">
-              {isVideo(post.data.image) ? <video controls preload="metadata" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading={index < 4 ? 'eager' : 'lazy'} />}
+      <div class="contact-sheet" data-reveal>
+        {posts.map((post) => (
+          <figure class="photo-entry">
+            <div class="photo-media">
+              {isVideo(post.data.image) ? <video controls preload="metadata" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading="lazy" decoding="async" />}
             </div>
-            <div class="fursuit-body">
-              <p class="data">{post.data.time}</p>
-              <p class="fursuit-caption">{post.data.caption}</p>
-            </div>
-          </article>
+            <figcaption>
+              <time datetime={post.data.time.replace(' ', 'T')}>{post.data.time}</time>
+              <p>{post.data.caption}</p>
+            </figcaption>
+          </figure>
         ))}
       </div>
     </div>
@@ -48,23 +48,26 @@ const isVideo = (path: string) => path.endsWith('.mp4');
 </BaseLayout>
 
 <style>
-  .fursuit-hero { padding-bottom:clamp(3rem,7vw,6rem); }
-  .hero-count { display:flex; align-items:center; gap:.9rem; margin-top:1.8rem; color:var(--muted); font:.74rem/1.5 var(--font-data); }
-  .hero-count strong { color:var(--signal); font:900 clamp(3.5rem,8vw,6rem)/.8 var(--font-data); letter-spacing:-.13em; }
-  .latest-shot { position:relative; margin:0; overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 1.5rem 3rem rgb(20 32 42 / .12); }
-  .latest-shot :global(img), .latest-shot :global(video) { display:block; width:100%; height:auto; }
-  .latest-shot::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,transparent 55%,rgb(11 18 24 / .72)); }
-  .latest-shot figcaption { position:absolute; z-index:1; right:1rem; bottom:.8rem; display:flex; gap:.75rem; color:#fff; font:.72rem var(--font-data); }
-  .latest-shot figcaption span { color:rgb(255 255 255 / .72); }
-  .fursuit-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; border:1px solid var(--line); background:var(--line); }
-  .fursuit-card { min-width:0; background:var(--surface); }
-  .fursuit-card.is-featured { grid-column:span 2; }
-  .fursuit-media { background:var(--canvas); }
-  .fursuit-media :global(img), .fursuit-media :global(video) { display:block; width:100%; height:auto; transition:transform .4s cubic-bezier(.16,1,.3,1); }
-  .fursuit-card:hover .fursuit-media :global(img) { transform:scale(1.025); }
-  .fursuit-body { padding:1rem; }
-  .fursuit-body .data { margin-bottom:.5rem; }
-  .fursuit-caption { margin:0; color:var(--ink); font-size:.92rem; line-height:1.6; white-space:pre-line; }
-  @media (max-width:760px) { .fursuit-grid { grid-template-columns:1fr; } .fursuit-card.is-featured { grid-column:span 1; } }
-  @media (prefers-reduced-motion:reduce) { .fursuit-media :global(img) { transition:none; } }
+  .fursuit-intro { padding:clamp(3.5rem,8vw,7rem) 0; }
+  .fursuit-intro::before, .fursuit-intro::after { content:none; }
+  .fursuit-intro-grid { display:grid; grid-template-columns:minmax(16rem,.72fr) minmax(0,1.28fr); align-items:end; gap:clamp(2rem,6vw,7rem); }
+  .intro-copy { padding-bottom:clamp(.25rem,2vw,2rem); }
+  .intro-copy h1 { margin:.45rem 0 1rem; font-size:clamp(4.4rem,10vw,8.5rem); letter-spacing:-.04em; line-height:.85; }
+  .intro-note { margin:1.8rem 0 0; color:var(--muted); font:.75rem/1.5 var(--font-data); }
+  .latest-frame { margin:0; padding:1px; background:var(--line); }
+  .latest-frame :global(img), .latest-frame :global(video) { display:block; width:100%; max-height:min(52vw,41rem); background:var(--surface); object-fit:contain; }
+  .latest-frame figcaption { display:flex; justify-content:space-between; gap:1rem; padding:.7rem .8rem; background:var(--surface); color:var(--muted); font:.72rem/1.4 var(--font-data); }
+  .latest-frame figcaption span:last-child { color:var(--ink); }
+  .fursuit-archive { padding:clamp(3.5rem,8vw,7rem) 0 clamp(5rem,10vw,9rem); border-top:1px solid var(--line); }
+  .archive-head { display:flex; justify-content:space-between; gap:2rem; align-items:baseline; margin-bottom:2rem; }
+  .archive-head h2 { margin:0; }
+  .archive-head p { max-width:30ch; margin:0; color:var(--muted); }
+  .contact-sheet { columns:3 18rem; column-gap:1px; background:var(--line); border:1px solid var(--line); }
+  .photo-entry { break-inside:avoid; display:block; margin:0 0 1px; padding:0; background:var(--surface); }
+  .photo-media { background:var(--canvas); }
+  .photo-media :global(img), .photo-media :global(video) { display:block; width:100%; height:auto; }
+  .photo-entry figcaption { padding:.8rem .9rem 1rem; }
+  .photo-entry time { display:block; color:var(--signal); font:.7rem/1.4 var(--font-data); }
+  .photo-entry figcaption p { margin:.4rem 0 0; color:var(--ink); font-size:.88rem; line-height:1.55; white-space:pre-line; }
+  @media (max-width:760px) { .fursuit-intro-grid { grid-template-columns:1fr; gap:2rem; } .intro-copy { padding:0; } .intro-copy h1 { font-size:clamp(4rem,22vw,6rem); } .latest-frame :global(img), .latest-frame :global(video) { max-height:none; } .archive-head { display:block; } .archive-head h2 { margin-bottom:.7rem; } .contact-sheet { columns:1; } }
 </style>
