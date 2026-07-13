@@ -28,7 +28,7 @@ const isVideo = (path: string) => path.endsWith('.mp4');
     <div class="wrap">
       <div class="section-head">
         <h2>照片记录</h2>
-        <p>按时间倒序排列。点开“原帖”可以回到当时的发布内容。</p>
+        <p>按时间倒序排列。照片保留原始比例，不裁切。</p>
       </div>
       <div class="fursuit-grid" data-reveal>
         {posts.map((post, index) => (
@@ -39,10 +39,6 @@ const isVideo = (path: string) => path.endsWith('.mp4');
             <div class="fursuit-body">
               <p class="data">{post.data.time}</p>
               <p class="fursuit-caption">{post.data.caption}</p>
-              <div class="fursuit-meta">
-                <div class="tags">{post.data.tags.map((tag) => <span class="tag">{tag}</span>)}</div>
-                {post.data.source && <a class="source-link" href={post.data.source} target="_blank" rel="noopener noreferrer">原帖 <span aria-hidden="true">↗</span></a>}
-              </div>
             </div>
           </article>
         ))}
@@ -55,24 +51,20 @@ const isVideo = (path: string) => path.endsWith('.mp4');
   .fursuit-hero { padding-bottom:clamp(3rem,7vw,6rem); }
   .hero-count { display:flex; align-items:center; gap:.9rem; margin-top:1.8rem; color:var(--muted); font:.74rem/1.5 var(--font-data); }
   .hero-count strong { color:var(--signal); font:900 clamp(3.5rem,8vw,6rem)/.8 var(--font-data); letter-spacing:-.13em; }
-  .latest-shot { position:relative; margin:0; min-height:22rem; overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 1.5rem 3rem rgb(20 32 42 / .12); }
-  .latest-shot :global(img), .latest-shot :global(video) { display:block; width:100%; height:100%; min-height:22rem; object-fit:cover; }
+  .latest-shot { position:relative; margin:0; overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 1.5rem 3rem rgb(20 32 42 / .12); }
+  .latest-shot :global(img), .latest-shot :global(video) { display:block; width:100%; height:auto; }
   .latest-shot::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg,transparent 55%,rgb(11 18 24 / .72)); }
   .latest-shot figcaption { position:absolute; z-index:1; right:1rem; bottom:.8rem; display:flex; gap:.75rem; color:#fff; font:.72rem var(--font-data); }
   .latest-shot figcaption span { color:rgb(255 255 255 / .72); }
   .fursuit-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1px; border:1px solid var(--line); background:var(--line); }
   .fursuit-card { min-width:0; background:var(--surface); }
   .fursuit-card.is-featured { grid-column:span 2; }
-  .fursuit-media { overflow:hidden; background:var(--canvas); aspect-ratio:4 / 3; }
-  .fursuit-card.is-featured .fursuit-media { aspect-ratio:16 / 9; }
-  .fursuit-media :global(img), .fursuit-media :global(video) { display:block; width:100%; height:100%; object-fit:cover; transition:transform .4s cubic-bezier(.16,1,.3,1); }
+  .fursuit-media { background:var(--canvas); }
+  .fursuit-media :global(img), .fursuit-media :global(video) { display:block; width:100%; height:auto; transition:transform .4s cubic-bezier(.16,1,.3,1); }
   .fursuit-card:hover .fursuit-media :global(img) { transform:scale(1.025); }
   .fursuit-body { padding:1rem; }
   .fursuit-body .data { margin-bottom:.5rem; }
-  .fursuit-caption { min-height:3.3em; margin:0; color:var(--ink); font-size:.92rem; line-height:1.6; white-space:pre-line; }
-  .fursuit-meta { display:flex; align-items:end; justify-content:space-between; gap:.75rem; margin-top:.9rem; }
-  .source-link { flex:none; color:var(--signal); font:.72rem var(--font-data); font-weight:800; }
-  .source-link:hover { color:var(--ink); }
-  @media (max-width:760px) { .latest-shot, .latest-shot :global(img), .latest-shot :global(video) { min-height:18rem; } .fursuit-grid { grid-template-columns:1fr; } .fursuit-card.is-featured { grid-column:span 1; } .fursuit-card.is-featured .fursuit-media { aspect-ratio:4 / 3; } }
+  .fursuit-caption { margin:0; color:var(--ink); font-size:.92rem; line-height:1.6; white-space:pre-line; }
+  @media (max-width:760px) { .fursuit-grid { grid-template-columns:1fr; } .fursuit-card.is-featured { grid-column:span 1; } }
   @media (prefers-reduced-motion:reduce) { .fursuit-media :global(img) { transition:none; } }
 </style>
