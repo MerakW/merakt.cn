@@ -61,7 +61,7 @@ const links = copy.site.nav.filter(([href]) =>
   [data-reveal] { transition:transform .24s cubic-bezier(.16,1,.3,1),background .24s cubic-bezier(.16,1,.3,1); }
   /* Digital paddock: original hangar calm, restrained F1 telemetry accents. */
   .site-header { border-bottom:1px solid var(--line); } .nav { min-height:4.75rem; } .brand { font-family:var(--font-ui); font-stretch:normal; } .nav-links a[aria-current="page"] { box-shadow:inset 0 -2px var(--signal); } .site-footer { background:var(--surface); }
-  .page-hero::before { opacity:.78; background:linear-gradient(115deg,transparent 0 46%,color-mix(in srgb,var(--signal) 60%,transparent) 46% 46.45%,transparent 46.45% 57%,var(--grid) 57% 57.35%,transparent 57.35%),radial-gradient(ellipse 38% 20% at 76% 66%,transparent 48%,color-mix(in srgb,var(--steel) 70%,transparent) 49% 49.6%,transparent 50% 60%,color-mix(in srgb,var(--signal) 52%,transparent) 61% 61.5%,transparent 62%),linear-gradient(90deg,var(--grid) 1px,transparent 1px),linear-gradient(var(--grid) 1px,transparent 1px); background-size:auto,auto,2.75rem 2.75rem,2.75rem 2.75rem; } .page-hero::after { content:"SECTOR 07 / HANGZHOU"; top:auto; bottom:2rem; right:8%; width:auto; height:auto; background:none; color:var(--muted); font:700 .64rem var(--font-data); letter-spacing:.12em; transform:none; opacity:.7; } h1 { font-family:var(--font-ui); font-stretch:normal; text-transform:none; line-height:.94; letter-spacing:-.04em; } h2 { letter-spacing:-.035em; } .hero-data { border-top:3px solid var(--signal); clip-path:none; box-shadow:0 8px 18px rgb(20 32 42 / .06); } .hangar-grid { border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; } .bay { background:var(--surface); } .bay:hover { background:color-mix(in srgb,var(--surface) 94%,var(--signal)); transform:translateY(-.15rem); } .button { clip-path:none; border-radius:var(--radius); border-color:var(--signal); background:var(--signal); box-shadow:none; } .button:hover { background:var(--ink); border-color:var(--ink); transform:translateY(-1px); } .button:active { transform:translateY(1px) scale(.985); } .button.alt { background:transparent; color:var(--ink); border-color:var(--line); } .route::after { transition:transform .2s cubic-bezier(.16,1,.3,1); } .bay:hover .route::after,.route:hover::after { transform:translateX(.25rem); } .orbit { clip-path:none; border:1px solid var(--line); border-top:3px solid var(--signal); background:var(--surface); } .orbit::before { inset:auto; width:16rem; height:7rem; border:1px solid var(--steel); transform:rotate(-28deg); } .orbit::after { inset:auto; width:8rem; height:14rem; border:1px solid var(--signal); background:none; transform:rotate(42deg); } .orbit span { border-radius:var(--radius); } .avatar { clip-path:polygon(8% 0,100% 0,92% 100%,0 100%); }
+  .page-hero::before { opacity:.78; background:linear-gradient(115deg,transparent 0 46%,color-mix(in srgb,var(--signal) 60%,transparent) 46% 46.45%,transparent 46.45% 57%,var(--grid) 57% 57.35%,transparent 57.35%),radial-gradient(ellipse 38% 20% at 76% 66%,transparent 48%,color-mix(in srgb,var(--steel) 70%,transparent) 49% 49.6%,transparent 50% 60%,color-mix(in srgb,var(--signal) 52%,transparent) 61% 61.5%,transparent 62%),linear-gradient(90deg,var(--grid) 1px,transparent 1px),linear-gradient(var(--grid) 1px,transparent 1px); background-size:auto,auto,2.75rem 2.75rem,2.75rem 2.75rem; } .page-hero::after { content:"SECTOR 07 / HANGZHOU"; top:auto; bottom:2rem; right:8%; width:auto; height:auto; background:none; color:var(--muted); font:700 .64rem var(--font-data); letter-spacing:.12em; transform:none; opacity:.7; } h1 { font-family:var(--font-ui); font-stretch:normal; text-transform:none; line-height:.94; letter-spacing:-.04em; } h2 { letter-spacing:-.035em; } .hero-data { border-top:3px solid var(--signal); clip-path:none; box-shadow:0 8px 18px rgb(20 32 42 / .06); } .hangar-grid { border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; } .bay { background:var(--surface); transform-origin:0 100%; } .bay:hover { background:color-mix(in srgb,var(--surface) 94%,var(--signal)); transform:translateY(-.15rem); } .button { clip-path:none; border-radius:var(--radius); border-color:var(--signal); background:var(--signal); box-shadow:none; } .button:hover { background:var(--ink); border-color:var(--ink); transform:translateY(-1px); } .button:active { transform:translateY(1px) scale(.985); } .button.alt { background:transparent; color:var(--ink); border-color:var(--line); } .route::after { transition:transform .2s cubic-bezier(.16,1,.3,1); } .bay:hover .route::after,.route:hover::after { transform:translateX(.25rem); } .orbit { clip-path:none; border:1px solid var(--line); border-top:3px solid var(--signal); background:var(--surface); } .orbit::before { inset:auto; width:16rem; height:7rem; border:1px solid var(--steel); transform:rotate(-28deg); } .orbit::after { inset:auto; width:8rem; height:14rem; border:1px solid var(--signal); background:none; transform:rotate(42deg); } .orbit span { border-radius:var(--radius); } .avatar { clip-path:polygon(8% 0,100% 0,92% 100%,0 100%); }
   @keyframes telemetry-sweep { 0%,100% { transform:rotate(-34deg) translateX(-1.25rem); opacity:.42; } 50% { transform:rotate(-22deg) translateX(1.25rem); opacity:.95; } } @keyframes telemetry-frame { 0%,100% { transform:rotate(36deg) scale(.94); opacity:.38; } 50% { transform:rotate(48deg) scale(1.05); opacity:.82; } } .page-hero .orbit::before { animation:telemetry-sweep 4.8s cubic-bezier(.45,0,.55,1) infinite; } .page-hero .orbit::after { animation:telemetry-frame 6.4s cubic-bezier(.45,0,.55,1) infinite; }
   @media (max-width:760px) { .wrap { width:min(100% - 2rem,1200px); } body.menu-open .site-header { z-index:32; } .nav { gap:.75rem; } .brand span { display:none; } .menu-button { display:grid; order:2; margin-left:auto; } .theme-button { order:3; } .nav-links { position:fixed; inset:0 auto 0 0; z-index:1; display:flex; width:min(22rem,84vw); flex-direction:column; align-items:stretch; justify-content:center; gap:0; margin:0; padding:2rem; background:var(--surface); box-shadow:1.5rem 0 3rem rgb(0 0 0 / .12); transform:translateX(-105%); transition:transform .25s cubic-bezier(.16,1,.3,1); } .nav-links.is-open { transform:translateX(0); } .nav-links a { padding:1rem 0; font-size:1.2rem; border-bottom:1px solid var(--line); color:var(--ink); } .menu-scrim { position:fixed; inset:0; z-index:30; display:block; visibility:hidden; opacity:0; background:rgb(0 0 0 / .42); transition:opacity .25s cubic-bezier(.16,1,.3,1); } .menu-scrim.is-open { visibility:visible; opacity:1; } .hero-grid { grid-template-columns:1fr; gap:1.5rem; } .page-hero { padding-top:4rem; } h1 { font-size:clamp(2.65rem,14vw,4.3rem); } .section-head { display:block; } .section-head h2 { margin-bottom:1rem; } .bay.wide,.bay.narrow,.bay.third { grid-column:span 12; } .footer-grid { grid-template-columns:1fr; gap:.8rem; } }
   @media (max-width:760px) { body.menu-open .site-header { backdrop-filter:none; -webkit-backdrop-filter:none; } }
@@ -96,16 +96,26 @@ const links = copy.site.nav.filter(([href]) =>
 
     revealGroups.forEach((group) => {
       const cards = Array.from(group.children);
-      gsap.from(cards, {
-        y: 54,
-        scale: .97,
+      gsap.set(cards, {
+        y: 96,
+        rotation: 1.2,
+        scale: .94,
+        clipPath: 'inset(0 0 100% 0)',
         autoAlpha: 0,
-        duration: .82,
-        stagger: { each: .13, from: 'start' },
+        transformOrigin: 'left bottom',
+        willChange: 'transform,opacity,clip-path',
+      });
+      gsap.to(cards, {
+        y: 0,
+        rotation: 0,
+        scale: 1,
+        clipPath: 'inset(0 0 0 0)',
+        autoAlpha: 1,
+        duration: 1.05,
+        stagger: { each: .18, from: 'start' },
         ease: 'power3.out',
-        willChange: 'transform,opacity',
-        clearProps: 'willChange',
-        scrollTrigger: { trigger: group, start: 'top 88%', once: true },
+        clearProps: 'transform,clipPath,visibility,willChange',
+        scrollTrigger: { trigger: group, start: 'top 62%', once: true },
       });
     });
 
