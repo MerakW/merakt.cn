@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { copy } from '../content/site-copy';
 
 const posts = (await getCollection('fursuitfriday'))
   .sort((a, b) => new Date(b.data.time).getTime() - new Date(a.data.time).getTime());
@@ -8,18 +9,18 @@ const latest = posts[0];
 const isVideo = (path: string) => path.endsWith('.mp4');
 ---
 
-<BaseLayout title="毛五 | Merak" description="Merak 的 FursuitFriday 照片与记录。">
+<BaseLayout title={copy.fursuit.title} description={copy.fursuit.description}>
   <section class="page-hero fursuit-intro">
     <div class="wrap fursuit-intro-grid" data-reveal>
       <div class="intro-copy">
-        <p class="eyebrow">FURSUITFRIDAY</p>
-        <h1>毛五。</h1>
-        <p class="lead">一些出毛的照片、合照和现场记录。</p>
-        <p class="intro-note">从 2025 年 1 月开始，按时间倒序整理。</p>
+        <p class="eyebrow">{copy.fursuit.eyebrow}</p>
+        <h1>{copy.fursuit.heading}</h1>
+        <p class="lead">{copy.fursuit.lead}</p>
+        <p class="intro-note">{copy.fursuit.note}</p>
       </div>
       <figure class="latest-frame">
         {isVideo(latest.data.image) ? <video controls preload="metadata" src={latest.data.image}></video> : <img src={latest.data.image} alt={latest.data.caption} loading="eager" />}
-        <figcaption><span>{latest.data.time}</span><span>最新记录</span></figcaption>
+        <figcaption><span>{latest.data.time}</span><span>{copy.fursuit.latest}</span></figcaption>
       </figure>
     </div>
   </section>
@@ -27,8 +28,8 @@ const isVideo = (path: string) => path.endsWith('.mp4');
   <section class="fursuit-archive" aria-labelledby="archive-title">
     <div class="wrap">
       <div class="archive-head">
-        <h2 id="archive-title">照片档案</h2>
-        <p>{posts.length} 条记录，保留照片原始比例。</p>
+        <h2 id="archive-title">{copy.fursuit.archiveHeading}</h2>
+        <p>{copy.fursuit.archiveSummary(posts.length)}</p>
       </div>
       <div class="contact-sheet" data-reveal>
         {posts.map((post) => (

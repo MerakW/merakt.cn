@@ -1,10 +1,9 @@
 ---
+import { copy } from '../content/site-copy';
 interface Props { title: string; description?: string; }
-const { title, description = 'Merak 的数字机库：航空、F1、Furry 与技术。' } = Astro.props;
+const { title, description = copy.site.defaultDescription } = Astro.props;
 const path = Astro.url.pathname;
-const links = [
-  ['/', '数字围场'], ['/merak', 'Merak'], ['/fursuitfriday', '毛五'], ['/blog', '航行日志'], ['/astronix', 'Astronix'], ['/airways', 'Merak Airways']
-];
+const links = copy.site.nav;
 ---
 
 <!doctype html>
@@ -35,7 +34,7 @@ const links = [
       <div class="menu-scrim" id="menuScrim" aria-hidden="true"></div>
       <main id="main"><slot /></main>
       <footer class="site-footer">
-        <div class="wrap footer-grid"><div><p class="footer-mark">MERAK / DIGITAL PADDOCK</p><p>把话说清楚，把事做好。</p></div><div><p>© 2026 Merak. All rights reserved.</p><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">浙ICP备2023006729号-1</a></div><p>和 <a href="/astronix">Astronix</a> 一起维护</p></div>
+        <div class="wrap footer-grid"><div><p class="footer-mark">{copy.site.footer.mark}</p><p>{copy.site.footer.motto}</p></div><div><p>{copy.site.footer.copyright}</p><a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{copy.site.footer.filing}</a></div><p>{copy.site.footer.companion}</p></div>
       </footer>
     </div>
     <script>
