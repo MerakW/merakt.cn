@@ -35,7 +35,7 @@ const isVideo = (path: string) => path.endsWith('.mp4');
         {archivePosts.map((post) => (
           <figure class="photo-entry">
             <div class="photo-media">
-              {isVideo(post.data.image) ? <video controls preload="none" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading="lazy" decoding="async" fetchpriority="low" />}
+              {isVideo(post.data.image) ? <video controls preload="none" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading="lazy" decoding="async" />}
             </div>
             <figcaption>
               <time datetime={post.data.time.replace(' ', 'T')}>{post.data.time}</time>
