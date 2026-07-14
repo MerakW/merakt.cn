@@ -47,7 +47,7 @@ const links = [...copy.site.nav.slice(0, 4), ['/status', status.navLabel], ...co
       const closeMenu = () => { button?.setAttribute('aria-expanded', 'false'); menu?.classList.remove('is-open'); scrim?.classList.remove('is-open'); document.body.classList.remove('menu-open'); };
       button?.addEventListener('click', () => { const opening = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(opening)); menu?.classList.toggle('is-open', opening); scrim?.classList.toggle('is-open', opening); document.body.classList.toggle('menu-open', opening); if (opening) menu?.querySelector('a')?.focus(); });
       scrim?.addEventListener('click', closeMenu); menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu)); document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMenu(); });
-      theme?.addEventListener('click', () => { const next = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = next; localStorage.setItem('theme', next); theme.setAttribute('aria-pressed', String(next === 'dark')); });
+      theme?.addEventListener('click', () => { const next = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = next; localStorage.setItem('theme', next); theme.setAttribute('aria-pressed', String(next === 'dark')); window.dispatchEvent(new CustomEvent('merak:theme-change', { detail: next })); });
     </script>
   </body>
 </html>
