@@ -6,6 +6,8 @@
 
 `src/content/site-settings.ts` 管理暂时隐藏的页面入口。把 `astronix` 或 `airways` 改为 `true`，即可恢复它们在导航和首页中的入口；页面本身的路由没有删除。
 
+`src/content/status.ts` 管理 Status 页的 Kuma 地址、导航名称和页面文案。
+
 改完后：
 
 1. 本地开发时保存文件，页面会自动刷新。

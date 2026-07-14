@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { status } from '../content/status';
+---
+
+<BaseLayout title={status.title} description={status.description}>
+  <section class="page-hero status-hero">
+    <div class="wrap status-head">
+      <div>
+        <p class="eyebrow">{status.eyebrow}</p>
+        <h1>{status.heading}</h1>
+        <p class="lead">{status.lead}</p>
+      </div>
+      <a class="button alt" href={status.url} target="_blank" rel="noopener noreferrer">{status.openLabel}</a>
+    </div>
+  </section>
+
+  <section class="section status-section" aria-label="实时服务状态">
+    <div class="wrap">
+      <div class="status-frame">
+        <iframe title={status.frameTitle} src={status.url} loading="lazy" referrerpolicy="no-referrer"></iframe>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .status-hero { padding-bottom:clamp(2.5rem,5vw,4rem); }
+  .status-head { position:relative; z-index:1; display:flex; align-items:end; justify-content:space-between; gap:2rem; }
+  .status-head .lead { margin-bottom:0; }
+  .status-frame { min-height:clamp(44rem,80vh,62rem); overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 8px 18px rgb(20 32 42 / .06); }
+  .status-frame iframe { display:block; width:100%; min-height:clamp(44rem,80vh,62rem); border:0; background:var(--surface); }
+  @media (max-width:760px) { .status-head { display:grid; align-items:start; } .status-head .button { width:max-content; } .status-section { padding-top:2rem; } .status-frame,.status-frame iframe { min-height:58rem; } }
+</style>

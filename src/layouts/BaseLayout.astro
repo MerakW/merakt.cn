@@ -1,10 +1,11 @@
 ---
 import { copy } from '../content/site-copy';
 import { visibility } from '../content/site-settings';
+import { status } from '../content/status';
 interface Props { title: string; description?: string; }
 const { title, description = copy.site.defaultDescription } = Astro.props;
 const path = Astro.url.pathname;
-const links = copy.site.nav.filter(([href]) =>
+const links = [...copy.site.nav.slice(0, 4), ['/status', status.navLabel], ...copy.site.nav.slice(4)].filter(([href]) =>
   (href !== '/astronix' || visibility.astronix) &&
   (href !== '/airways' || visibility.airways),
 );
