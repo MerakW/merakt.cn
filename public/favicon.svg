@@ -1,10 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2563eb"/>
-      <stop offset="100%" style="stop-color:#7c3aed"/>
-    </linearGradient>
-  </defs>
-  <circle cx="50" cy="50" r="48" fill="url(#gradient)"/>
-  <text x="50" y="65" font-size="50" text-anchor="middle" fill="white">🐉</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="3" y="3" width="58" height="58" rx="14" fill="#0b1218"/>
+  <path d="M14 48V16l13 15 5-10 5 10 13-15v32h-7V31l-6 10H27l-6-10v17Z" fill="#9ee8f7"/>
+  <path d="M14 48V16l13 15M50 48V16L37 31" fill="none" stroke="#58b9d1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="49" cy="15" r="4" fill="#df6b57"/>
 </svg>
