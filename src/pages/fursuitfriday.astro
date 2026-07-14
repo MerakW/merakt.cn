@@ -6,6 +6,7 @@ import { copy } from '../content/site-copy';
 const posts = (await getCollection('fursuitfriday'))
   .sort((a, b) => new Date(b.data.time).getTime() - new Date(a.data.time).getTime());
 const latest = posts[0];
+const archivePosts = posts.slice(1);
 const isVideo = (path: string) => path.endsWith('.mp4');
 ---
 
@@ -19,7 +20,7 @@ const isVideo = (path: string) => path.endsWith('.mp4');
         <p class="intro-note">{copy.fursuit.note}</p>
       </div>
       <figure class="latest-frame">
-        {isVideo(latest.data.image) ? <video controls preload="metadata" src={latest.data.image}></video> : <img src={latest.data.image} alt={latest.data.caption} loading="eager" />}
+        {isVideo(latest.data.image) ? <video controls preload="metadata" src={latest.data.image}></video> : <img src={latest.data.image} alt={latest.data.caption} loading="eager" decoding="async" fetchpriority="high" />}
         <figcaption><span>{latest.data.time}</span><span>{copy.fursuit.latest}</span></figcaption>
       </figure>
     </div>
@@ -32,10 +33,10 @@ const isVideo = (path: string) => path.endsWith('.mp4');
         <p>{copy.fursuit.archiveSummary(posts.length)}</p>
       </div>
       <div class="contact-sheet" data-reveal>
-        {posts.map((post) => (
+        {archivePosts.map((post) => (
           <figure class="photo-entry">
             <div class="photo-media">
-              {isVideo(post.data.image) ? <video controls preload="metadata" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading="lazy" decoding="async" />}
+              {isVideo(post.data.image) ? <video controls preload="none" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading="lazy" decoding="async" fetchpriority="low" />}
             </div>
             <figcaption>
               <time datetime={post.data.time.replace(' ', 'T')}>{post.data.time}</time>
