@@ -53,8 +53,8 @@ export const copy = {
   },
   blog: {
     title: '航行日志 | Merak', eyebrow: 'LOGBOOK / OPEN ARCHIVE', heading: '把想说的\n记下来。', lead: '技术笔记、F1、航空和生活随笔。有空就写，不凑更新频率。',
-    count: '01', lastEntry: 'LAST ENTRY / 2026.03.11', categories: ['全部', '技术', '赛车', '航空', '生活'],
-    posts: [{ title: '欢迎来到我的博客', excerpt: '这里会写技术、赛车、航空和生活。更新不一定勤，但会尽量写清楚。', date: '2026-03-11', category: '生活', tags: ['随笔', '开场白'], slug: '/blog/welcome' }],
+    count: '01', lastEntry: 'LAST ENTRY / 2026.07.13', categories: ['全部', '技术', '赛车', '航空', '生活'],
+    posts: [{ title: 'Prologue', excerpt: '废弃三年的博客重新启航：关于 merakt.cn、重构，以及重新开始写下来的理由。', date: '2026-07-13', category: '生活', tags: ['开场白', 'Prologue', '随笔', '生活'], slug: '/blog/prologue' }],
     topicHeading: '常写的话题', topics: [], notice: '更多文章还在整理。有新内容会放在这里。',
   },
   airways: {

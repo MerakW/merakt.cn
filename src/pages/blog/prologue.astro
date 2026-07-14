@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Prologue | 航行日志" description="废弃三年的博客重新启航。">
+  <article class="logbook-post wrap">
+    <header class="post-head">
+      <p class="eyebrow">LOGBOOK / 2026.07.13</p>
+      <h1>Prologue.</h1>
+      <div class="tags" aria-label="文章标签"><span class="tag">#开场白</span><span class="tag">#Prologue</span><span class="tag">#随笔</span><span class="tag">#生活</span></div>
+    </header>
+
+    <div class="post-body">
+      <h3>First things first.</h3>
+      <p>继废弃了三年的博客，我现在又重新拾起来了，也不知道是什么驱使着我重新做的。不过依旧不太会写文章，文笔不好还请见谅。 <del>（笑）</del></p>
+      <p>转眼间，从我买下 <strong>merakt.cn</strong> 这个域名到现在，已经过去了八年了，我也从一个啥也不懂的初中小孩成长到了一个快大学毕业的 <del>老登</del> 成年人了，这个博客也经历了多次的重构重构再重构，从 WordPress，到 Hexo 和 Typecho，再到现在的 Astro。虽然折腾这些也不会有人来看，但是可能还是见证了我的青春的一部分？</p>
+      <p>说了这么些，也该来聊聊重构的契机了。起因是年初 OpenClaw，跟风玩了一下，顺便让他跑了一个重构网页的尝试，确实是建起来了，不过各方面都很普通，就暂时搁置了。等到六月份，开始用了 Codex，才开始了这一次的深度重构。虽然有点难以启齿，但是不得不承认我已经在丧失 <em>古法 Coding</em> 的边缘了，我想原因大概有两点：</p>
+      <ul>
+        <li>大学学的东西和编程完全不相关</li>
+        <li>自己也不太有时间捣鼓相关的东西 <del>（说白了就是懒啊喂！）</del></li>
+      </ul>
+
+      <h3>致谢</h3>
+      <p>只能说感谢有 Codex 和 OpenClaw 吧，不然我真的很难很难再开这个头了。感谢 OpenClaw 和 Qwen 让我有了重新启航的方向，感谢 Codex 和 GPT 5.6 的强大能力能让我在短短一两天内做出一个令我满意的前端和一些后端上的解决方案。说真的，让我像当年的自己一样完全自己捣鼓，放到现在真的可谓是天方夜谭。</p>
+      <p>同时，我也很感谢一个人，是他，让我的生活有了更多的动力，让我能在过去的一年里有了些许的目标，也让我走出原先那个情绪低落的自己。</p>
+      <p>我也要感谢五月天，虽然很早就听过他们的音乐，但是在过去的一年里，是他们的音乐陪伴了我，让我也能活得更加自在。</p>
+
+      <h3>Last Words.</h3>
+      <p>也很感谢每一位读到这里的你，非常感谢你能读完我的碎碎念。也欢迎你在这个全新重构的 <a href="/"><strong>数字围场</strong></a> 中看看。</p>
+    </div>
+
+    <footer class="post-foot"><a class="route" href="/blog">返回航行日志</a></footer>
+  </article>
+</BaseLayout>
+
+<style>
+  .logbook-post { max-width:52rem; padding-top:clamp(4rem,10vw,8rem); padding-bottom:clamp(4rem,10vw,8rem); }
+  .post-head { padding-bottom:2rem; border-bottom:1px solid var(--line); }
+  .post-head h1 { margin-bottom:1.5rem; font-size:clamp(3.25rem,9vw,6rem); }
+  .post-body { padding-top:2.5rem; font-size:1.05rem; line-height:1.9; }
+  .post-body > * { max-width:42rem; }
+  .post-body h2 { margin:0 0 1.5rem; font-size:clamp(1.9rem,4vw,3rem); }
+  .post-body h3 { margin:2.8rem 0 1rem; font:800 .9rem/1.4 var(--font-data); letter-spacing:.1em; text-transform:uppercase; color:var(--signal); }
+  .post-body p { margin-bottom:1.35rem; }
+  .post-body ul { margin:0 0 1.35rem; padding-left:1.25rem; }
+  .post-body li + li { margin-top:.45rem; }
+  .post-foot { margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--line); }
+</style>
