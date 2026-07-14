@@ -53,6 +53,17 @@ tar -C dist -czf merakt-cn-static.tar.gz .
 
 解压包后，把其中内容放入 Nginx 或 Caddy 的静态目录。目录内的 `index.html` 及各子目录的 `index.html` 已包含所有路由页面。
 
+### GitHub 自动部署
+
+推送到 `main` 会触发 `.github/workflows/deploy.yml`：GitHub Actions 先构建静态产物，再通过受限的 `deploy` 用户上传到服务器的发布暂存目录，并调用服务器端受控脚本更新站点。工作流不会把 SSH 私钥或服务器配置提交到 Git。
+
+需要在仓库 Actions 设置中配置以下项：
+
+- Secrets：`DEPLOY_SSH_KEY`、`DEPLOY_KNOWN_HOSTS`
+- Variables：`DEPLOY_HOST`、`DEPLOY_PORT`、`DEPLOY_USER`、`DEPLOY_RELEASES_PATH`
+
+服务器端脚本位于 `/usr/local/sbin/merakt-activate`；其只接受 40 位 Git commit SHA，并由 `deploy` 用户获得的单项 sudo 规则调用。
+
 ## 内容维护
 
 日常文案、页面入口与状态页配置不写在页面组件里：

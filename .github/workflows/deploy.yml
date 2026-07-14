@@ -1,0 +1,64 @@
+name: Deploy production site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: merakt-production-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build static site
+        run: |
+          npm ci
+          npm run build
+
+      - name: Configure deployment SSH key
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Upload and activate release
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_RELEASES_PATH: ${{ vars.DEPLOY_RELEASES_PATH }}
+        run: |
+          set -euo pipefail
+          release="$DEPLOY_RELEASES_PATH/$GITHUB_SHA"
+          ssh_command="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -p $DEPLOY_PORT"
+
+          $ssh_command "$DEPLOY_USER@$DEPLOY_HOST" "mkdir -p '$release'"
+          rsync -rlt --delete --safe-links \
+            --chmod=Du=rwx,Dgo=rx,Fu=rw,Fgo=r \
+            -e "$ssh_command" \
+            dist/ "$DEPLOY_USER@$DEPLOY_HOST:$release/"
+          $ssh_command "$DEPLOY_USER@$DEPLOY_HOST" \
+            "sudo -n /usr/local/sbin/merakt-activate '$GITHUB_SHA'"
+
+      - name: Check public site
+        run: curl --fail --silent --show-error --retry 3 --retry-delay 2 https://merakt.cn/ > /dev/null
