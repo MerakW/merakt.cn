@@ -18,13 +18,13 @@ const featuredFursuit = {
 
 <BaseLayout title={page.title} description={page.description}>
   <section class="page-hero"><div class="wrap hero-grid" data-reveal><div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map((line) => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p><div class="actions"><a class="button" href="/merak">{page.primary}</a><a class="button alt" href="/blog">{page.secondary}</a></div></div><div class="orbit"><span>{page.orbit}</span></div></div></section>
-  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.aboutHeading}</h2><p>{page.aboutLead}</p></div><div class="hangar-grid" data-reveal><article class="bay wide"><p class="data">{aboutCards[0][0]}</p><h3>{aboutCards[0][1]}</h3><p>{aboutCards[0][2]}</p><a class="route" href="/merak">{aboutCards[0][3]}</a></article><a class="home-fursuit-shot" href="/fursuitfriday" aria-label="查看毛五照片"><img src={featuredFursuit.image} alt={featuredFursuit.alt} /></a>{aboutCards.slice(1).map(([label, heading, text, action]) => <article class="bay narrow"><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p><a class="route" href="/astronix">{action}</a></article>)}</div></div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.aboutHeading}</h2><p>{page.aboutLead}</p></div><div class="hangar-grid" data-reveal><article class="bay wide"><p class="data">{aboutCards[0][0]}</p><h3>{aboutCards[0][1]}</h3><p>{aboutCards[0][2]}</p><a class="route" href="/merak">{aboutCards[0][3]}</a></article><a class="home-fursuit-shot" href="/fursuitfriday" aria-label="查看毛五照片"><img src={featuredFursuit.image} width="2048" height="1366" alt={featuredFursuit.alt} /></a>{aboutCards.slice(1).map(([label, heading, text, action]) => <article class="bay narrow"><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p><a class="route" href="/astronix">{action}</a></article>)}</div></div></section>
   <section class="section"><div class="wrap"><div class="section-head"><h2>{page.routesHeading}</h2><p>{page.routesLead}</p></div><div class="hangar-grid" data-reveal>{routes.map(({ route: [label, heading, text], href, feature }) => <a class={`bay ${routes.length <= 3 ? 'third' : feature ? 'narrow' : 'third'}`} href={href}><p class="data">{label}</p><h3>{heading}</h3><p>{text}</p>{feature && <span class="route">{feature === 'airways' ? '查看企划' : '看看 Astronix'}</span>}</a>)}</div></div></section>
 </BaseLayout>
 
 <style>
-  .home-fursuit-shot { display:block; grid-column:span 5; min-height:19rem; overflow:hidden; background:var(--steel); }
-  .home-fursuit-shot img { width:100%; height:100%; object-fit:cover; object-position:42% center; transition:transform .35s cubic-bezier(.16,1,.3,1); }
+  .home-fursuit-shot { display:block; align-self:start; grid-column:span 5; overflow:hidden; line-height:0; }
+  .home-fursuit-shot img { display:block; width:100%; height:auto; transition:transform .35s cubic-bezier(.16,1,.3,1); }
   .home-fursuit-shot:hover img { transform:scale(1.025); }
-  @media (max-width:760px) { .home-fursuit-shot { grid-column:span 12; min-height:18rem; } }
+  @media (max-width:760px) { .home-fursuit-shot { grid-column:span 12; } }
 </style>
