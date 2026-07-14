@@ -28,7 +28,7 @@ import { status } from '../content/status';
   .status-hero { padding-bottom:clamp(2.5rem,5vw,4rem); }
   .status-head { position:relative; z-index:1; display:flex; align-items:end; justify-content:space-between; gap:2rem; }
   .status-head .lead { margin-bottom:0; }
-  .status-frame { min-height:clamp(44rem,80vh,62rem); overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 8px 18px rgb(20 32 42 / .06); }
-  .status-frame iframe { display:block; width:100%; min-height:clamp(44rem,80vh,62rem); border:0; background:var(--surface); }
-  @media (max-width:760px) { .status-head { display:grid; align-items:start; } .status-head .button { width:max-content; } .status-section { padding-top:2rem; } .status-frame,.status-frame iframe { min-height:58rem; } }
+  .status-frame { height:clamp(42rem,72vh,52rem); overflow:hidden; border:1px solid var(--line); background:var(--surface); box-shadow:0 8px 18px rgb(20 32 42 / .06); }
+  .status-frame iframe { display:block; width:100%; height:100%; border:0; background:var(--surface); }
+  @media (max-width:760px) { .status-head { display:grid; align-items:start; } .status-head .button { width:max-content; } .status-section { padding-top:2rem; } .status-frame { height:54rem; } }
 </style>
