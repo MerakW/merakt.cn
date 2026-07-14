@@ -2,6 +2,7 @@
 export const status = {
   url: 'https://status.merakt.cn/status/home',
   navLabel: '系统状态',
+  home: { label: 'SYSTEM STATUS', heading: '系统状态', text: '查看网站与家庭服务的实时运行状态。' },
   title: '系统状态 | Merak',
   description: 'Merak 服务的实时运行状态与维护公告。',
   eyebrow: 'SERVICE TELEMETRY / LIVE',
