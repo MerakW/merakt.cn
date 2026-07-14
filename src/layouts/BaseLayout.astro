@@ -28,7 +28,7 @@ const links = [...copy.site.nav.slice(0, 4), ['/status', status.navLabel], ...co
     <div class="site-shell">
       <header class="site-header">
         <nav class="nav wrap" aria-label="主要导航">
-          <a class="brand" href="/" aria-label="Merak 首页"><img src="/logo.png" alt="Merak" /><span>MERAK</span></a>
+          <a class="brand" href="/" aria-label="Merak 首页"><img src="/logo.webp" width="128" height="128" alt="Merak" /><span>MERAK</span></a>
           <button class="menu-button" id="menuButton" aria-controls="siteMenu" aria-expanded="false"><span class="visually-hidden">打开导航</span><i></i><i></i></button>
           <ul class="nav-links" id="siteMenu">
             {links.map(([href, label]) => <li><a href={href} aria-current={path === href ? 'page' : undefined}>{label}</a></li>)}
