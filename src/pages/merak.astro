@@ -8,8 +8,11 @@ const page = copy.merak;
 
 <style>
   .portrait-stage { position:relative; display:grid; min-height:clamp(21rem,33vw,28rem); place-items:center; isolation:isolate; }
-  .portrait-stage::before { content:""; position:absolute; z-index:-1; width:min(27rem,108%); aspect-ratio:1; border:1px solid color-mix(in srgb,var(--steel) 55%,transparent); border-radius:50%; background:radial-gradient(circle at center,color-mix(in srgb,var(--surface) 72%,transparent) 0 35%,transparent 35.4%),linear-gradient(90deg,transparent 49.8%,color-mix(in srgb,var(--steel) 45%,transparent) 50% 50.2%,transparent 50.4%),linear-gradient(transparent 49.8%,color-mix(in srgb,var(--steel) 45%,transparent) 50% 50.2%,transparent 50.4%); }
-  .portrait-stage::after { content:""; position:absolute; z-index:-1; width:min(31rem,120%); height:42%; border-top:1px solid color-mix(in srgb,var(--signal) 65%,transparent); border-bottom:1px solid color-mix(in srgb,var(--steel) 55%,transparent); border-radius:50%; transform:rotate(-19deg); }
+  .portrait-stage::before { content:""; position:absolute; z-index:-1; width:min(27rem,108%); aspect-ratio:1; border:1px solid color-mix(in srgb,var(--steel) 55%,transparent); border-radius:50%; background:radial-gradient(circle at center,color-mix(in srgb,var(--surface) 72%,transparent) 0 35%,transparent 35.4%),linear-gradient(90deg,transparent 49.8%,color-mix(in srgb,var(--steel) 45%,transparent) 50% 50.2%,transparent 50.4%),linear-gradient(transparent 49.8%,color-mix(in srgb,var(--steel) 45%,transparent) 50% 50.2%,transparent 50.4%); animation:portrait-radar 18s linear infinite; will-change:transform; }
+  .portrait-stage::after { content:""; position:absolute; z-index:-1; width:min(31rem,120%); height:42%; border-top:1px solid color-mix(in srgb,var(--signal) 65%,transparent); border-bottom:1px solid color-mix(in srgb,var(--steel) 55%,transparent); border-radius:50%; animation:portrait-orbit 6.5s cubic-bezier(.45,0,.55,1) infinite alternate; will-change:transform; }
   .portrait-stage .avatar { width:min(24rem,96%); height:auto; aspect-ratio:auto; margin:0; border:0; border-radius:0; object-fit:contain; clip-path:none; filter:drop-shadow(0 1.2rem 1.3rem rgb(20 32 42 / .14)); }
+  @keyframes portrait-radar { to { transform:rotate(360deg); } }
+  @keyframes portrait-orbit { from { transform:rotate(-23deg) translateX(-.4rem); } to { transform:rotate(-13deg) translateX(.4rem); } }
+  @media (prefers-reduced-motion:reduce) { .portrait-stage::before,.portrait-stage::after { animation:none; } }
   @media (max-width:760px) { .portrait-stage { min-height:20rem; } .portrait-stage .avatar { width:min(21rem,88vw); } }
 </style>
