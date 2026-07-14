@@ -30,7 +30,6 @@ const isVideo = (path: string) => path.endsWith('.mp4');
     <div class="wrap">
       <div class="archive-head">
         <h2 id="archive-title">{copy.fursuit.archiveHeading}</h2>
-        <p>{copy.fursuit.archiveSummary(posts.length)}</p>
       </div>
       <div class="contact-sheet" data-reveal>
         {archivePosts.map((post) => (
