@@ -1,6 +1,6 @@
 ---
 import { copy } from '../content/site-copy';
-import { visibility } from '../content/site-settings';
+import { motion, visibility } from '../content/site-settings';
 import { status } from '../content/status';
 import { execFileSync } from 'node:child_process';
 import { ClientRouter } from 'astro:transitions';
@@ -23,7 +23,13 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html
+  lang="zh-CN"
+  data-nav-indicator-min-duration={motion.navIndicatorMinDurationMs}
+  data-nav-indicator-max-duration={motion.navIndicatorMaxDurationMs}
+  data-nav-indicator-pixels-per-millisecond={motion.navIndicatorPixelsPerMillisecond}
+  data-nav-content-start-ratio={motion.navContentStartRatio}
+>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -98,9 +104,15 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
         document.documentElement.dataset.navMotionReady = 'true';
         const navLinks = document.querySelector('.nav-links');
         const indicator = navLinks?.querySelector('.nav-indicator');
+        const navMotionSettings = document.documentElement.dataset;
+        const minIndicatorDuration = Number(navMotionSettings.navIndicatorMinDuration) || 180;
+        const maxIndicatorDuration = Number(navMotionSettings.navIndicatorMaxDuration) || 360;
+        const indicatorPixelsPerMillisecond = Number(navMotionSettings.navIndicatorPixelsPerMillisecond) || 1.2;
+        const contentStartRatio = Number(navMotionSettings.navContentStartRatio) || 0.28;
         const normalizePath = (value: string) => new URL(value, window.location.origin).pathname.replace(/\/+$/, '') || '/';
-        const setActiveNavigation = (url = window.location.href, animate = false) => new Promise<void>((resolve) => {
-          if (!navLinks || !indicator) { resolve(); return; }
+        const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+        const setActiveNavigation = (url = window.location.href, animate = false) => {
+          if (!navLinks || !indicator) return 0;
           const currentPath = normalizePath(url);
           const navItems = Array.from(navLinks.querySelectorAll('a[href]'));
           const activeItem = navItems.find((item) => {
@@ -109,9 +121,10 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
           });
           navItems.forEach((item) => item.removeAttribute('aria-current'));
           activeItem?.setAttribute('aria-current', 'page');
-          if (!activeItem) { resolve(); return; }
+          if (!activeItem) return 0;
           const navBounds = navLinks.getBoundingClientRect();
           const itemBounds = activeItem.getBoundingClientRect();
+          const currentBounds = indicator.getBoundingClientRect();
           const targetTransform = `translate3d(${itemBounds.left - navBounds.left}px,0,0) scaleX(${itemBounds.width})`;
           const runningAnimations = indicator.getAnimations();
           const currentTransform = getComputedStyle(indicator).transform;
@@ -119,17 +132,18 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
           indicator.classList.add('is-ready');
           if (!animate || matchMedia('(prefers-reduced-motion: reduce)').matches) {
             indicator.style.transform = targetTransform;
-            resolve();
-            return;
+            return 0;
           }
+          const travelDistance = Math.hypot(itemBounds.left - currentBounds.left, (itemBounds.width - currentBounds.width) / 2);
+          const duration = Math.round(clamp(travelDistance / indicatorPixelsPerMillisecond, minIndicatorDuration, maxIndicatorDuration));
           indicator.style.transform = currentTransform;
-          const motion = indicator.animate(
+          const indicatorMotion = indicator.animate(
             [{ transform: currentTransform }, { transform: targetTransform }],
-            { duration: 260, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
+            { duration, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'forwards' },
           );
-          motion.addEventListener('finish', () => { indicator.style.transform = targetTransform; resolve(); }, { once: true });
-          motion.addEventListener('cancel', resolve, { once: true });
-        });
+          indicatorMotion.addEventListener('finish', () => { indicator.style.transform = targetTransform; }, { once: true });
+          return Math.round(duration * clamp(contentStartRatio, 0, 1));
+        };
         const scheduleNavigationUpdate = () => requestAnimationFrame(() => { void setActiveNavigation(); });
         navLinks?.addEventListener('click', async (event) => {
           const target = event.target instanceof Element ? event.target.closest('a[href]') : null;
@@ -143,8 +157,8 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
           document.querySelector('#menuScrim')?.classList.remove('is-open');
           document.body.classList.remove('menu-open');
           navLinks.dataset.navigationInProgress = 'true';
-          void setActiveNavigation(destination.href, true);
-          await new Promise((resolve) => window.setTimeout(resolve, 72));
+          const navigationDelay = setActiveNavigation(destination.href, true);
+          await new Promise((resolve) => window.setTimeout(resolve, navigationDelay));
           await navigate(destination.href);
         }, true);
         document.addEventListener('astro:after-swap', () => {
