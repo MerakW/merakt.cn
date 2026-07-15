@@ -31,13 +31,24 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script is:inline>
       (() => {
+        const systemTheme = () => matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         const applyTheme = () => {
-          try { const saved = localStorage.getItem('theme'); document.documentElement.dataset.theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+          try {
+            const override = sessionStorage.getItem('merak-theme-override');
+            document.documentElement.dataset.theme = override === 'dark' || override === 'light' ? override : systemTheme();
+          }
           catch { document.documentElement.dataset.theme = 'dark'; }
+        };
+        const syncSystemTheme = () => {
+          try { sessionStorage.removeItem('merak-theme-override'); } catch {}
+          applyTheme();
+          window.dispatchEvent(new CustomEvent('merak:theme-change', { detail: document.documentElement.dataset.theme }));
         };
         applyTheme();
         if (!document.documentElement.dataset.themeSyncReady) {
           document.documentElement.dataset.themeSyncReady = 'true';
+          try { localStorage.removeItem('theme'); } catch {}
+          matchMedia('(prefers-color-scheme: dark)').addEventListener('change', syncSystemTheme);
           document.addEventListener('astro:after-swap', applyTheme);
         }
       })();
@@ -78,7 +89,7 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
       const closeMenu = () => { button?.setAttribute('aria-expanded', 'false'); menu?.classList.remove('is-open'); scrim?.classList.remove('is-open'); document.body.classList.remove('menu-open'); };
       button?.addEventListener('click', () => { const opening = button.getAttribute('aria-expanded') !== 'true'; button.setAttribute('aria-expanded', String(opening)); menu?.classList.toggle('is-open', opening); scrim?.classList.toggle('is-open', opening); document.body.classList.toggle('menu-open', opening); if (opening) menu?.querySelector('a')?.focus(); });
       scrim?.addEventListener('click', closeMenu); menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu)); document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMenu(); });
-      theme?.addEventListener('click', () => { const next = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = next; localStorage.setItem('theme', next); theme.setAttribute('aria-pressed', String(next === 'dark')); window.dispatchEvent(new CustomEvent('merak:theme-change', { detail: next })); });
+      theme?.addEventListener('click', () => { const next = root.dataset.theme === 'dark' ? 'light' : 'dark'; root.dataset.theme = next; sessionStorage.setItem('merak-theme-override', next); theme.setAttribute('aria-pressed', String(next === 'dark')); window.dispatchEvent(new CustomEvent('merak:theme-change', { detail: next })); });
     </script>
     <script>
       import { navigate } from 'astro:transitions/client';
