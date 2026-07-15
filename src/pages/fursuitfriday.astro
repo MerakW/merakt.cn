@@ -2,12 +2,15 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { copy } from '../content/site-copy';
+import { media } from '../content/site-settings';
 
 const posts = (await getCollection('fursuitfriday'))
   .sort((a, b) => new Date(b.data.time).getTime() - new Date(a.data.time).getTime());
 const latest = posts[0];
-const archivePosts = posts.slice(1);
 const isVideo = (path: string) => path.endsWith('.mp4');
+const fursuitMediaUrl = (path: string) => path.startsWith('/images/fursuitfriday/')
+  ? `${media.fursuitCdnOrigin}${path.replace('/images', '')}`
+  : path;
 ---
 
 <BaseLayout title={copy.fursuit.title} description={copy.fursuit.description}>
@@ -20,7 +23,7 @@ const isVideo = (path: string) => path.endsWith('.mp4');
         <p class="intro-note">{copy.fursuit.note}</p>
       </div>
       <figure class="latest-frame">
-        {isVideo(latest.data.image) ? <video controls preload="metadata" src={latest.data.image}></video> : <img src={latest.data.image} alt={latest.data.caption} loading="eager" decoding="async" fetchpriority="high" />}
+        {isVideo(latest.data.image) ? <video controls preload="metadata" src={fursuitMediaUrl(latest.data.image)}></video> : <img src={fursuitMediaUrl(latest.data.image)} alt={latest.data.caption} loading="eager" decoding="async" fetchpriority="high" />}
         <figcaption><span>{latest.data.time}</span><span>{copy.fursuit.latest}</span></figcaption>
       </figure>
     </div>
@@ -32,10 +35,10 @@ const isVideo = (path: string) => path.endsWith('.mp4');
         <h2 id="archive-title">{copy.fursuit.archiveHeading}</h2>
       </div>
       <div class="contact-sheet" data-reveal>
-        {archivePosts.map((post) => (
+        {posts.map((post) => (
           <figure class="photo-entry">
             <div class="photo-media">
-              {isVideo(post.data.image) ? <video controls preload="none" src={post.data.image}></video> : <img src={post.data.image} alt={post.data.caption} loading="lazy" decoding="async" />}
+              {isVideo(post.data.image) ? <video controls preload="none" src={fursuitMediaUrl(post.data.image)}></video> : <img src={fursuitMediaUrl(post.data.image)} alt={post.data.caption} loading="lazy" decoding="async" />}
             </div>
             <figcaption>
               <time datetime={post.data.time.replace(' ', 'T')}>{post.data.time}</time>

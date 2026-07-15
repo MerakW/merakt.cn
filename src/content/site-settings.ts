@@ -20,3 +20,8 @@ export const motion = {
   navIndicatorPixelsPerMillisecond: 1.2,
   navContentStartRatio: 0.60,
 } as const;
+
+/** 对外媒体域名。毛五内容文件仍使用本地 /images/fursuitfriday 路径。 */
+export const media = {
+  fursuitCdnOrigin: 'https://cos.merakt.cn',
+} as const;
