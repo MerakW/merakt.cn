@@ -4,10 +4,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { copy } from '../content/site-copy';
 import { media } from '../content/site-settings';
 
+const isVideo = (path: string) => /\.(?:mp4|webm|mov|m4v)(?:[?#]|$)/i.test(path);
 const posts = (await getCollection('fursuitfriday'))
+  .filter((post) => !isVideo(post.data.image))
   .sort((a, b) => new Date(b.data.time).getTime() - new Date(a.data.time).getTime());
 const latest = posts[0];
-const isVideo = (path: string) => path.endsWith('.mp4');
+const archiveColumns = Array.from({ length: 3 }, (_, column) =>
+  posts.filter((_, index) => index % 3 === column),
+);
 const fursuitMediaUrl = (path: string) => path.startsWith('/images/fursuitfriday/')
   ? `${media.fursuitCdnOrigin}${path.replace('/images', '')}`
   : path;
@@ -23,7 +27,7 @@ const fursuitMediaUrl = (path: string) => path.startsWith('/images/fursuitfriday
         <p class="intro-note">{copy.fursuit.note}</p>
       </div>
       <figure class="latest-frame">
-        {isVideo(latest.data.image) ? <video controls preload="metadata" src={fursuitMediaUrl(latest.data.image)}></video> : <img src={fursuitMediaUrl(latest.data.image)} alt={latest.data.caption} loading="eager" decoding="async" fetchpriority="high" />}
+        <img src={fursuitMediaUrl(latest.data.image)} alt={latest.data.caption} loading="eager" decoding="async" fetchpriority="high" />
         <figcaption><span>{latest.data.time}</span><span>{copy.fursuit.latest}</span></figcaption>
       </figure>
     </div>
@@ -34,11 +38,28 @@ const fursuitMediaUrl = (path: string) => path.startsWith('/images/fursuitfriday
       <div class="archive-head">
         <h2 id="archive-title">{copy.fursuit.archiveHeading}</h2>
       </div>
-      <div class="contact-sheet" data-reveal>
+      <div class="contact-sheet contact-sheet-wide" data-reveal>
+        {archiveColumns.map((column, columnIndex) => (
+          <div class="archive-column" data-archive-column={columnIndex}>
+            {column.map((post) => (
+              <figure class="photo-entry">
+                <div class="photo-media">
+                  <img src={fursuitMediaUrl(post.data.image)} alt={post.data.caption} loading="lazy" decoding="async" />
+                </div>
+                <figcaption>
+                  <time datetime={post.data.time.replace(' ', 'T')}>{post.data.time}</time>
+                  <p>{post.data.caption}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div class="contact-sheet contact-sheet-narrow" data-reveal>
         {posts.map((post) => (
           <figure class="photo-entry">
             <div class="photo-media">
-              {isVideo(post.data.image) ? <video controls preload="none" src={fursuitMediaUrl(post.data.image)}></video> : <img src={fursuitMediaUrl(post.data.image)} alt={post.data.caption} loading="lazy" decoding="async" />}
+              <img src={fursuitMediaUrl(post.data.image)} alt={post.data.caption} loading="lazy" decoding="async" />
             </div>
             <figcaption>
               <time datetime={post.data.time.replace(' ', 'T')}>{post.data.time}</time>
@@ -50,6 +71,31 @@ const fursuitMediaUrl = (path: string) => path.startsWith('/images/fursuitfriday
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  const archive = document.querySelector<HTMLElement>('.contact-sheet-wide');
+
+  if (archive && 'IntersectionObserver' in window) {
+    const activateColumnLeads = () => {
+      const leadMedia = Array.from(archive.querySelectorAll<HTMLElement>('.archive-column'))
+        .map((column) => column.querySelector<HTMLImageElement>('img'))
+        .filter((media): media is HTMLImageElement => media !== null);
+
+      leadMedia.forEach((media) => {
+        media.loading = 'eager';
+        media.fetchPriority = 'high';
+      });
+    };
+
+    const archiveObserver = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      activateColumnLeads();
+      archiveObserver.disconnect();
+    }, { rootMargin: '420px 0px' });
+
+    archiveObserver.observe(archive);
+  }
+</script>
 
 <style>
   .fursuit-intro { padding:clamp(3.5rem,8vw,7rem) 0; }
@@ -66,12 +112,14 @@ const fursuitMediaUrl = (path: string) => path.startsWith('/images/fursuitfriday
   .archive-head { display:flex; justify-content:space-between; gap:2rem; align-items:baseline; margin-bottom:2rem; }
   .archive-head h2 { margin:0; }
   .archive-head p { max-width:30ch; margin:0; color:var(--muted); }
-  .contact-sheet { columns:3 18rem; column-gap:1rem; }
-  .photo-entry { break-inside:avoid; display:block; margin:0 0 1rem; padding:.35rem; overflow:hidden; border-radius:.75rem; background:color-mix(in srgb,var(--surface) 78%,var(--line)); box-shadow:0 .15rem .55rem color-mix(in srgb,var(--ink) 4%,transparent); }
+  .contact-sheet { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+  .contact-sheet-narrow { display:none; }
+  .archive-column { display:grid; align-content:start; gap:1rem; min-width:0; }
+  .photo-entry { display:block; margin:0; padding:.35rem; overflow:hidden; border-radius:.75rem; background:color-mix(in srgb,var(--surface) 78%,var(--line)); box-shadow:0 .15rem .55rem color-mix(in srgb,var(--ink) 4%,transparent); }
   .photo-media { overflow:hidden; border-radius:.45rem; background:var(--canvas); }
   .photo-media :global(img), .photo-media :global(video) { display:block; width:100%; height:auto; }
   .photo-entry figcaption { padding:.8rem .45rem .45rem; }
   .photo-entry time { display:block; color:var(--signal); font:.7rem/1.4 var(--font-data); }
   .photo-entry figcaption p { margin:.4rem 0 0; color:var(--ink); font-size:.88rem; line-height:1.55; white-space:pre-line; }
-  @media (max-width:760px) { .fursuit-intro-grid { grid-template-columns:1fr; gap:2rem; } .intro-copy { padding:0; } .intro-copy h1 { font-size:clamp(4rem,22vw,6rem); } .latest-frame :global(img), .latest-frame :global(video) { max-height:none; } .archive-head { display:block; } .archive-head h2 { margin-bottom:.7rem; } .contact-sheet { columns:1; } }
+  @media (max-width:760px) { .fursuit-intro-grid { grid-template-columns:1fr; gap:2rem; } .intro-copy { padding:0; } .intro-copy h1 { font-size:clamp(4rem,22vw,6rem); } .latest-frame :global(img), .latest-frame :global(video) { max-height:none; } .archive-head { display:block; } .archive-head h2 { margin-bottom:.7rem; } .contact-sheet-wide { display:none; } .contact-sheet-narrow { display:grid; grid-template-columns:1fr; } }
 </style>
