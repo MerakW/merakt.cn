@@ -18,31 +18,47 @@ import { status } from '../content/status';
   <section class="section status-section" aria-label="实时服务状态">
     <div class="wrap">
       <div class="status-frame" aria-busy="true">
-        <p class="status-frame-loading" aria-live="polite">正在连接状态站…</p>
-        <iframe title={status.frameTitle} src={status.url} loading="eager" referrerpolicy="no-referrer" scrolling="no"></iframe>
+        <p class="status-frame-loading" aria-live="polite">正在获取运行状态…</p>
+        <iframe title={status.frameTitle} src={status.url} loading="eager" referrerpolicy="no-referrer"></iframe>
       </div>
     </div>
   </section>
 </BaseLayout>
 
 <script>
-  const statusFrame = document.querySelector<HTMLIFrameElement>('.status-frame iframe');
-  const statusFrameContainer = statusFrame?.closest<HTMLElement>('.status-frame');
-
-  statusFrame?.addEventListener('load', () => {
-    statusFrameContainer?.classList.add('is-loaded');
-    statusFrameContainer?.setAttribute('aria-busy', 'false');
-  });
-
-  window.addEventListener('merak:theme-change', (event) => {
-    if (!statusFrame) return;
-    const theme = (event as CustomEvent<string>).detail;
-    const url = new URL(statusFrame.src);
-    url.searchParams.set('_merakTheme', theme);
-    statusFrameContainer?.classList.remove('is-loaded');
-    statusFrameContainer?.setAttribute('aria-busy', 'true');
-    statusFrame.src = url.toString();
-  });
+  let cleanup = () => {};
+  function initializeStatus() {
+    cleanup();
+    const frame = document.querySelector<HTMLIFrameElement>('.status-frame iframe');
+    const container = frame?.closest<HTMLElement>('.status-frame');
+    if (!frame || !container) return;
+    const controller = new AbortController();
+    const { signal } = controller;
+    let timer: ReturnType<typeof setTimeout>;
+    const startTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const message = container.querySelector('.status-frame-loading');
+        if (message) message.textContent = '暂时没能加载出来，可以打开状态页再试试。';
+        container.setAttribute('aria-busy', 'false');
+      }, 12000);
+    };
+    frame.addEventListener('load', () => { clearTimeout(timer); container.classList.add('is-loaded'); container.setAttribute('aria-busy', 'false'); }, { signal });
+    window.addEventListener('merak:theme-change', (event) => {
+      const theme = (event as CustomEvent<string>).detail;
+      const url = new URL(frame.src);
+      if (url.searchParams.get('_merakTheme') === theme) return;
+      url.searchParams.set('_merakTheme', theme);
+      container.classList.remove('is-loaded');
+      container.setAttribute('aria-busy', 'true');
+      frame.src = url.toString();
+      startTimer();
+    }, { signal });
+    startTimer();
+    cleanup = () => { controller.abort(); clearTimeout(timer); };
+  }
+  document.addEventListener('astro:page-load', initializeStatus);
+  document.addEventListener('astro:before-swap', () => cleanup());
 </script>
 
 <style>
@@ -50,7 +66,7 @@ import { status } from '../content/status';
   .status-head { position:relative; z-index:1; display:flex; align-items:end; justify-content:space-between; gap:2rem; }
   .status-head .lead { margin-bottom:0; }
   .status-section { padding:2rem 0 0; }
-  .status-frame { position:relative; display:grid; height:clamp(30rem,52vh,34rem); overflow:hidden; background:color-mix(in srgb,var(--canvas) 90%,var(--steel)); }
+  .status-frame { position:relative; display:grid; min-height:36rem; height:65dvh; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:color-mix(in srgb,var(--canvas) 90%,var(--steel)); }
   .status-frame-loading { position:absolute; inset:0; display:grid; place-items:center; margin:0; background:color-mix(in srgb,var(--canvas) 90%,var(--steel)); color:var(--muted); font:.72rem var(--font-data); letter-spacing:.1em; }
   .status-frame iframe { position:relative; z-index:1; display:block; width:100%; height:100%; border:0; opacity:0; background:var(--surface); color-scheme:light; transition:opacity .18s ease; }
   .status-frame.is-loaded iframe { opacity:1; }
