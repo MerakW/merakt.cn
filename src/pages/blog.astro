@@ -3,5 +3,61 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { copy } from '../content/site-copy';
 const page = copy.blog;
 ---
-
-<BaseLayout title={page.title}><section class="page-hero"><div class="wrap hero-grid" data-reveal><div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map((line) => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p></div><div class="hero-data"><strong>{page.count}</strong> 已公开记录<br />{page.lastEntry}</div></div></section><section class="section"><div class="wrap"><div class="tags" aria-label="文章分类">{page.categories.map((category) => <button class="tag" type="button" aria-pressed={category === '全部' ? 'true' : 'false'}>{category}</button>)}</div><div class="hangar-grid" style="margin-top:2rem" data-reveal>{page.posts.map((post) => <article class="bay wide"><p class="data">{post.category} / {post.date}</p><h2>{post.title}</h2><p>{post.excerpt}</p><div class="tags">{post.tags.map((tag) => <span class="tag">#{tag}</span>)}</div><a class="route" href={post.slug}>阅读全文</a></article>)}<aside class="bay narrow"><p class="data">TOPIC INDEX</p><h3>{page.topicHeading}</h3><div class="tags">{page.topics.map((topic) => <span class="tag">{topic}</span>)}</div></aside></div><p class="notice" style="margin-top:2rem">{page.notice}</p></div></section></BaseLayout>
+<BaseLayout title={page.title} description={page.lead}>
+  <section class="page-hero"><div class="wrap hero-grid"><div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map(line => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p></div><div class="hero-data"><strong>{String(page.posts.length).padStart(2,'0')}</strong>已公开记录<br />{page.lastEntry}</div></div></section>
+  <section class="section"><div class="wrap">
+    <div class="archive-toolbar"><div class="category-filters" role="group" aria-label="文章分类">{page.categories.map(category => <button type="button" data-category={category} aria-pressed={category === '全部' ? 'true' : 'false'}>{category}</button>)}</div><span id="postCount" role="status" aria-live="polite">{page.posts.length} 篇文章</span></div>
+    <div class="post-list">{page.posts.map(post => <article class="post-entry" data-post-category={post.category}><div class="post-date"><time datetime={post.date}>{post.date.replaceAll('-', '.')}</time><span>{post.category}</span></div><div class="post-copy"><h2><a href={post.slug}>{post.title}<span aria-hidden="true">↗</span></a></h2><p>{post.excerpt}</p><div class="tags">{post.tags.map(tag => <span class="tag">#{tag}</span>)}</div><a class="route" href={post.slug}>阅读全文</a></div></article>)}</div>
+    <div class="blog-empty" id="blogEmpty" hidden><h2>这一页，留给下一篇。</h2><p>这个分类还没有公开文章，先看看其他记录吧。</p><button class="button alt" id="resetCategory" type="button">查看全部文章</button></div>
+    <p class="writing-note">{page.notice}</p>
+  </div></section>
+</BaseLayout>
+<script>
+  let cleanup = () => {};
+  function initializeFilters() {
+    cleanup();
+    const filters = document.querySelector<HTMLElement>('.category-filters');
+    if (!filters) return;
+    const controller = new AbortController();
+    cleanup = () => controller.abort();
+    const posts = Array.from(document.querySelectorAll<HTMLElement>('[data-post-category]'));
+    const apply = (category: string) => {
+      let count = 0;
+      posts.forEach(post => { post.hidden = category !== '全部' && post.dataset.postCategory !== category; if (!post.hidden) count++; });
+      filters.querySelectorAll<HTMLButtonElement>('button').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.category === category)));
+      const summary = document.querySelector('#postCount');
+      if (summary) summary.textContent = `${count} 篇文章`;
+      const empty = document.querySelector<HTMLElement>('#blogEmpty');
+      if (empty) empty.hidden = count > 0;
+    };
+    filters.addEventListener('click', event => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-category]');
+      if (button?.dataset.category) apply(button.dataset.category);
+    }, { signal: controller.signal });
+    document.querySelector('#resetCategory')?.addEventListener('click', () => { apply('全部'); filters.querySelector<HTMLButtonElement>('button')?.focus(); }, { signal: controller.signal });
+  }
+  document.addEventListener('astro:page-load', initializeFilters);
+  document.addEventListener('astro:before-swap', () => cleanup());
+</script>
+<style>
+  .archive-toolbar { display:flex; justify-content:space-between; gap:1rem; align-items:center; padding-bottom:1.5rem; border-bottom:1px solid var(--line); }
+  .category-filters { display:flex; flex-wrap:wrap; gap:.4rem; }
+  .category-filters button { border:1px solid transparent; background:transparent; color:var(--muted); padding:.55rem 1rem; border-radius:6px; font-size:.88rem; }
+  .category-filters button:hover { background:var(--surface); }
+  .category-filters button[aria-pressed="true"] { background:var(--ink); color:var(--canvas); }
+  #postCount { white-space:nowrap; color:var(--muted); font-size:.75rem; }
+  .post-entry { display:grid; grid-template-columns:1fr 3fr; padding:3rem 0; border-bottom:1px solid var(--line); gap:3rem; }
+  .post-date { display:flex; flex-direction:column; gap:.75rem; padding-top:.6rem; font:.75rem var(--font-data); color:var(--muted); }
+  .post-date span { color:var(--signal); }
+  .post-copy { max-width:46rem; }
+  .post-copy h2 { font-size:2.5rem; margin-bottom:1rem; }
+  .post-copy h2 a { display:flex; justify-content:space-between; align-items:center; }
+  .post-copy h2 span { color:var(--signal); font-size:1.5rem; }
+  .post-copy p { color:var(--muted); max-width:45ch; }
+  .post-copy .route { margin-top:1.5rem; }
+  .writing-note { color:var(--muted); font-size:.83rem; margin-top:2rem; }
+  .blog-empty { padding:4rem 0; text-align:center; border-bottom:1px solid var(--line); }
+  .blog-empty h2 { font-size:1.5rem; }
+  .blog-empty p { color:var(--muted); }
+  @media (max-width:760px) { .archive-toolbar { align-items:start; flex-direction:column; } .category-filters button { padding:.5rem .8rem; } .post-entry { grid-template-columns:1fr; gap:1.25rem; } .post-date { flex-direction:row; } }
+</style>

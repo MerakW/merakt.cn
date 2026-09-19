@@ -6,8 +6,8 @@ export const status = {
   title: '系统状态 | Merak',
   description: 'Merak 服务的实时运行状态与维护公告。',
   eyebrow: 'SERVICE TELEMETRY / LIVE',
-  heading: '系统遥测。',
-  lead: '这里显示网站和相关服务的运行状态、历史可用性与维护公告。',
-  openLabel: '在新窗口打开',
+  heading: '网站还好吗？',
+  lead: '这里可以查看网站和相关服务的运行情况。',
+  openLabel: '打开完整状态页',
   frameTitle: 'Merak 服务状态（Uptime Kuma）',
 } as const;

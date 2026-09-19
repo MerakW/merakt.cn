@@ -3,16 +3,41 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { copy } from '../content/site-copy';
 const page = copy.merak;
 ---
-
-<BaseLayout title={page.title}><section class="page-hero"><div class="wrap hero-grid" data-reveal><div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map((line) => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p><div class="tags">{page.tags.map((tag) => <span class="tag">{tag}</span>)}</div></div><div class="portrait-stage"><img class="avatar" src="/avatar.webp" width="768" height="768" alt="Merak 的头像" decoding="async" fetchpriority="high" /></div></div></section><section class="section"><div class="wrap"><div class="hangar-grid" data-reveal><article class="bay wide"><p class="data">ORIGIN</p><h2>{page.origin}</h2><p>{page.originText}</p><h3>{page.interestsHeading}</h3><ul>{page.interests.map(([name, text]) => <li><strong>{name}：</strong>{text}</li>)}</ul></article><aside class="bay narrow"><p class="data">BASIC DATA</p><h3>基本信息</h3>{page.basics.map(([label, value]) => <p>{label}<br /><strong>{value}</strong></p>)}</aside></div></div></section><section class="section"><div class="wrap"><div class="section-head"><h2>{page.findHeading}</h2><p>{page.findLead}</p></div><ul class="social-list" data-reveal>{page.socials.map(([mark, name, description, href]) => <li><a href={href} target="_blank" rel="noopener noreferrer"><span><strong>{mark}</strong>　{name}</span><small>{description} ↗</small></a></li>)}</ul></div></section></BaseLayout>
-
+<BaseLayout title={page.title} description={page.lead}>
+  <section class="page-hero profile-hero">
+    <div class="wrap hero-grid">
+      <div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map(line => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p><div class="tags">{page.tags.map(tag => <span class="tag">{tag}</span>)}</div></div>
+      <div class="portrait-stage"><img src="/avatar.webp" width="768" height="768" alt="Merak 的头像" fetchpriority="high" /><span>MERAK / 米拉克</span></div>
+    </div>
+  </section>
+  <section class="section"><div class="wrap profile-details">
+    <div class="origin"><h2>{page.origin}</h2><p>{page.originText}</p></div>
+    <dl class="basics">{page.basics.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+  </div></section>
+  <section class="section"><div class="wrap"><div class="section-head"><h2>{page.interestsHeading}</h2></div><div class="interests">{page.interests.map(([name, text], index) => <article><span class="interest-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><h3>{name}</h3><p>{text}</p></article>)}</div></div></section>
+  <section class="section"><div class="wrap contact-layout"><div><h2>{page.findHeading}</h2><p class="contact-note">{page.findLead}</p></div><ul class="social-list">{page.socials.map(([mark, name, description, href]) => <li><a href={href} target="_blank" rel="noopener noreferrer"><span class="social-mark">{mark}</span><span class="social-copy"><strong>{name}</strong><small>{description}</small></span><span class="social-arrow" aria-hidden="true">↗</span></a></li>)}</ul></div></section>
+</BaseLayout>
 <style>
-  .portrait-stage { position:relative; display:grid; min-height:clamp(21rem,33vw,28rem); place-items:center; isolation:isolate; }
-  .portrait-stage::before { content:""; position:absolute; z-index:-1; width:min(27rem,108%); aspect-ratio:1; border:1px solid color-mix(in srgb,var(--steel) 55%,transparent); border-radius:50%; background:radial-gradient(circle at center,color-mix(in srgb,var(--surface) 72%,transparent) 0 35%,transparent 35.4%),linear-gradient(90deg,transparent 49.8%,color-mix(in srgb,var(--steel) 45%,transparent) 50% 50.2%,transparent 50.4%),linear-gradient(transparent 49.8%,color-mix(in srgb,var(--steel) 45%,transparent) 50% 50.2%,transparent 50.4%); animation:portrait-radar 18s linear infinite; will-change:transform; }
-  .portrait-stage::after { content:""; position:absolute; z-index:-1; width:min(31rem,120%); height:42%; border-top:1px solid color-mix(in srgb,var(--signal) 65%,transparent); border-bottom:1px solid color-mix(in srgb,var(--steel) 55%,transparent); border-radius:50%; animation:portrait-orbit 6.5s cubic-bezier(.45,0,.55,1) infinite alternate; will-change:transform; }
-  .portrait-stage .avatar { width:min(24rem,96%); height:auto; aspect-ratio:auto; margin:0; border:0; border-radius:0; object-fit:contain; clip-path:none; filter:drop-shadow(0 1.2rem 1.3rem rgb(20 32 42 / .14)); }
-  @keyframes portrait-radar { to { transform:rotate(360deg); } }
-  @keyframes portrait-orbit { from { transform:rotate(-23deg) translateX(-.4rem); } to { transform:rotate(-13deg) translateX(.4rem); } }
-  @media (prefers-reduced-motion:reduce) { .portrait-stage::before,.portrait-stage::after { animation:none; } }
-  @media (max-width:760px) { .portrait-stage { min-height:20rem; } .portrait-stage .avatar { width:min(21rem,88vw); } }
+  .portrait-stage { display:grid; justify-items:center; padding:2rem; border-radius:16px; background:var(--surface); border:1px solid var(--line); }
+  .portrait-stage img { width:min(100%,320px); height:auto; object-fit:contain; }
+  .portrait-stage > span { color:var(--muted); font:.65rem var(--font-data); letter-spacing:.1em; margin-top:1rem; }
+  .profile-details,.contact-layout { display:grid; grid-template-columns:1fr 1fr; gap:5rem; }
+  .origin p { max-width:32ch; color:var(--muted); }
+  .basics { margin:0; }
+  .basics > div { display:flex; justify-content:space-between; gap:1rem; padding:1rem 0; border-bottom:1px solid var(--line); }
+  .basics dt { color:var(--muted); font-size:.75rem; }
+  .basics dd { margin:0; font-size:.85rem; }
+  .interests { display:grid; grid-template-columns:repeat(4,1fr); gap:2rem; }
+  .interests article { padding-top:1rem; border-top:1px solid var(--line); }
+  .interest-number { font:.65rem var(--font-data); color:var(--signal); }
+  .interests h3 { margin:1.5rem 0 .8rem; font-size:1.6rem; }
+  .interests p { font-size:.9rem; color:var(--muted); margin:0; }
+  .contact-note { color:var(--muted); }
+  .social-list a { padding-top:1rem; }
+  .social-mark { display:grid; place-items:center; width:42px; height:42px; border:1px solid var(--line); border-radius:10px; font:.8rem var(--font-data); }
+  .social-copy { display:grid; gap:.15rem; flex:1; }
+  .social-copy strong { font-size:.92rem; font-weight:600; }
+  .social-copy small { font-size:.77rem; }
+  .social-arrow { color:var(--signal); }
+  @media (max-width:760px) { .portrait-stage img { width:230px; } .profile-details,.contact-layout { grid-template-columns:1fr; gap:2rem; } .interests { grid-template-columns:repeat(2,1fr); gap:2rem 1.5rem; } }
 </style>
