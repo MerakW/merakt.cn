@@ -3,7 +3,20 @@ import { copy } from '../content/site-copy';
 import { visibility } from '../content/site-settings';
 import { status } from '../content/status';
 import { ClientRouter } from 'astro:transitions';
+import { execFileSync } from 'node:child_process';
 import '../styles/global.css';
+const repositoryUrl = 'https://github.com/MerakW/merakt.cn';
+const commit = (() => {
+  const ciCommit = process.env.GITHUB_SHA;
+  if (ciCommit && /^[a-f0-9]{40}$/i.test(ciCommit)) return ciCommit;
+  try {
+    return execFileSync('git', ['rev-parse', '--verify', 'HEAD'], {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    return null;
+  }
+})();
 interface Props { title: string; description?: string; }
 const { title, description = copy.site.defaultDescription } = Astro.props;
 const path = Astro.url.pathname;
@@ -56,7 +69,10 @@ const isActive = (href: string) => href === '/' ? path === href : path === href 
         <div class="wrap footer-bottom">
           <span>{copy.site.footer.copyright}</span>
           <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">{copy.site.footer.filing}</a>
-          <a href="https://github.com/MerakW/merakt.cn" target="_blank" rel="noopener noreferrer">源代码 <span aria-hidden="true">↗</span></a>
+          <div class="build-record" aria-label="代码与构建信息">
+            <a href={repositoryUrl} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.1a6.9 6.9 0 0 0-2.18 13.44c.35.06.48-.15.48-.34v-1.2c-1.96.43-2.38-.83-2.38-.83-.32-.82-.79-1.04-.79-1.04-.64-.44.05-.43.05-.43.71.05 1.08.73 1.08.73.63 1.08 1.65.77 2.05.59.06-.46.25-.77.45-.95-1.56-.18-3.2-.78-3.2-3.47 0-.77.28-1.4.73-1.9-.07-.18-.32-.9.07-1.88 0 0 .6-.19 1.96.72A6.8 6.8 0 0 1 8 4.3c.6 0 1.2.08 1.76.24 1.36-.91 1.96-.72 1.96-.72.39.98.14 1.7.07 1.88.45.5.73 1.13.73 1.9 0 2.7-1.65 3.29-3.22 3.46.25.22.48.65.48 1.31v1.94c0 .19.13.4.48.34A6.9 6.9 0 0 0 8 1.1Z" /></svg>REPOSITORY / MERAKW·MERAKT.CN</a>
+            {commit ? <a href={`${repositoryUrl}/commit/${commit}`} target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2 8h3.25m5.5 0H14M8 10.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" /></svg>BUILD / {commit.slice(0, 7)}</a> : <span class="build-local">BUILD / LOCAL</span>}
+          </div>
         </div>
       </footer>
     </div>
