@@ -102,8 +102,15 @@ a.bay:hover { transform:translateY(-3px); border-color:var(--signal); color:var(
 .footer-wordmark span { color:var(--signal); }
 .footer-top p { margin:.8rem 0 0; color:var(--muted); font-size:.85rem; }
 .footer-top nav { display:flex; flex-wrap:wrap; align-content:start; gap:1rem 1.75rem; font-size:.84rem; }
-.footer-bottom { display:flex; gap:1.5rem; padding-block:1.25rem; border-top:1px solid var(--line); color:var(--muted); font-size:.72rem; }
-.footer-bottom a:last-child { margin-left:auto; }
+.footer-bottom { display:flex; align-items:end; flex-wrap:wrap; gap:1.5rem; padding-block:1.25rem; border-top:1px solid var(--line); color:var(--muted); font-size:.72rem; }
+.build-record { display:grid; margin-left:auto; justify-items:end; gap:.28rem; font:.68rem/1.35 var(--font-data); letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
+.build-record a { display:inline-flex; align-items:center; gap:.45rem; }
+.build-record svg { width:.88rem; height:.88rem; flex:0 0 auto; fill:currentColor; }
+.build-record a:last-child { color:var(--signal); }
+.build-record a:last-child svg { fill:none; stroke:currentColor; stroke-width:1.35; stroke-linecap:round; stroke-linejoin:round; }
+.build-record a:hover { color:var(--ink); }
+.build-record a:active { transform:translateY(1px); }
+.build-local { color:var(--signal); }
 @keyframes enter { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
 @media (prefers-reduced-motion:no-preference) { .page-hero .wrap,.home-hero .wrap,.post-head { animation:enter .55s ease-out both; } }
 @media (max-width:1024px) { .wrap { width:calc(100% - 4rem); } .nav-links { gap:1.3rem; } .hero-grid { gap:2rem; } .footer-top nav { max-width:24rem; } }
@@ -132,7 +139,7 @@ a.bay:hover { transform:translateY(-3px); border-color:var(--signal); color:var(
   .footer-top { flex-direction:column; padding-block:2.5rem; }
   .footer-top nav { max-width:none; gap:.75rem 1.5rem; }
   .footer-bottom { flex-wrap:wrap; gap:.5rem 1rem; }
-  .footer-bottom span { width:100%; }
-  .footer-bottom a:last-child { margin-left:0; }
+  .footer-bottom > span { width:100%; }
+  .build-record { margin-left:0; justify-items:start; margin-top:.25rem; }
 }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; } }
