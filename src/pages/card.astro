@@ -1,0 +1,86 @@
+---
+import '../styles/card.css';
+import SFSymbol from '../components/SFSymbol.astro';
+const links = [
+  { label: 'X', handle: '@real_merakw', href: 'https://x.com/real_merakw', icon: 'x.svg', kind: 'x' },
+  { label: '网页', handle: 'merakt.cn', href: '/', symbol: 'globe.asia.australia', kind: 'website' },
+  { label: 'QQ', handle: '1540180211', href: 'https://qm.qq.com/cgi-bin/qm/qr?k=1540180211', icon: 'qq.png', kind: 'qq' },
+  { label: '抖音', handle: '@merak_w', href: 'https://v.douyin.com/9FjfikdKPog', icon: 'douyin-mark.svg', kind: 'douyin' },
+];
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f2f2f7" />
+    <meta name="description" content="米拉克的电子登机牌：从杭州出发，在星海相遇。" />
+    <meta property="og:title" content="米拉克 / Merak · 电子登机牌" />
+    <meta property="og:description" content="从杭州到大熊座。找到米拉克，领取一枚登机纪念章。" />
+    <title>米拉克 / Merak · 电子登机牌</title>
+    <link rel="icon" href="/images/card/merak-mark.svg" />
+    <link rel="canonical" href={new URL('/card', Astro.site)} />
+    <script>import '../scripts/card.js';</script>
+  </head>
+  <body>
+    <a class="skip-link" href="#profileCard">跳至电子登机牌</a>
+    <main class="wallet-shell">
+      <header class="wallet-toolbar">
+        <a class="circle-button" href="/" aria-label="返回首页"><SFSymbol name="chevron.left" /></a>
+        <span class="toolbar-title">登机牌</span>
+        <button class="circle-button" id="shareCard" type="button" aria-label="分享电子登机牌" hidden><SFSymbol name="square.and.arrow.up" /></button>
+      </header>
+      <section class="wallet-content" aria-label="米拉克的电子登机牌名片">
+        <article class="wallet-pass" id="profileCard">
+          <header class="pass-header">
+            <div class="airline-brand">
+              <img src="/images/card/merak-mark.svg" width="33" height="29" alt="" />
+              <span><strong>MERAK AIRWAYS</strong><small>THE PAW-LACE™ SUITE</small></span>
+            </div>
+            <div class="boarding-status" id="boardingStatus" data-state="waiting"><span><i class="live-dot" aria-hidden="true"></i><span id="boardingStatusLabel">等待登机</span></span><b id="boardingStatusEnglish">WAITING TO BOARD</b></div>
+          </header>
+          <div class="identity-route" aria-label="航线：杭州至大熊座">
+            <div class="route-field"><span>出发地 / FROM</span><strong>HGH</strong><small>杭州 / HANGZHOU</small></div>
+            <div class="route-track" aria-hidden="true"><span></span><SFSymbol name="airplane" /><span></span></div>
+            <div class="route-field align-right"><span>目的地 / TO</span><strong>UMJ</strong><small>大熊座 / URSA MAJOR</small></div>
+          </div>
+          <section class="cardholder" aria-labelledby="profileName">
+            <div><span class="field-label">旅客 / PASSENGER</span><h1 id="profileName">米拉克 / MERAK</h1><div class="identity-tags"><b>FIRST CLASS</b><b>PULSAR ELITE</b></div></div>
+            <img class="avatar" src="/images/card/avatar.webp" width="64" height="64" alt="" />
+          </section>
+          <dl class="flight-fields">
+            <div><dt>航班 / FLIGHT</dt><dd>MK 518</dd></div>
+            <div><dt>登机口 / GATE</dt><dd>42</dd></div>
+            <div><dt>座位 / SEAT</dt><dd>1A</dd></div>
+            <div><dt>登机 / BOARD</dt><dd>09:41</dd></div>
+            <div class="cabin-field"><dt>舱位 / CABIN</dt><dd>PAW-LACE™ Suite</dd></div>
+          </dl>
+          <section class="connect-section" aria-labelledby="connect-title">
+            <div class="connect-heading"><h2 id="connect-title">在这里，保持联络。</h2><span>LET’S CONNECT</span></div>
+            <ul class="social-grid">
+              {links.map((link) => <li><a href={link.href} target={link.kind === 'website' ? undefined : '_blank'} rel={link.kind === 'website' ? undefined : 'noopener noreferrer'} aria-label={`${link.label}：${link.handle}`}>
+                <span class={`social-logo is-${link.kind}`}>{link.icon ? <img src={`/images/card/${link.icon}`} width="25" height="25" alt="" /> : <SFSymbol name={link.symbol!} />}</span>
+                <span class="social-name"><strong>{link.label}</strong><small>{link.handle}</small></span>
+                <SFSymbol name="arrow.up.right" />
+              </a></li>)}
+            </ul>
+          </section>
+          <footer class="pass-footer"><span>SEQ 044 · PNR SKYFOX</span><span>HGH → UMJ</span></footer>
+        </article>
+        <section class="lounge" aria-labelledby="lounge-title">
+          <header class="lounge-heading"><div><span class="eyebrow">BEFORE WE TAKE OFF</span><h2 id="lounge-title">登机前的小片刻</h2></div><SFSymbol name="sparkles" /></header>
+          <div class="local-time"><span><i class="live-dot" aria-hidden="true"></i>杭州当地时间<small>HANGZHOU · UTC+8</small></span><time id="hangzhouClock" aria-label="杭州当地时间">--:--:--</time></div>
+          <div class="souvenir" id="souvenir">
+            <div class="souvenir-copy"><span class="souvenir-kicker">A LITTLE PROOF WE MET</span><h3 id="stampTitle">这一程，很高兴遇见你。</h3><p id="stampDescription">留下一枚属于今天的登机纪念章。</p></div>
+            <div class="stamp" id="boardingStamp" hidden><img src="/images/card/merak-mark.svg" width="28" height="25" alt="" /><strong>BOARDED</strong><span>HGH → UMJ · MK 518</span><time id="stampDate"></time></div>
+            <button class="stamp-button" id="collectStamp" type="button"><SFSymbol name="checkmark.seal.fill" /><span>领取登机纪念章</span></button>
+            <p class="stamp-note" id="stampNote" hidden>已留存在这台设备，期待下次相遇。</p>
+          </div>
+          <p class="closing-motto">Follow the Stars. Boundless Beyond.</p>
+        </section>
+        <p class="fiction-note">MERAK AIRWAYS · 一张飞往星海的个人名片</p>
+      </section>
+    </main>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

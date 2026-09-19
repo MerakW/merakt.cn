@@ -1,0 +1,108 @@
+:root { color-scheme:light dark; --canvas:#dce0e6; --background:#f2f2f7; --surface:#fff; --ink:#1d1d1f; --muted:#707078; --line:#e7e8ed; --blue:#007aff; --green:#157442; --font:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif; --mono:"SFMono-Regular",ui-monospace,monospace; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--canvas); color:var(--ink); font-family:var(--font); -webkit-font-smoothing:antialiased; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { font:inherit; cursor:pointer; }
+a { color:inherit; text-decoration:none; }
+[hidden] { display:none !important; }
+button:focus-visible,a:focus-visible { outline:3px solid var(--blue); outline-offset:4px; }
+.sf-symbol { display:inline-block; width:24px; height:24px; flex:0 0 auto; background:currentColor; mask:var(--symbol) center/contain no-repeat; -webkit-mask:var(--symbol) center/contain no-repeat; }
+.skip-link { position:fixed; top:10px; left:-9999px; z-index:30; background:var(--surface); padding:12px; border-radius:10px; }
+.skip-link:focus { left:10px; }
+.wallet-shell { width:min(100%,440px); min-height:100dvh; margin:auto; background:var(--background); }
+.wallet-toolbar { display:grid; grid-template-columns:44px 1fr 44px; align-items:center; padding:max(24px,env(safe-area-inset-top)) 16px 18px; }
+.toolbar-title { text-align:center; font-size:17px; font-weight:650; }
+.circle-button { width:44px; height:44px; display:grid; place-items:center; padding:0; border:1px solid #ffffff70; border-radius:50%; background:var(--surface); color:var(--ink); box-shadow:0 3px 14px #23304b0b; }
+.circle-button .sf-symbol { width:23px; height:23px; }
+.wallet-content { padding:0 16px max(24px,env(safe-area-inset-bottom)); }
+.wallet-pass { overflow:hidden; border-radius:22px; color:#fff; background:linear-gradient(150deg,#1a91ee,#096acb 65%); box-shadow:0 12px 26px #164d9424; }
+.pass-header { margin:0 18px; min-height:75px; display:flex; align-items:center; justify-content:space-between; gap:10px; border-bottom:1px solid #ffffff38; }
+.airline-brand { display:flex; align-items:center; gap:9px; min-width:0; }
+.airline-brand img { width:30px; height:auto; flex:none; }
+.airline-brand > span { display:grid; gap:4px; }
+.airline-brand strong { font-size:11px; letter-spacing:.07em; }
+.airline-brand small { font-size:8px; color:#ffffffda; }
+.boarding-status { flex:none; display:grid; gap:5px; padding:8px; border-radius:10px; }
+.boarding-status[data-state="waiting"] { color:#075cba; background:#deeeff; }
+.boarding-status[data-state="boarding"] { color:#075b2c; background:#d3f9df; }
+.boarding-status[data-state="last-call"] { color:#9d4a00; background:#fff0d8; }
+.boarding-status[data-state="closed"] { color:#5f636b; background:#e8eaed; }
+.boarding-status > span { display:flex; align-items:center; justify-content:center; gap:5px; font-size:10px; font-weight:650; }
+.boarding-status b { font:600 7px var(--mono); letter-spacing:.025em; }
+.live-dot { display:inline-block; width:6px; height:6px; border-radius:50%; background:currentColor; flex:none; box-shadow:0 0 0 3px currentColor; opacity:.9; animation:breathe 2.8s ease-in-out infinite; }
+.boarding-status[data-state="last-call"] .live-dot { animation-duration:1.2s; }
+.boarding-status[data-state="boarding"] .live-dot { animation-duration:2.2s; }
+.boarding-status[data-state="closed"] .live-dot { animation:none; opacity:.55; }
+@keyframes breathe { 50% { box-shadow:0 0 0 5px #18a95425; opacity:.65; } }
+.identity-route { display:flex; align-items:center; gap:12px; padding:24px 18px; }
+.route-field { display:grid; gap:4px; flex:none; }
+.route-field > span,.field-label,.flight-fields dt { font-size:9px; color:#ffffffdb; }
+.route-field strong { font-size:49px; font-weight:650; letter-spacing:-.05em; line-height:1; }
+.route-field small { font-size:8px; color:#ffffffdb; }
+.align-right { text-align:right; }
+.route-track { display:flex; align-items:center; flex:1; color:white; padding-top:10px; }
+.route-track > span:not(.sf-symbol) { height:1px; background:#ffffff55; flex:1; }
+.route-track .sf-symbol { width:25px; margin:0 4px; }
+.cardholder { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 18px; padding:17px 0; border-block:1px solid #ffffff38; }
+.cardholder h1 { margin:5px 0 9px; font-size:19px; font-weight:650; letter-spacing:-.03em; }
+.identity-tags { display:flex; gap:5px; }
+.identity-tags b { font-size:8px; letter-spacing:.04em; padding:4px 7px; border-radius:5px; background:#ffffff25; }
+.identity-tags b:first-child { background:#ffe0ae; color:#584024; }
+.identity-tags b:last-child { background:rgba(35, 18, 57, .72); box-shadow:inset 0 1px 0 rgba(214, 189, 255, .14); }
+.avatar { width:58px; height:58px; padding:2px 2px 0; border:1.5px solid #ffffffbb; border-radius:17px; background:#c8c8c8; object-fit:contain; object-position:center bottom; }
+.flight-fields { display:grid; grid-template-columns:1fr 1fr 1fr; gap:17px 12px; margin:0; padding:19px 18px 24px; }
+.flight-fields dt { margin-bottom:6px; }
+.flight-fields dd { margin:0; font:600 13px var(--mono); }
+.cabin-field { grid-column:span 2; }
+.cabin-field dd { font:600 14px var(--font); white-space:nowrap; }
+.connect-section { padding:20px 18px 10px; background:var(--surface); color:var(--ink); }
+.connect-heading { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:14px; }
+.connect-heading h2 { font-size:13px; margin:0; font-weight:650; }
+.connect-heading > span { font:500 7px var(--mono); letter-spacing:.06em; color:var(--muted); }
+.social-grid { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.social-grid a { display:flex; align-items:center; gap:8px; min-height:65px; padding:10px 8px; border-radius:12px; background:var(--background); }
+.social-logo { width:28px; height:28px; flex:0 0 28px; display:grid; place-items:center; background:white; border-radius:7px; }
+.social-logo img { object-fit:contain; width:22px; height:22px; }
+.social-logo.is-x,.social-logo.is-qq,.social-logo.is-douyin { background:transparent; border-radius:0; }
+.social-logo.is-x img { width:18px; height:18px; filter:brightness(0); }
+.social-logo.is-douyin img { width:22px; height:22px; }
+.social-logo.is-website { color:#007aff; background:transparent; }
+.social-logo.is-website .sf-symbol { color:#007aff; }
+.social-logo.is-website .sf-symbol { width:30px; height:30px; transform:translateX(-1px); }
+.social-name { display:grid; gap:4px; min-width:0; }
+.social-name strong { font-size:12px; font-weight:600; }
+.social-name small { font-size:9px; color:var(--muted); white-space:nowrap; }
+.social-grid .sf-symbol { width:13px; height:13px; margin-left:auto; color:var(--muted); }
+.pass-footer { display:flex; justify-content:space-between; gap:10px; padding:13px 18px; border-top:1px solid var(--line); color:var(--muted); background:var(--surface); font:500 8px var(--mono); letter-spacing:.035em; }
+.lounge { margin-top:25px; }
+.lounge-heading { display:flex; justify-content:space-between; align-items:center; padding:0 4px 14px; }
+.eyebrow { font:500 8px var(--mono); color:var(--muted); letter-spacing:.1em; }
+.lounge-heading h2 { margin:5px 0 0; font-size:17px; letter-spacing:-.035em; font-weight:650; }
+.lounge-heading > .sf-symbol { color:var(--muted); width:27px; height:27px; }
+.local-time { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:16px; background:var(--surface); border-radius:16px 16px 0 0; border-bottom:1px solid var(--line); }
+.local-time > span { font-size:11px; }
+.local-time .live-dot { margin-right:7px; width:5px; height:5px; color:#14934a; background:#14934a; }
+.local-time small { display:block; margin:6px 0 0 12px; color:var(--muted); font:500 7px var(--mono); letter-spacing:.06em; }
+.local-time time { font:600 21px "SF Pro Rounded", "SF Pro Display", -apple-system, sans-serif; font-variant-numeric:tabular-nums; letter-spacing:-.04em; }
+.souvenir { position:relative; display:flex; flex-direction:column; align-items:center; padding:27px 18px 20px; background:var(--surface); border-radius:0 0 16px 16px; text-align:center; }
+.souvenir-kicker { font:500 7px var(--mono); letter-spacing:.12em; color:var(--muted); }
+.souvenir h3 { margin:10px 0 7px; font-size:18px; letter-spacing:-.04em; font-weight:600; }
+.souvenir p { font-size:11px; color:var(--muted); margin:0; line-height:1.65; }
+.stamp-button { display:flex; align-items:center; justify-content:center; gap:6px; margin-top:20px; width:100%; min-height:44px; border:0; border-radius:11px; background:#e9f2ff; color:#0866c6; font-size:12px; font-weight:600; }
+.stamp-button .sf-symbol { width:23px; height:23px; }
+.stamp-button:disabled { cursor:default; background:transparent; color:var(--green); margin-top:12px; min-height:30px; }
+.stamp { display:grid; justify-items:center; gap:5px; width:185px; padding:13px 10px; margin-top:22px; color:var(--green); border:2px solid currentColor; outline:1px solid currentColor; outline-offset:-6px; border-radius:12px; transform:rotate(-7deg); animation:stamp-in 350ms ease-out; }
+.stamp img { filter:brightness(0); opacity:.55; }
+.stamp strong { font:700 23px var(--mono); letter-spacing:.09em; }
+.stamp span,.stamp time { font:500 8px var(--mono); letter-spacing:.05em; }
+.souvenir .stamp-note { margin-top:5px; font-size:10px; }
+.closing-motto { text-align:center; color:var(--muted); font-size:10px; margin:18px 0 0; }
+.fiction-note { text-align:center; color:var(--muted); font-size:8px; letter-spacing:.025em; margin:20px 0 0; }
+.toast { position:fixed; left:50%; bottom:25px; width:max-content; max-width:90vw; transform:translate(-50%,10px); opacity:0; pointer-events:none; background:#222e; color:#fff; padding:12px 18px; border-radius:14px; font-size:12px; transition:opacity .2s,transform .2s; z-index:40; }
+.toast.is-visible { transform:translate(-50%,0); opacity:1; }
+@keyframes stamp-in { from { opacity:0; transform:rotate(-12deg) scale(1.2); } to { opacity:1; transform:rotate(-7deg) scale(1); } }
+@media(min-width:550px) { .wallet-shell { margin:20px auto; border-radius:32px; min-height:calc(100dvh - 40px); box-shadow:0 20px 70px #18284318; } }
+@media(max-width:360px) { .wallet-content { padding-inline:10px; } .pass-header { margin-inline:14px; gap:6px; } .airline-brand { gap:6px; } .airline-brand img { width:25px; } .airline-brand strong { font-size:9px; } .airline-brand small { font-size:7px; } .identity-route { padding-inline:14px; gap:7px; } .route-field strong { font-size:43px; } .route-field small { font-size:7px; } .cardholder { margin-inline:14px; } .flight-fields { padding-inline:14px; } .connect-section { padding-inline:12px; } .social-grid a { gap:5px; padding-inline:6px; } .social-name small { font-size:8px; } .social-grid .sf-symbol { width:11px; } .cardholder h1 { font-size:17px; } .connect-heading > span { font-size:6px; } }
+@media(prefers-color-scheme:dark) { :root { --canvas:#1c1c1e; --background:#000; --surface:#1c1c1e; --ink:#f5f5f7; --muted:#a0a0a8; --line:#333338; --green:#72d49a; } .circle-button { border-color:#ffffff12; } .avatar { background:#373737; } .social-grid a { background:#2c2c2e; } .stamp-button { background:#17304e; color:#87bfff; } .stamp img { filter:brightness(0) invert(1); } }
+@media(hover:hover) { a:hover,button:not(:disabled):hover { filter:brightness(.94); } }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
