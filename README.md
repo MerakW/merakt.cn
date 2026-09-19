@@ -13,10 +13,15 @@ Merak 的个人博客与小小的数字围场 ✈️
 | `/fursuitfriday` | 🐾 毛五照片档案 |
 | `/blog` | 📓 航行日志 |
 | `/status` | 📡 系统遥测 |
+| `/card` | ✈️ Apple Wallet 风格电子登机牌名片 |
 
 `astronix` 与 `airways` 目前仅隐藏入口，页面路由仍会保留。
 
 ## 待办 🧭
+
+电子名片提供 X、GitHub、QQ、抖音直达入口，支持系统分享（浏览器支持时显示），保留实体票的 MK 518 / HGH → UMJ / 1A 信息，舱位为 PAW-LACE™ Suite。下方候机区显示杭州实时时钟，并可领取保存在当前设备的登机纪念章；绿色登机状态是票面创意设定，并非个人在线状态。首页和人物页均有入口。此版本为网页票券，不生成 Apple Wallet `.pkpass`。
+
+名片品牌标志来自用户提供的 `花纹.svg`；通用图标由 macOS 原生 SF Symbols 渲染为本地 PNG，通过 CSS mask 适配深浅色。社交资源来源：X 官方 Brand Toolkit 的 `x-logo.zip`、GitHub 官方 `GitHub_Logos.zip`、QQ 官网 `https://static-res.qq.com/static-res/imqq/qq-logo.png`、抖音官网 `https://www.douyin.com/favicon.ico`。所有资源均本地加载。
 
 - [ ] 🗓️ 近期行程：展示专用公开日历中的日期、标题和地点。
 - [ ] 🖼️ 为毛五归档提供更多合适尺寸的图片版本，改善慢速网络体验。
