@@ -1,0 +1,134 @@
+:root{color-scheme:light}
+.theme-control{display:flex;align-items:center;gap:2px;color:var(--muted);flex:none;padding-left:14px;border-left:1px solid var(--line)}
+.theme-control button{position:relative;display:grid;place-items:center;width:32px;height:36px;padding:0;border:0;background:none;color:inherit;cursor:pointer;transition:color .2s}
+.theme-control button:hover,.theme-control button[aria-pressed=true]{color:var(--blue)}
+.theme-control button[aria-pressed=true]::after{content:'';position:absolute;bottom:0;width:12px;height:2px;background:currentColor}
+.theme-control button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+@media(max-width:1150px){.site-nav{flex-wrap:wrap}.site-nav .nav-location{display:none}.theme-control{margin-left:auto}}
+@media(max-width:1150px){
+ .site-nav{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}
+ .site-nav .brand{grid-column:1;grid-row:1;min-width:0}
+ .site-nav .theme-control{position:static;grid-column:2;grid-row:1;margin:0;padding:0}
+ .site-nav .theme-control button{width:44px;height:44px}
+ .site-nav nav{grid-column:1 / -1;grid-row:2;min-width:0;justify-content:space-between;gap:10px;flex-wrap:nowrap}
+ .site-nav nav a{white-space:nowrap}
+ .site-nav .brand-caption{display:none}
+}
+.collection-filters{position:relative}
+.collection-filters button[aria-pressed=true]::after{display:none}
+.collection-filter-marker{position:absolute;left:0;top:0;width:var(--filter-width,0px);height:2px;background:var(--blue);transform:translate(var(--filter-x,0px),var(--filter-y,0px));transition:transform .3s cubic-bezier(.22,1,.36,1),width .3s cubic-bezier(.22,1,.36,1);pointer-events:none}
+@media(prefers-reduced-motion:no-preference){
+ .collection-module-stage{animation:collection-arrive .38s cubic-bezier(.22,1,.36,1) both}
+ .collection-grid .collection-item{animation:collection-card-arrive .32s cubic-bezier(.22,1,.36,1) both}
+ .collection-grid .collection-item:nth-child(2){animation-delay:25ms}.collection-grid .collection-item:nth-child(3){animation-delay:50ms}.collection-grid .collection-item:nth-child(n+4){animation-delay:75ms}
+}
+@keyframes collection-arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes collection-card-arrive{from{opacity:0;translate:0 9px}to{opacity:1;translate:0 0}}
+@media(prefers-reduced-motion:reduce){.collection-filter-marker{transition:none}}
+
+html[data-theme=dark]{color-scheme:dark;--ink:#e5edf9;--canvas:#0e1623;--paper:#162234;--ice:#20384b;--blue:#91adff;--orange:#ff956d;--muted:#a0b0c8;--line:#304057;--map-land:#263e4c;--map-coast:#527084}
+html[data-theme=dark] .departure-board{background:#2445c5;color:#f5f8ff}
+html[data-theme=dark] :is(.aircraft-mark,.empty-board){background:#2445c5;color:#f5f8ff}
+html[data-theme=dark] :is(.image-viewer,.image-viewer button){color:#f5f8ff}
+html[data-theme=dark] :is(.archive-view button[aria-pressed=true],.airport-stamp[aria-pressed=true]::after){color:#101d36}
+html[data-theme=dark] :is(.archive-tags .baggage-tag,.baggage-tag,.baggage-tag.tag-1,.baggage-entry.is-open,.archive-tags .ticket-face,.checkin-form,.visitor-boarding-pass,.gallery-page .photo-record,.waiting-room .checkin-wall article){background:var(--paper);border-color:var(--line)}
+html[data-theme=dark] :is(.archive-tags .ticket-face .tag-bottom,.pass-tear,.checkin-form input:not([type=checkbox]),.checkin-form textarea){background:#111c2d;border-color:var(--line);color:var(--ink)}
+html[data-theme=dark] :is(.route-atlas-toggle,.home-flight,.overview-panel,.route-map,.lounge-invite,.profile-hero figure,.visitor-stub,.photo-button,.video-thumbnail,.album-desk){background:#1a2b43}
+html[data-theme=dark] :is(.flight-row:hover,.journal-entry:hover,.archive-list .baggage-tag:hover,.archive-pagination button:hover,.base-shortcuts button[aria-pressed=true]){background:#233652}
+html[data-theme=dark] .first-ticket{background:#34332f;border-color:#57554d;color:#f2e9da}
+html[data-theme=dark] .first-ticket::before{background:#d9cbb044}
+html[data-theme=dark] .familiar-ticket{border-color:#40647a;box-shadow:5px 5px 0 #142638,6px 6px 0 #40647a,10px 10px 0 #111e2e,11px 11px 0 #40647a}
+html[data-theme=dark] :is(.piece-cities,.repeat-count>small){color:#b2cee2}
+html[data-theme=dark] :is(.fact-card,.fact-carrier){background:#1b3040;border-color:#34526a}
+html[data-theme=dark] .fact-aircraft{background:#17263a}
+html[data-theme=dark] .fact-tail{background:#232d47}
+html[data-theme=dark] :is(.airport-stamp,.airport-stamp.stamp-1,.airport-stamp.stamp-2){color:#98b9e2}
+html[data-theme=dark] .airport-stamp.stamp-1{color:#8bc6d0}
+html[data-theme=dark] .airport-stamp.stamp-2{color:#b1ace0}
+html[data-theme=dark] :is(.collection-family-code,.collection-carrier-code){color:#384b64}
+html[data-theme=dark] .collection-airlines .collection-item{background:#16223490;border-color:var(--line)}
+html[data-theme=dark] .collection-item[aria-pressed=true]{background:#243856}
+html[data-theme=dark] :is(.collection-item-foot,.collection-aircraft .collection-item-foot,.collection-airlines .collection-item-foot){border-color:var(--line)}
+html[data-theme=dark] .collection-carrier-logo{mix-blend-mode:normal;background:none;border-radius:0;padding:0;filter:drop-shadow(0 1px 5px #a8c9ff25)}
+html[data-theme=dark] .collection-filters img{background:none;border-radius:0;padding:0}
+html[data-theme=dark] .collection-filters button[aria-label="Airbus"] img{filter:none;background:none;padding:0;opacity:1}
+html[data-theme=dark] .aircraft-type-logo{filter:invert(1)}
+html[data-theme=dark] .aircraft-detail .aircraft-type-logo{filter:none}
+html[data-theme=dark] :is(.carrier-wordmark,.carrier-alliance){background:none;border-radius:0;padding:0}
+html[data-theme=dark] .footer-repo img{filter:brightness(0) invert(1);opacity:.7}
+html[data-theme=dark] :is(.state-label.cancelled,.diversion-label,.letter-error,.checkin-form [role=alert]){color:#ffb393}
+html[data-theme=dark] .import-error{background:#402a2b;color:#ffd0c0}
+html[data-theme=dark] .album-print,html[data-theme=dark] .album-print:after,html[data-theme=dark] .album-print:before{background:#203047}
+html[data-theme=dark] :is(.album-print .photo-button,.gallery-page .photo-record .photo-button){background:#162234}
+html[data-theme=dark] :is(.print-footer,.pass-tear>span,.base-shortcuts button){color:var(--muted)}
+html[data-theme=dark] .photo-count{background:#162234e8}
+html[data-theme=dark] .cover-photo{color:#132441}
+html[data-theme=dark] .pass-flight-line{background:var(--paper)}
+html[data-theme=dark] :is(.issue-pass,.checkin-form button,.manage-login,.map-airport-tabs button[aria-pressed=true]){color:#101d36}
+html[data-theme=dark] .waiting-room .checkin-form{box-shadow:8px 8px 0 #172338}
+html[data-theme=dark] .received-stamp{color:#98bedf;border-color:#98bedf}
+html[data-theme=dark] :is(input,textarea,select){caret-color:var(--ink)}
+
+.theme-logo-dark{display:none!important}
+html[data-theme=dark] .theme-logo-light{display:none!important}
+html[data-theme=dark] .theme-logo-dark{display:block!important}
+html[data-theme=dark] .collection-filters[aria-label="飞机厂商"] img{filter:brightness(0) invert(1);opacity:.95}
+html[data-theme=dark] .collection-filters button[aria-label="天合联盟"] img,
+html[data-theme=dark] .alliance-skyteam{filter:brightness(0) invert(1);opacity:.9}
+.collection-filters button[aria-label="寰宇一家"] img{width:42px;height:42px}
+.collection-filters button[aria-label="星空联盟"] img{width:112px;height:32px}
+html[data-theme=dark] .airline-logo{filter:drop-shadow(0 0 2px #a8c9ff30)}
+@media(max-width:600px){.collection-filters button[aria-label="寰宇一家"] img{width:34px;height:34px}.collection-filters button[aria-label="星空联盟"] img{width:95px}}
+
+html[data-theme=dark] .fact-carrier{background:#a7b7c5;border-color:#879dad;--ink:#172b45;--muted:#384f65;--blue:#213e83;--line:#788fa4;color:var(--ink)}
+html[data-theme=dark] .fact-carrier .carrier-wordmark{filter:none}
+html[data-theme=dark] .fact-carrier .alliance-skyteam{filter:none;opacity:1}
+.fact-tail-aircraft{display:block;margin-top:10px}
+.fact-tail-aircraft .aircraft-type-logo{height:16px;width:auto;max-width:100%}
+.distance-thread{background:none!important;position:relative}
+.distance-thread>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.distance-thread>svg path{fill:none;stroke:#91a8cc;stroke-width:1;vector-effect:non-scaling-stroke}
+.distance-thread>span{position:relative}
+
+/* Visit-scoped theme toggle and flight presentation. */
+.theme-control{border:0;padding-left:8px}
+.theme-control button{width:40px;height:40px}
+.departure-board{--ice:#dceaff;--paper:#fff}
+.departure-board .signal-dot{background:#65d6a0}
+.departure-board .aircraft-symbol{background:#fff;color:#fff}
+.departure-board::before{border-color:#ffffff40;box-shadow:0 0 0 45px #ffffff0d,0 0 0 90px #ffffff08;animation:departure-breeze 5s ease-in-out infinite alternate}
+.departure-board::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,#ffffff09 44%,#ffffff18 45%,transparent 47%);animation:departure-sweep 6s ease-in-out infinite}
+@keyframes departure-breeze{from{transform:translate(25px,-30px) scale(.85)}to{transform:translate(-85px,75px) scale(1.22)}}
+@keyframes departure-sweep{0%{transform:translateX(-100%);opacity:0}20%,65%{opacity:1}100%{transform:translateX(100%);opacity:0}}
+.state-label{display:inline-flex;align-items:center;gap:7px;line-height:1.4}
+.state-label.completed::before{flex:none;margin:0;background:#4c9a85}
+.state-label.arrival-delayed{color:#a16c08}
+.state-label.arrival-delayed::before{background:#d5a028}
+html[data-theme=dark] .state-label.arrival-delayed{color:#e8c36c}
+.is-open .tag-bottom{align-items:center}
+.flight-page-end{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.flight-page-end .flight-page-credit{margin:0;font:11px var(--mono);color:var(--muted)}
+html:not([data-theme=dark]) .aircraft-detail{background:#b4dbed;border-color:#a7cedd;color:#193d59}
+html:not([data-theme=dark]) .aircraft-sky{background:linear-gradient(165deg,#85c4e5,#c7e6f2 70%,#e7f3f7)}
+html:not([data-theme=dark]) .aircraft-stars{display:none}
+html:not([data-theme=dark]) .aircraft-clouds{opacity:.95;filter:blur(7px);background-image:radial-gradient(ellipse 110px 32px at 80px 42%,#ffffffed,transparent 75%),radial-gradient(ellipse 160px 50px at 165px 48%,#fffffff0,transparent 78%),radial-gradient(ellipse 140px 40px at 440px 78%,#ffffffea,transparent 75%);animation-duration:28s}
+html:not([data-theme=dark]) .aircraft-clouds-near{animation-duration:19s}
+html:not([data-theme=dark]) .aircraft-detail .aircraft-type-logo{filter:brightness(0);opacity:.85}
+html:not([data-theme=dark]) :is(.aircraft-heading small,.aircraft-registration){color:#355870}
+@media(prefers-reduced-motion:reduce){.departure-board::before,.departure-board::after{animation:none}.departure-board::after{display:none}}
+
+.arrival-time-delayed{color:#bb303f}
+html[data-theme=dark] .arrival-time-delayed{color:#ff9a9f}
+.departure-board .arrival-time-delayed{color:#ffd0d4}
+.departure-bottomline strong>small{font-size:12px;margin-left:4px}
+@media(prefers-reduced-motion:no-preference){
+ .aircraft-portrait .aircraft-canvas{animation:aircraft-float 5.5s ease-in-out infinite paused}
+ .aircraft-portrait[data-active=true] .aircraft-canvas{animation-play-state:running}
+ ::view-transition-old(root){animation:theme-out .32s ease both}
+ ::view-transition-new(root){animation:theme-in .38s ease both}
+}
+@keyframes aircraft-float{0%,100%{transform:translateY(2px) rotate(.15deg)}50%{transform:translateY(-3px) rotate(-.15deg)}}
+@keyframes theme-out{to{opacity:0}}
+@keyframes theme-in{from{opacity:0}to{opacity:1}}
+
+@media(prefers-reduced-motion:no-preference){html.theme-fading *,html.theme-fading *::before,html.theme-fading *::after{transition:background-color .35s ease,color .35s ease,border-color .35s ease,box-shadow .35s ease!important}}

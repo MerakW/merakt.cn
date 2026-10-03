@@ -1,7 +1,0 @@
----
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { copy } from '../content/site-copy';
-const page = copy.astronix;
----
-
-<BaseLayout title={page.title}><section class="page-hero"><div class="wrap hero-grid" data-reveal><div><p class="eyebrow">{page.eyebrow}</p><h1>{page.heading.split('\n').map((line) => <>{line}<br /></>)}</h1><p class="lead">{page.lead}</p></div><div class="orbit"><span>{page.orbit}</span></div></div></section><section class="section"><div class="wrap"><div class="hangar-grid" data-reveal>{page.cards.map(([label, heading, text], index) => <article class={`bay ${index === 0 ? 'wide' : index === 1 ? 'narrow' : 'third'}`}><p class="data">{label}</p>{index === 0 ? <h2>{heading}</h2> : <h3>{heading}</h3>}<p>{text}</p>{index === 0 && <a class="route" href="/merak">认识 Merak</a>}</article>)}</div></div></section></BaseLayout>

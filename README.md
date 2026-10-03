@@ -1,39 +1,59 @@
-# Merak 🏁
+# Merak · 数字围场
 
-Merak 的个人博客与小小的数字围场 ✈️
+Next.js + Payload CMS + SQLite。
 
-这里记录 F1、航空、技术、毛五，以及日常喜欢的事 🐾
+## 本地开发
 
-## 页面一览
+```sh
+cd web
+npm ci
+cp .env.example .env
+npm run dev
+```
 
-| 路径 | 内容 |
-| --- | --- |
-| `/` | 🏠 首页与站内入口 |
-| `/merak` | 👤 人物资料 |
-| `/fursuitfriday` | 🐾 毛五照片档案 |
-| `/blog` | 📓 航行日志 |
-| `/status` | 📡 系统遥测 |
-| `/card` | ✈️ Apple Wallet 风格电子登机牌名片 |
+已有 `.env` 时请保留原配置。预览地址：http://127.0.0.1:3000。
 
-`astronix` 与 `airways` 目前仅隐藏入口，页面路由仍会保留。
+```sh
+npm test
+npm run typecheck
+npm run build
+```
 
-## 待办 🧭
+数据库、媒体和机模素材在本地单独配置，不随源码分发。机模 Credit：Norebbo。
 
-电子名片提供 X、GitHub、QQ、抖音直达入口，支持系统分享（浏览器支持时显示），保留实体票的 MK 518 / HGH → UMJ / 1A 信息，舱位为 PAW-LACE™ Suite。下方候机区显示杭州实时时钟，并可领取保存在当前设备的登机纪念章；绿色登机状态是票面创意设定，并非个人在线状态。首页和人物页均有入口。此版本为网页票券，不生成 Apple Wallet `.pkpass`。
+## 家庭服务器预览
 
-名片品牌标志来自用户提供的 `花纹.svg`；通用图标由 macOS 原生 SF Symbols 渲染为本地 PNG，通过 CSS mask 适配深浅色。社交资源来源：X 官方 Brand Toolkit 的 `x-logo.zip`、GitHub 官方 `GitHub_Logos.zip`、QQ 官网 `https://static-res.qq.com/static-res/imqq/qq-logo.png`、抖音官网 `https://www.douyin.com/favicon.ico`。所有资源均本地加载。
+需要 Python 3.10+ 和本机 Docker。公开素材另行放置；预览不会连接云端或上传文件。
 
-- [ ] 🗓️ 近期行程：展示专用公开日历中的日期、标题和地点。
-- [ ] 🖼️ 为毛五归档提供更多合适尺寸的图片版本，改善慢速网络体验。
+```sh
+cd web
+./deploy.sh preview --assets /path/to/reviewed-public --host 192.168.1.20
+```
 
-## UI 与交互
+将 IP 替换为家庭服务器内网地址，浏览器访问 `http://192.168.1.20:3001`。
+省略 `--host` 时仅本机可访问；可用 `--port` 修改端口。首次为空库，在 `/admin` 初始化管理员。
+预览构建当前工作目录代码，独立数据保存在 `web/.data/local-preview/data`，后续启动继续使用。
 
-- `src/styles/global.css` 统一字体、颜色、间距、导航、页脚及深浅主题；页面特有布局保留在各 `.astro` 文件中。
-- 首页以真实照片、站内目录和最近文章呈现内容，人物页分为介绍、兴趣与联系入口。
-- 航行日志支持分类筛选和空状态；阅读页使用独立的正文行宽。
-- 毛五档案支持响应式瀑布流、照片放大、左右切换和 Escape 关闭。开发环境读取本地照片，生产环境优先使用原有 CDN，加载失败时回退本地副本。
-- 系统遥测继续嵌入原有 Uptime Kuma 状态站，保留独立打开入口和加载提示；远程状态站的界面由该服务自身维护。
-- 主题跟随系统，也可在当前会话手动切换；交互在 Astro 页面切换后重新初始化，并清理旧监听。
-- 动效尊重 `prefers-reduced-motion`。移动导航支持键盘关闭与焦点管理。
+```sh
+./deploy.sh preview-stop
+```
 
-本轮验证：8 个页面生产构建、320px 窄屏无横向溢出、390px 手机与 1440px 桌面视觉、分类筛选与重置、照片切换与关闭、跨页面主题保持。
+停止后数据保留。重新执行 preview 会重新构建。预览目录和素材不要提交 Git，也不要开放到公网。
+
+## 云端发布
+
+```sh
+cd web
+./deploy.sh init
+# 编辑本地 .env.deploy.json 的 SSH 地址、HTTPS 域名、Git ref 和公开素材路径
+./deploy.sh
+```
+
+家庭服务器从指定 Git 提交构建，SSH 上传后备份数据并启动新版。云端需要 Docker Compose、Python 3.10+ 和可非交互 sudo 的部署账户；1Panel 配置域名与 HTTPS 反向代理到宿主机 `127.0.0.1:3000`。
+首次自动建库；运行数据位于云端 `/opt/merak/data`，不随程序替换。
+
+```sh
+./deploy.sh rollback --restore-data
+```
+
+回退恢复上一版及部署前数据，回退前数据另存保留。首次部署无上一版可回退。

@@ -1,0 +1,198 @@
+.aircraft-portrait{display:block;min-width:0;position:relative}
+.aircraft-window{display:block;position:relative}
+.aircraft-canvas{display:block;position:relative;width:100%;max-width:340px;margin-inline:auto;aspect-ratio:2}
+.aircraft-canvas>img{display:block;width:100%;height:auto;max-width:none;filter:drop-shadow(0 5px 3px #15294322);mix-blend-mode:normal}
+.aircraft-preview{width:100%;margin:-8px 0 4px;background:transparent}
+.archive-tags .is-open .aircraft-preview{display:none}
+.archive-list .baggage-tag{display:grid;grid-template-columns:.85fr 1.2fr 1.15fr 1fr;gap:20px}
+.archive-list .tag-bottom{grid-column:4}
+.archive-list .aircraft-preview{margin:0}
+.aircraft-detail{width:100%;max-width:460px;isolation:isolate;background:#101e32;color:#f1f6ff;border:1px solid #2a3d58;border-radius:8px;padding:20px 22px 17px;overflow:hidden}
+.aircraft-heading{position:relative;display:flex;align-items:start;justify-content:space-between;gap:16px}
+.aircraft-heading>span:first-child{display:flex;flex-direction:column;gap:8px;min-width:0}
+.aircraft-heading small{font:9px var(--mono);letter-spacing:.14em;color:#9eafc9}
+.aircraft-heading strong{font:500 28px/1.1 var(--display);letter-spacing:.01em}
+.aircraft-registration{font:11px var(--mono);color:#a9cce7;padding-top:2px;white-space:nowrap}
+.aircraft-detail .aircraft-window{margin:8px 0 0}
+.aircraft-detail .aircraft-canvas{max-width:340px}
+.aircraft-caption{position:relative;display:block;font:9px var(--mono);color:#b7c7db}
+.aircraft-caption a{color:inherit;text-underline-offset:3px}
+.aircraft-sky{position:absolute;inset:0;z-index:-1;overflow:hidden;background:linear-gradient(165deg,#0c1729 5%,#1d3449 65%,#243b4d)}
+.aircraft-stars{position:absolute;inset:0 -100% 0 0;opacity:.6;background-image:radial-gradient(circle at 31px 23px,#ebf4ff 0 .6px,transparent 1px),radial-gradient(circle at 137px 93px,#accbdf 0 .7px,transparent 1.1px),radial-gradient(circle at 79px 159px,#fff 0 .5px,transparent 1px);background-size:211px 193px;animation:aircraft-sky-drift 90s linear infinite paused}
+.aircraft-clouds{position:absolute;inset:-20% -800px -20% -800px;opacity:.55;filter:blur(12px);background-image:radial-gradient(ellipse 100px 32px at 80px 42%,#a8c4d350,transparent 75%),radial-gradient(ellipse 130px 40px at 155px 48%,#bad1dc60,transparent 78%),radial-gradient(ellipse 95px 30px at 390px 75%,#c1d5df55,transparent 75%),radial-gradient(ellipse 140px 50px at 460px 79%,#b7cfdc55,transparent 78%),radial-gradient(ellipse 130px 45px at 690px 36%,#adc9d860,transparent 78%);background-size:800px 100%;animation:aircraft-cloud-drift 55s linear infinite paused}
+.aircraft-clouds-near{opacity:.65;top:15%;filter:blur(9px);animation-duration:38s;animation-delay:-11s}
+.aircraft-detail[data-active=true] .aircraft-sky>span{animation-play-state:running}
+@keyframes aircraft-sky-drift{from{transform:translateX(-211px)}to{transform:translateX(0)}}
+@keyframes aircraft-cloud-drift{from{transform:translateX(-800px)}to{transform:translateX(0)}}
+.aircraft-credit{font-size:10px;color:var(--muted);margin:20px 5px 0}
+.aircraft-credit a{color:inherit;text-underline-offset:3px}
+.fact-card .aircraft-preview{margin:0 -12px;width:calc(100% + 24px)}
+.fact-card .aircraft-canvas{max-width:300px}
+@media(max-width:760px){.archive-list .baggage-tag{display:grid;grid-template-columns:1fr 1fr;gap:12px}.archive-list .tag-top{grid-column:1/-1}.archive-list .aircraft-preview{grid-column:2;grid-row:2 / span 2}.archive-list .tag-bottom{grid-column:1;margin-left:0}.archive-list .tag-route{grid-column:1}.aircraft-detail{padding:18px 16px 14px}.aircraft-heading{gap:8px}.aircraft-registration{font-size:10px}.aircraft-heading strong{font-size:25px}}
+@media(max-width:460px){.aircraft-preview{margin-bottom:3px}.aircraft-heading{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.aircraft-detail .aircraft-sky>span{animation:none}}
+
+.fact-card h3{margin-bottom:0;min-height:0}
+.souvenir-method a{color:inherit;text-underline-offset:3px}
+
+/* A compact ticket face, with the flight number on its detachable lower stub. */
+.archive-tags .baggage-tag.ticket-face{padding:17px 18px 0 26px;height:100%;border-radius:7px;background:#fff}
+.archive-tags .ticket-face .tag-top{align-items:center;flex-direction:row;padding-bottom:11px;border-bottom:1px solid #e8edf5}
+.archive-tags .ticket-face .tag-route{margin:16px 0 2px}
+.archive-tags .ticket-face .tag-route strong{font-size:46px;letter-spacing:.01em}
+.archive-tags .ticket-face .aircraft-preview{margin:0 0 5px}
+.archive-tags .ticket-face .aircraft-window{height:112px;display:flex;align-items:center;justify-content:center}
+.archive-tags .ticket-face .aircraft-canvas{max-width:300px;flex:0 1 300px}
+.archive-tags .ticket-face .tag-bottom{margin:0 -18px 0 -26px;padding:12px 18px 13px 26px;background:#f6f8fc;border-top:1px dashed #becde1;min-height:61px;margin-top:auto}
+.archive-tags .ticket-face .tag-open{display:inline-flex;gap:6px;align-items:center}
+.archive-tags .ticket-face .tag-open::after{content:'↗';font-size:14px;color:#7896c3}
+.archive-tags .ticket-face .tag-perforation{bottom:64px}
+.archive-detail{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr) minmax(0,1fr);gap:24px;padding:22px;align-items:stretch}
+.archive-detail>.aircraft-detail{max-width:none;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;min-width:0}
+.archive-detail .aircraft-canvas>img{filter:drop-shadow(0 7px 5px #0006)}
+.archive-detail>.detail-copy{padding:2px 0;min-width:0}
+.archive-detail .detail-copy .kicker{margin:0 0 12px}
+.archive-detail .detail-copy h3{font-size:17px;line-height:1.5;margin:0 0 18px}
+.archive-detail .detail-copy dl{grid-template-columns:1fr 1fr;gap:16px 12px}
+.archive-detail .detail-copy dl>div{display:block;min-width:0}
+.archive-detail .detail-copy dt{font-size:10px;margin-bottom:4px}
+.archive-detail .detail-copy dd{overflow-wrap:anywhere}
+.archive-detail>.route-map-panel{min-width:0;display:flex;flex-direction:column}
+.archive-detail>.route-map-panel>.route-map{height:100%;min-height:260px}
+.archive-detail>.route-map-panel svg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+@media(max-width:1100px) and (min-width:701px){
+ .archive-detail{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+ .archive-detail>.detail-copy{grid-column:1/-1;grid-row:2;border-top:1px solid var(--line);padding-top:18px}
+ .archive-detail .detail-copy dl{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .archive-detail .detail-copy h3{margin-bottom:14px}
+}
+@media(max-width:700px){
+ .archive-detail{grid-template-columns:1fr;gap:20px;padding:14px}
+ .archive-detail>.aircraft-detail{max-width:none}
+ .archive-detail>.detail-copy{padding:0 3px}
+ .archive-detail>.route-map-panel>.route-map{height:220px;min-height:220px}
+ .archive-tags .baggage-tag.ticket-face{padding:13px 12px 0 18px}
+ .archive-tags .ticket-face .tag-top{align-items:start;flex-direction:column;gap:5px;padding-bottom:9px}
+ .archive-tags .ticket-face .tag-route{margin-top:12px}
+ .archive-tags .ticket-face .tag-route strong{font-size:34px}
+ .archive-tags .ticket-face .aircraft-window{height:84px}
+ .archive-tags .ticket-face .tag-bottom{margin-inline:-18px -12px;padding:11px 12px 12px 18px;gap:7px}
+ .archive-tags .ticket-face .tag-open::after{display:none}
+}
+@media(max-width:360px){.archive-tags .ticket-face .tag-route strong{font-size:29px}.archive-tags .ticket-face .aircraft-window{height:70px}}
+.archive-detail:not(:has(>.aircraft-detail)){grid-template-columns:1fr 1fr}
+.archive-detail:not(:has(>.aircraft-detail))>.detail-copy{grid-column:auto;grid-row:auto;border:0;padding-top:0}
+@media(max-width:700px){.archive-detail:not(:has(>.aircraft-detail)){grid-template-columns:1fr}}
+.flight-number .alliance-logo{display:block;flex:none;width:21px;height:21px;object-fit:contain;margin-left:2px;opacity:.88}
+.flight-number .alliance-star{width:32px}
+.first-ticket .alliance-logo{filter:none;opacity:1}
+.first-ticket .alliance-oneworld{border-radius:50%;box-shadow:0 0 0 1px #ffffff70}
+.spotlight-aircraft{position:relative;display:flex;align-items:end;justify-content:center;margin:-20px 0 14px;gap:12px}
+.spotlight-aircraft .aircraft-preview{width:min(290px,55%);margin:0}
+.spotlight-aircraft .aircraft-window{height:105px;display:flex;align-items:center}
+.spotlight-aircraft .aircraft-canvas{width:100%;max-width:290px}
+.spotlight-aircraft .aircraft-canvas>img{filter:drop-shadow(0 6px 4px #07174455)}
+
+
+.departure-board::before{animation:departure-rings 14s ease-in-out infinite alternate;transform-origin:center}
+@keyframes departure-rings{from{transform:translate(0,0) scale(.95);opacity:.65}to{transform:translate(-32px,25px) scale(1.15);opacity:1}}
+@media(max-width:520px){.flight-number{gap:.35em}.flight-number .alliance-logo{width:16px;height:16px;margin-left:0}.flight-number .alliance-star{width:25px}.spotlight-aircraft{margin:-12px 0 10px}.spotlight-aircraft .aircraft-preview{width:70%}.spotlight-aircraft .aircraft-window{height:90px}}
+@media(prefers-reduced-motion:reduce){.departure-board::before{animation:none}}
+
+.fact-card h3.fact-carrier-identity{display:flex;align-items:center;gap:14px;min-height:36px}
+.fact-carrier-identity .carrier-wordmark{display:block;width:min(170px,calc(100% - 44px));height:auto}
+.fact-carrier-identity .carrier-mark{display:block;width:40px;height:36px;object-fit:contain}
+.fact-carrier-identity .carrier-alliance{display:block;flex:none;width:28px;height:28px;object-fit:contain}
+
+/* Aircraft wordmarks share the surrounding text hierarchy. */
+.aircraft-type-logo{display:block;width:150px;max-width:100%;height:24px;object-fit:contain;object-position:left center}
+.tag-bottom .aircraft-type-logo{width:116px;height:18px;margin-top:4px}
+.fact-card .aircraft-type-logo{width:195px;height:36px}
+.aircraft-heading .aircraft-type-logo{width:190px;height:34px}
+.first-ticket{background:#ede6da;color:var(--ink);border-color:#d5cbbc}
+.first-ticket::before{background:#f9f5e9cc}
+.flight-page-credit{font:11px var(--mono);color:var(--muted);margin:24px 0 0}
+.flight-page-credit a{color:inherit;text-underline-offset:3px}
+.fact-card{transition:box-shadow 220ms ease,border-color 220ms ease}
+.fact-card .aircraft-canvas{transition:transform 300ms ease}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .fact-card:hover{border-color:#8ea7ce;box-shadow:0 12px 24px #152e5910}
+ .fact-card:hover .aircraft-canvas{transform:translate(-5px,-3px) rotate(-1deg)}
+}
+@media(prefers-reduced-motion:reduce){.fact-card,.fact-card .aircraft-canvas{transition:none}}
+
+/* Keep the actual lettering at a readable height rather than squeezing every mark into one width. */
+.aircraft-type-logo{width:auto;height:20px;max-width:100%;object-position:left center}
+.tag-bottom>span:first-child{min-width:0;flex:1}
+.tag-bottom .aircraft-type-logo{width:auto;height:22px;max-width:100%;margin-top:8px}
+.fact-card .aircraft-type-logo{width:auto;height:24px;max-width:100%}
+.aircraft-heading .aircraft-type-logo{width:auto;height:24px;max-width:100%}
+.aircraft-heading>span:first-child{flex:1}
+.tag-bottom .tag-open{flex:none}
+@media(max-width:520px){.tag-bottom .aircraft-type-logo{height:20px}.aircraft-heading .aircraft-type-logo{height:20px}}
+.tag-bottom .aircraft-type-logo{height:16px;margin-top:10px;max-width:min(100%,230px)}
+.tag-bottom .aircraft-type-boeing{height:13px}
+.aircraft-type-boeing{height:17px}
+.aircraft-heading .aircraft-type-boeing{height:20px}
+.diversion-label{font:inherit;font-style:normal;color:#9b5a36;border-left:1px solid #c7cfdd;margin-left:8px;padding-left:8px}
+.flight-collection{border-block:1px solid var(--line);padding:24px 0;margin-top:28px}
+.flight-collection .airport-stampbook{border:0;padding-bottom:0}
+.collection-modules{width:max-content;max-width:100%;margin-bottom:28px}
+.collection-panel .stampbook-heading{margin-bottom:24px}
+.collection-filters{display:flex;flex-wrap:wrap;gap:10px;margin:20px 0 26px}
+.collection-filters button{display:flex;align-items:center;justify-content:center;gap:8px;min-width:76px;height:58px;padding:12px 18px;border:1px solid var(--line);border-radius:5px;background:transparent;color:var(--muted);cursor:pointer}
+.collection-filters button[aria-pressed=true]{border-color:var(--blue);background:#e9efff;color:var(--blue)}
+.collection-filters img{width:88px;height:30px;object-fit:contain}
+.collection-filters button[aria-label="寰宇一家"] img{width:32px}
+.collection-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.collection-item{display:flex;flex-direction:column;min-width:0;padding:18px;text-align:left;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--ink);cursor:pointer;transition:border-color .2s,box-shadow .2s}
+.collection-item[aria-pressed=true]{border-color:var(--blue);box-shadow:inset 0 3px var(--blue)}
+.collection-item-head,.collection-item-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;font:11px var(--mono)}
+.collection-item-head small,.collection-item-foot{color:var(--muted)}
+.collection-item .aircraft-preview{margin:12px 0;width:100%}
+.collection-item .aircraft-window{height:110px;display:flex;align-items:center}
+.collection-item-foot{margin-top:auto;padding-top:12px;border-top:1px dashed var(--line);width:100%}
+.collection-carrier-logo{width:54px;height:48px;object-fit:contain;margin-bottom:18px;mix-blend-mode:multiply}
+.collection-item strong{font:500 15px var(--body);margin-bottom:20px}
+.collection-note{font-size:11px;color:var(--muted);margin:22px 0 0}
+@media(hover:hover){.collection-item:hover{border-color:#8ea7ce;box-shadow:0 8px 18px #152e5910}}
+.collection-item:focus-visible,.collection-filters button:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+@media(max-width:1000px){.collection-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.collection-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.collection-item{padding:12px}.collection-item-head{flex-wrap:wrap}.collection-item .aircraft-window{height:85px}.collection-filters{gap:7px}.collection-filters button{min-width:52px;padding:10px;height:48px}.collection-filters img{width:65px;height:25px}.collection-item strong{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.collection-item{transition:none}}
+.collection-filters button[aria-label="Airbus"] img{filter:brightness(0);opacity:.85}
+
+.tag-bottom .aircraft-type-dreamliner{height:18px}
+.aircraft-heading .aircraft-type-dreamliner{height:24px}
+
+/* Open specimen edges and punched carrier slips share the stampbook's light ink. */
+.collection-filters{gap:6px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.collection-filters button{border:0;border-radius:0;position:relative;background:transparent}
+.collection-filters button[aria-pressed=true]{background:transparent}
+.collection-filters button[aria-pressed=true]::after{content:'';position:absolute;bottom:-13px;left:18px;right:18px;height:2px;background:var(--blue)}
+.collection-grid{gap:28px 24px;padding:12px 0}
+.collection-item{position:relative;isolation:isolate;background:transparent;border:0;border-radius:0;padding:18px 14px 12px;box-shadow:none;transition:transform .24s ease}
+.collection-item::before{content:'';position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.6;transition:opacity .24s ease}
+.collection-aircraft .collection-item::before{background:linear-gradient(#8298b5,#8298b5) left top/18px 1px no-repeat,linear-gradient(#8298b5,#8298b5) right top/18px 1px no-repeat,linear-gradient(#8298b5,#8298b5) left bottom/18px 1px no-repeat,linear-gradient(#8298b5,#8298b5) right bottom/18px 1px no-repeat,linear-gradient(#8298b5,#8298b5) left top/1px 18px no-repeat,linear-gradient(#8298b5,#8298b5) right top/1px 18px no-repeat,linear-gradient(#8298b5,#8298b5) left bottom/1px 18px no-repeat,linear-gradient(#8298b5,#8298b5) right bottom/1px 18px no-repeat}
+.collection-family-code{position:absolute;z-index:-1;top:43px;left:16px;font:500 clamp(48px,5vw,78px)/1 var(--display);letter-spacing:.02em;color:#dbe3ed;user-select:none}
+.collection-item-head{font:9px var(--mono);letter-spacing:.05em;color:var(--muted)}
+.collection-item-head small{font:8px var(--mono)}
+.collection-aircraft .aircraft-preview{margin:24px -4px 8px;width:calc(100% + 8px)}
+.collection-aircraft .aircraft-window{height:118px}
+.collection-aircraft .collection-item-foot{border-top:1px solid #ced8e5;padding-top:12px;font-size:10px}
+.collection-item-foot b{font:500 22px/1 var(--display);color:var(--ink);margin-right:3px}
+.collection-item-foot i{font-style:normal;margin-left:8px;color:var(--blue)}
+.collection-airlines{gap:24px}
+.collection-airlines .collection-item{padding:20px 20px 14px 26px;background:#ffffff70;border-bottom:1px solid #cad5e3;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%)}
+.collection-airlines .collection-item::before{inset:0 auto 0 9px;width:1px;background:repeating-linear-gradient(to bottom,#9eb1c9 0 3px,transparent 3px 8px)}
+.collection-carrier-code{position:absolute;right:16px;top:18px;font:500 37px/1 var(--display);letter-spacing:.08em;color:#d0dbe9;writing-mode:vertical-rl}
+.collection-carrier-logo{width:62px;height:55px;margin-bottom:19px}
+.collection-airlines .collection-item strong{font-size:14px;margin:0 28px 6px 0}
+.collection-carrier-alliance{font:9px var(--mono);color:var(--muted);margin-bottom:18px}
+.collection-airlines .collection-item-foot{border-top:1px solid #dde4ee;font-size:10px}
+.collection-item[aria-pressed=true]{box-shadow:none;background:#e9efff80}
+.collection-item[aria-pressed=true]::before{opacity:1}
+@media(hover:hover){.collection-item:hover{box-shadow:none;transform:translateY(-3px)}.collection-item:hover::before{opacity:1}.collection-aircraft .collection-item:hover .aircraft-canvas{transform:translateX(-4px)}.collection-aircraft .aircraft-canvas{transition:transform .24s ease}}
+@media(max-width:600px){.collection-grid{gap:20px 14px}.collection-item{padding:14px 10px 10px}.collection-item-head{gap:5px}.collection-item-head small{font-size:7px}.collection-family-code{top:48px;left:10px;font-size:48px}.collection-aircraft .aircraft-window{height:95px}.collection-aircraft .collection-item-foot{font-size:9px;gap:4px}.collection-item-foot b{font-size:20px}.collection-item-foot i{margin-left:1px}.collection-airlines .collection-item{padding:18px 12px 12px 20px}.collection-carrier-code{font-size:27px;right:10px}.collection-carrier-logo{width:48px;height:46px}.collection-airlines .collection-item strong{font-size:12px;margin-right:8px}}
+@media(prefers-reduced-motion:reduce){.collection-item,.collection-item::before,.collection-aircraft .aircraft-canvas{transition:none}.collection-item:hover,.collection-aircraft .collection-item:hover .aircraft-canvas{transform:none}}
+.collection-airlines .collection-item:focus-visible{outline-offset:-3px}
