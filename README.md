@@ -57,3 +57,28 @@ cd web
 ```
 
 回退恢复上一版及部署前数据，回退前数据另存保留。首次部署无上一版可回退。
+
+## 单张毛五发布
+
+登录后访问 `/manage/fursuitfriday`，拖入一张图片、粘贴配文，再点击「上传并发布」。记录日期默认当天（上海时区），可修改；文案中的「摄影：」或「📷：」会识别为摄影署名。
+
+服务器自动纠正图片方向、移除元信息、将长边缩到最多 2048px，并压缩为 WebP。压缩图上传到 COS，相册随后公开发布；媒体库同时保留一份压缩图供后台使用。相同图片、文案和日期重复提交会返回已有相册。COS 上传成功但数据库保存失败时，可重试；已上传对象保留供重试使用。
+
+云端在 `/opt/merak/runtime.env` 中添加以下配置，保留原有环境变量：
+
+```dotenv
+COS_BUCKET=你的存储桶名称-APPID
+COS_REGION=ap-shanghai
+COS_SECRET_ID=
+COS_SECRET_KEY=
+```
+
+填写实际地域；使用临时凭据时另设置 `COS_SESSION_TOKEN`。上传账号需要目标 `fursuitfriday/` 目录的 `cos:PutObject` 权限。CDN `https://cos.merakt.cn` 应指向该存储桶，并允许站点读取该目录。
+
+更新配置后重建运行容器以载入环境变量：
+
+```sh
+sudo docker compose -p merak-deploy -f /opt/merak/deploy-compose.json up -d --force-recreate web
+```
+
+本地预览在 `web/.env` 配置相同变量后重启。密钥只供服务端使用，不写入 `NEXT_PUBLIC_` 变量，也不提交真实环境文件。上传服务未配置时，页面可以整理图片和文案，发布按钮会禁用。
