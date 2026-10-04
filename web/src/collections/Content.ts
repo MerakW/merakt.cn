@@ -7,6 +7,10 @@ const versions = { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 30 }
 
 export const Users: CollectionConfig = {
   slug: 'users', labels: { singular: '管理员', plural: '管理员' }, auth: { tokenExpiration: 7200, maxLoginAttempts: 5, lockTime: 600000 },
+  hooks: { beforeDelete: [async ({ id, req }) => {
+    await req.payload.delete({ collection: 'passkeys', req, where: { user: { equals: id } } })
+    await req.payload.delete({ collection: 'passkey-challenges', req, where: { userID: { equals: id } } })
+  }] },
   admin: { useAsTitle: 'name', group: '管理' },
   access: { ...editingAccess, read: adminOnly, admin: adminOnly },
   fields: [{ name: 'name', label: '称呼', type: 'text', required: true }],

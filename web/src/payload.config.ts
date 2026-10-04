@@ -10,6 +10,7 @@ import { Users, Trips, Albums, Posts, Notes, Events, SiteSettings } from './coll
 import { Flights } from './collections/Flights'
 import { Checkins } from './collections/Checkins'
 import { Media } from './collections/Media'
+import { Passkeys, PasskeyChallenges } from './collections/Passkeys'
 import { migrations } from './migrations'
 
 const baseDir = dirname(fileURLToPath(import.meta.url))
@@ -20,9 +21,9 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET,
   cookiePrefix: process.env.SERVER_URL === 'http://127.0.0.1:3002' ? 'merak-qa' : 'payload',
   serverURL: process.env.SERVER_URL || 'http://127.0.0.1:3000',
-  admin: { user: 'users', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink'] } },
+  admin: { user: 'users', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink'] } },
   i18n: { supportedLanguages: { zh }, fallbackLanguage: 'zh' },
-  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins],
+  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, Passkeys, PasskeyChallenges],
   globals: [SiteSettings],
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [
     { slug: 'trip', labels: { singular: '航程', plural: '航程' }, fields: [{ name: 'trip', label: '选择旅行', type: 'relationship', relationTo: 'trips', required: true }] },

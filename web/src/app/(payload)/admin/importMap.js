@@ -23,6 +23,7 @@ import { UnderlineFeatureClient as UnderlineFeatureClient_e70f5e05f09f93e00b997e
 import { BoldFeatureClient as BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { ItalicFeatureClient as ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FlightImportLink as FlightImportLink_a8145c5603aa93e6f449c34708a0bb36 } from '../../../components/admin/FlightImportLink'
+import { PasskeyLoginLink as PasskeyLoginLink_a8145c5603aa93e6f449c34708a0bb36 } from '../../../components/admin/FlightImportLink'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -52,5 +53,6 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BoldFeatureClient": BoldFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/richtext-lexical/client#ItalicFeatureClient": ItalicFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "./components/admin/FlightImportLink#FlightImportLink": FlightImportLink_a8145c5603aa93e6f449c34708a0bb36,
+  "./components/admin/FlightImportLink#PasskeyLoginLink": PasskeyLoginLink_a8145c5603aa93e6f449c34708a0bb36,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

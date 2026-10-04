@@ -76,6 +76,8 @@ export interface Config {
     notes: Note;
     events: Event;
     checkins: Checkin;
+    passkeys: Passkey;
+    'passkey-challenges': PasskeyChallenge;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -92,6 +94,8 @@ export interface Config {
     notes: NotesSelect<false> | NotesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     checkins: CheckinsSelect<false> | CheckinsSelect<true>;
+    passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
+    'passkey-challenges': PasskeyChallengesSelect<false> | PasskeyChallengesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -384,6 +388,42 @@ export interface Checkin {
   status: 'pending' | 'approved' | 'rejected';
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkeys".
+ */
+export interface Passkey {
+  id: number;
+  user: number | User;
+  credentialID: string;
+  publicKey: string;
+  counter: number;
+  transports?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  name: string;
+  lastUsedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkey-challenges".
+ */
+export interface PasskeyChallenge {
+  id: number;
+  tokenHash: string;
+  challenge: string;
+  purpose: 'login' | 'register';
+  userID?: number | null;
+  expiresAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -692,6 +732,32 @@ export interface CheckinsSelect<T extends boolean = true> {
   status?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkeys_select".
+ */
+export interface PasskeysSelect<T extends boolean = true> {
+  user?: T;
+  credentialID?: T;
+  publicKey?: T;
+  counter?: T;
+  transports?: T;
+  name?: T;
+  lastUsedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "passkey-challenges_select".
+ */
+export interface PasskeyChallengesSelect<T extends boolean = true> {
+  tokenHash?: T;
+  challenge?: T;
+  purpose?: T;
+  userID?: T;
+  expiresAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
