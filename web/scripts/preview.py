@@ -12,6 +12,7 @@ import tarfile
 import tempfile
 import time
 import urllib.request
+from urllib.parse import urlsplit
 
 WEB = Path(__file__).resolve().parent.parent
 ROOT = WEB / '.data/local-preview'
@@ -57,8 +58,23 @@ def validate_address(host, port):
     return f'http://{address}:{port}'
 
 
-def start(config_path, assets, host, port):
-    url = validate_address(host, port)
+def public_address(listen_url, public_url):
+    if not public_url:
+        return listen_url
+    parts = urlsplit(public_url)
+    if (parts.scheme != 'https' or not parts.hostname or parts.username or parts.password
+            or parts.path not in ('', '/') or parts.query or parts.fragment
+            or any(c.isspace() for c in public_url)):
+        raise ValueError('--url 必须是 HTTPS 源地址，例如 https://preview.example.com:3443')
+    # Validate the port as well, without resolving or contacting the host.
+    if parts.port is not None and not 1 <= parts.port <= 65535:
+        raise ValueError('--url 端口无效')
+    return public_url.rstrip('/')
+
+
+def start(config_path, assets, host, port, public_url=None):
+    listen_url = validate_address(host, port)
+    url = public_address(listen_url, public_url)
     if not assets and config_path.exists():
         assets = json.loads(config_path.read_text()).get('assets_dir')
     if not assets or not str(assets).strip():
@@ -95,9 +111,9 @@ def start(config_path, assets, host, port):
         '-w', '/app', 'node:22-bookworm-slim', 'node', 'start-production.mjs')
     for _ in range(60):
         try:
-            with urllib.request.urlopen(url + '/api/flights?limit=1', timeout=3) as response:
+            with urllib.request.urlopen(listen_url + '/api/flights?limit=1', timeout=3) as response:
                 if response.status == 200 and isinstance(json.load(response).get('docs'), list):
-                    print(f'预览已启动：{url}\n后台：{url}/admin\n独立数据：{data}\n停止：./deploy.sh preview-stop（保留数据）\n本次未连接或上传云端。')
+                    print(f'后端预览已启动（HTTPS 代理请单独确认）：{url}\n后台：{url}/admin\n独立数据：{data}\n停止：./deploy.sh preview-stop（保留数据）\n本次未连接或上传云端。')
                     return
         except (OSError, ValueError):
             pass
@@ -106,7 +122,7 @@ def start(config_path, assets, host, port):
     raise RuntimeError('预览健康检查未通过；容器和独立数据已保留，可检查日志或 preview-stop。')
 
 
-def preview(action, config_path, assets, host, port):
+def preview(action, config_path, assets, host, port, public_url=None):
     ensure_local_docker()
     ROOT.mkdir(parents=True, exist_ok=True)
     with (ROOT / 'preview.lock').open('w') as lock:
@@ -115,4 +131,4 @@ def preview(action, config_path, assets, host, port):
             stop_container()
             print('预览已停止，数据库与上传文件保留。')
         else:
-            start(config_path, assets, host, port)
+            start(config_path, assets, host, port, public_url)

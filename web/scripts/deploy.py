@@ -103,10 +103,11 @@ def main():
     parser.add_argument('--assets', help='预览用的已审核公开素材目录')
     parser.add_argument('--host', default='127.0.0.1', help='预览监听的本机 IPv4 地址，内网访问填家庭服务器 IP')
     parser.add_argument('--port', type=int, default=3001, help='预览端口，默认 3001')
+    parser.add_argument('--url', help='预览反向代理的 HTTPS 访问源地址，写入 SERVER_URL')
     args = parser.parse_args()
     if args.action in ('preview', 'preview-stop'):
         from preview import preview
-        preview(args.action, args.config, args.assets, args.host, args.port)
+        preview(args.action, args.config, args.assets, args.host, args.port, args.url)
         return
     if args.action == 'init':
         with args.config.open('x') as stream:
