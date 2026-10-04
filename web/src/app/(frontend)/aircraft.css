@@ -194,3 +194,18 @@
 @media(max-width:600px){.collection-grid{gap:20px 14px}.collection-item{padding:14px 10px 10px}.collection-item-head{gap:5px}.collection-item-head small{font-size:7px}.collection-family-code{top:48px;left:10px;font-size:48px}.collection-aircraft .aircraft-window{height:95px}.collection-aircraft .collection-item-foot{font-size:9px;gap:4px}.collection-item-foot b{font-size:20px}.collection-item-foot i{margin-left:1px}.collection-airlines .collection-item{padding:18px 12px 12px 20px}.collection-carrier-code{font-size:27px;right:10px}.collection-carrier-logo{width:48px;height:46px}.collection-airlines .collection-item strong{font-size:12px;margin-right:8px}}
 @media(prefers-reduced-motion:reduce){.collection-item,.collection-item::before,.collection-aircraft .aircraft-canvas{transition:none}.collection-item:hover,.collection-aircraft .collection-item:hover .aircraft-canvas{transform:none}}
 .collection-airlines .collection-item:focus-visible{outline-offset:-3px}
+
+/* A320 LED equipment profile. Step timing preserves the two separate flashes:
+   0–50 ms ON, 50–110 OFF, 110–160 ON, then OFF until the next 1000 ms cycle.
+   Both channels start on the same CSS timeline; the beacon is offset by 500 ms. */
+.aircraft-lights{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible;pointer-events:none;visibility:hidden}
+.aircraft-wing-pulse,.aircraft-beacon-pulse{opacity:0;animation-duration:1s;animation-timing-function:steps(1,end);animation-iteration-count:infinite;animation-play-state:paused}
+.aircraft-wing-pulse{animation-name:a320-wing-pulse}
+.aircraft-beacon-pulse{animation-name:a320-beacon-pulse}
+.aircraft-portrait[data-animated=true][data-active=true][data-light-ready=true] .aircraft-lights{visibility:visible}
+.aircraft-portrait[data-animated=true][data-active=true][data-light-ready=true] .aircraft-lights>g{animation-play-state:running}
+@keyframes a320-wing-pulse{0%,11%{opacity:1}5%,16%,100%{opacity:0}}
+@keyframes a320-beacon-pulse{0%,70%,100%{opacity:0}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.aircraft-portrait .aircraft-lights{display:none}.aircraft-lights>g{animation:none}}
+.aircraft-light-preview{padding:40px 0}.aircraft-light-preview h1{font:500 clamp(32px,5vw,56px) var(--display);margin:18px 0}.aircraft-light-preview>p{max-width:65ch;font-size:14px;line-height:1.8;color:var(--muted)}.aircraft-light-samples{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:35px 0}.aircraft-light-samples article{min-width:0}.aircraft-light-samples h2{font-size:16px;font-weight:500;margin-bottom:16px}.aircraft-light-samples .aircraft-detail{min-height:245px;max-width:none}.aircraft-light-preview .aircraft-preview{max-width:420px;margin:20px 0;padding:20px;background:var(--paper);border:1px solid var(--line);border-radius:6px}.aircraft-light-preview .aircraft-credit{font-size:11px}
+@media(max-width:850px){.aircraft-light-samples{grid-template-columns:1fr}.aircraft-light-samples .aircraft-detail{max-width:460px;min-height:0}}

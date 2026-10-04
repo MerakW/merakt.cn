@@ -21,7 +21,7 @@ const liveries: Record<string, { key: string; file: string }> = {
   'A330:CX': {key:'A330300',file:'A330-300_cathay_pacific_2015_livery_thumb_a87f39b3-f2fa-4b48-b4e1-f992249f26b9'},
   'A350:SQ': {key:'A350900',file:'A350-900_singapore_airlines_thumb_eceb8701-2490-48f6-babd-bf487f48004a'},
 }
-const aliases: Record<string, string> = { A319N:'A319NEO', A320N:'A320NEO', A321N:'A321NEO', A21N:'A321NEO', A20N:'A320NEO', '788':'7878', '789':'7879', '78X':'78710', '773':'777300', '77W':'777300ER', '738':'737800', '7M8':'737MAX8', '744':'747400', '748':'7478', A332:'A330200', A333:'A330300', A359:'A350900', A388:'A380800' }
+const aliases: Record<string, string> = { A320200:'A320', A321200:'A321', A319N:'A319NEO', A320N:'A320NEO', A321N:'A321NEO', A21N:'A321NEO', A20N:'A320NEO', '788':'7878', '789':'7879', '78X':'78710', '773':'777300', '77W':'777300ER', '738':'737800', '7M8':'737MAX8', '744':'747400', '748':'7478', A332:'A330200', A333:'A330300', A359:'A350900', A388:'A380800' }
 export function aircraftModel(flight: FlightAircraft): AircraftModel | undefined {
   const raw = (flight.aircraft || '').toUpperCase().replace(/BOEING|AIRBUS|COMAC/g, '').replace(/[^A-Z0-9]/g, '')
   if (!raw) return undefined
