@@ -21,7 +21,7 @@
 .aircraft-stars{position:absolute;inset:0 -100% 0 0;opacity:.6;background-image:radial-gradient(circle at 31px 23px,#ebf4ff 0 .6px,transparent 1px),radial-gradient(circle at 137px 93px,#accbdf 0 .7px,transparent 1.1px),radial-gradient(circle at 79px 159px,#fff 0 .5px,transparent 1px);background-size:211px 193px;animation:aircraft-sky-drift 90s linear infinite paused}
 .aircraft-clouds{position:absolute;inset:-20% -800px -20% -800px;opacity:.55;filter:blur(12px);background-image:radial-gradient(ellipse 100px 32px at 80px 42%,#a8c4d350,transparent 75%),radial-gradient(ellipse 130px 40px at 155px 48%,#bad1dc60,transparent 78%),radial-gradient(ellipse 95px 30px at 390px 75%,#c1d5df55,transparent 75%),radial-gradient(ellipse 140px 50px at 460px 79%,#b7cfdc55,transparent 78%),radial-gradient(ellipse 130px 45px at 690px 36%,#adc9d860,transparent 78%);background-size:800px 100%;animation:aircraft-cloud-drift 55s linear infinite paused}
 .aircraft-clouds-near{opacity:.65;top:15%;filter:blur(9px);animation-duration:38s;animation-delay:-11s}
-.aircraft-detail[data-active=true] .aircraft-sky>span{animation-play-state:running}
+.aircraft-detail[data-animated=true][data-active=true] .aircraft-sky>span{animation-play-state:running}
 @keyframes aircraft-sky-drift{from{transform:translateX(-211px)}to{transform:translateX(0)}}
 @keyframes aircraft-cloud-drift{from{transform:translateX(-800px)}to{transform:translateX(0)}}
 .aircraft-credit{font-size:10px;color:var(--muted);margin:20px 5px 0}
@@ -114,10 +114,8 @@
 .flight-page-credit{font:11px var(--mono);color:var(--muted);margin:24px 0 0}
 .flight-page-credit a{color:inherit;text-underline-offset:3px}
 .fact-card{transition:box-shadow 220ms ease,border-color 220ms ease}
-.fact-card .aircraft-canvas{transition:transform 300ms ease}
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .fact-card:hover{border-color:#8ea7ce;box-shadow:0 12px 24px #152e5910}
- .fact-card:hover .aircraft-canvas{transform:translate(-5px,-3px) rotate(-1deg)}
 }
 @media(prefers-reduced-motion:reduce){.fact-card,.fact-card .aircraft-canvas{transition:none}}
 
@@ -192,7 +190,7 @@
 .collection-airlines .collection-item-foot{border-top:1px solid #dde4ee;font-size:10px}
 .collection-item[aria-pressed=true]{box-shadow:none;background:#e9efff80}
 .collection-item[aria-pressed=true]::before{opacity:1}
-@media(hover:hover){.collection-item:hover{box-shadow:none;transform:translateY(-3px)}.collection-item:hover::before{opacity:1}.collection-aircraft .collection-item:hover .aircraft-canvas{transform:translateX(-4px)}.collection-aircraft .aircraft-canvas{transition:transform .24s ease}}
+@media(hover:hover){.collection-item:hover{box-shadow:none;transform:translateY(-3px)}.collection-item:hover::before{opacity:1}}
 @media(max-width:600px){.collection-grid{gap:20px 14px}.collection-item{padding:14px 10px 10px}.collection-item-head{gap:5px}.collection-item-head small{font-size:7px}.collection-family-code{top:48px;left:10px;font-size:48px}.collection-aircraft .aircraft-window{height:95px}.collection-aircraft .collection-item-foot{font-size:9px;gap:4px}.collection-item-foot b{font-size:20px}.collection-item-foot i{margin-left:1px}.collection-airlines .collection-item{padding:18px 12px 12px 20px}.collection-carrier-code{font-size:27px;right:10px}.collection-carrier-logo{width:48px;height:46px}.collection-airlines .collection-item strong{font-size:12px;margin-right:8px}}
 @media(prefers-reduced-motion:reduce){.collection-item,.collection-item::before,.collection-aircraft .aircraft-canvas{transition:none}.collection-item:hover,.collection-aircraft .collection-item:hover .aircraft-canvas{transform:none}}
 .collection-airlines .collection-item:focus-visible{outline-offset:-3px}

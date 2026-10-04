@@ -24,9 +24,9 @@ test('mixed albums retain only public photos and drop unsafe source links', () =
   assert.equal(result.date, '2025-01-17')
 })
 
-test('public media uses local derivatives and preserves video type', () => {
+test('public media uses CDN derivatives and preserves video type', () => {
   const photo = publicPhoto({ ...media, sizes: { thumbnail: { filename: 'small photo.jpg', width: 480 }, display: { filename: 'large.jpg', width: 1440 } } })!
-  assert.equal(photo.thumbnail, '/api/media/file/small%20photo.jpg')
-  assert.equal(photo.srcSet, '/api/media/file/small%20photo.jpg 480w, /api/media/file/large.jpg 1440w')
+  assert.equal(photo.thumbnail, 'https://cos.merakt.cn/api/media/file/small%20photo.jpg')
+  assert.equal(photo.srcSet, 'https://cos.merakt.cn/api/media/file/small%20photo.jpg 480w, https://cos.merakt.cn/api/media/file/large.jpg 1440w')
   assert.equal(publicPhoto({ ...media, mimeType: 'video/mp4' })!.video, true)
 })

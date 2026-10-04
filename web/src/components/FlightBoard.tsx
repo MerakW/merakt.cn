@@ -1,4 +1,6 @@
 'use client'
+
+import { imageURL } from '@/lib/assets'
 import AircraftLabel from './AircraftLabel'
 import FlightSouvenirs from './FlightSouvenirs'
 import AircraftPortrait from './AircraftPortrait'
@@ -59,7 +61,7 @@ export default function FlightBoard({ flights, featured, airports, preview = fal
         <div className="flight-thread flight-arc" aria-hidden="true"><svg viewBox="0 0 300 90" preserveAspectRatio="xMidYMid meet"><path d="M10 76 Q150 -32 290 76" pathLength="1"/><circle cx="10" cy="76" r="3"/><circle cx="290" cy="76" r="3"/></svg><span className="aircraft-symbol" /></div>
         <div className="airport-heading arrival"><strong>{spotlight.to}</strong><span>{airportName(spotlight.to)}</span></div>
       </div>
-      <div className="spotlight-aircraft"><AircraftPortrait flight={spotlight} /></div>
+      <div className="spotlight-aircraft"><AircraftPortrait flight={spotlight} animate /></div>
       <div className="departure-bottomline">
         <div><span>{departure?.label} · 当地</span><strong>{departure?.clock}</strong></div>
         <div><span>{arrival?.label} · 当地</span><strong className={arrivalDelayMinutes(spotlight) > 0 && arrival?.label === '实际到达' ? 'arrival-time-delayed' : undefined}>{arrival?.clock}{arrivalDelayMinutes(spotlight) > 0 && arrival?.label === '实际到达' && <small>（+{arrivalDelayMinutes(spotlight)}min）</small>}</strong></div>
@@ -67,7 +69,7 @@ export default function FlightBoard({ flights, featured, airports, preview = fal
       </div>
       </div>
       <aside className="ticket-stub">
-        <div className="stub-owner"><span>PERSONAL FLIGHT ARCHIVE</span><strong>MERAK.</strong><img src="/identity/merak-avatar.webp" alt="Merak 的蓝白狐狸角色" width={768} height={768} /></div>
+        <div className="stub-owner"><span>PERSONAL FLIGHT ARCHIVE</span><strong>MERAK.</strong><img src={imageURL('/identity/merak-avatar.webp')} alt="Merak 的蓝白狐狸角色" width={768} height={768} /></div>
         <dl><div><dt>航班 / FLIGHT</dt><dd><FlightNumber flight={spotlight} /></dd></div><div><dt>乘坐机型 / AIRCRAFT</dt><dd><AircraftLabel aircraft={spotlight.aircraft} /></dd></div></dl>
         <button className="ticket-detail-button" onClick={showFeatured}>查看航程</button>
       </aside>

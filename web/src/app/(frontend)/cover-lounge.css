@@ -113,7 +113,7 @@
 .flight-thread.flight-arc{height:auto;aspect-ratio:10/3;margin:0;align-self:center;min-width:0}
 .flight-thread.flight-arc svg{inset:0;width:100%;height:100%;overflow:visible}
 .flight-arc circle{fill:var(--blue);stroke:var(--ice);stroke-width:1.1;vector-effect:non-scaling-stroke}
-.flight-arc .aircraft-symbol{position:absolute;left:50%;top:25%;width:25px;aspect-ratio:94/82;transform:translate(-50%,-50%);background:var(--paper);mask:url('/images/card/airplane.svg') center/contain no-repeat}
+.flight-arc .aircraft-symbol{position:absolute;left:50%;top:25%;width:25px;aspect-ratio:94/82;transform:translate(-50%,-50%);background:var(--paper);mask:url('https://cos.merakt.cn/images/card/airplane.svg') center/contain no-repeat}
 .counter-readings{grid-template-columns:1.8fr 1fr .8fr .8fr;gap:24px}
 @media(max-width:1100px){.counter-readings{grid-template-columns:1fr 1fr}.counter-reading:first-child{grid-column:auto}}
 @media(max-width:580px){.counter-reading:first-child{grid-column:1/-1}.flight-arc .aircraft-symbol{width:19px}.site-footer .footer-revision{margin-left:0}}
@@ -134,7 +134,7 @@
 .flight-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:22px 7px 0;padding:0;border:0}
 .fact-card{position:relative;min-width:0;padding:22px;background:#edf3fb;border:1px solid #c7d6e8;border-radius:3px;box-shadow:0 5px 13px #18284a08;color:var(--ink)}
 .fact-card header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px dashed #aebfd5;margin-bottom:20px;font:8px var(--mono);letter-spacing:.06em;color:var(--muted)}
-.fact-plane{width:22px;height:19px;background:currentColor;mask:url('/images/card/airplane.svg') center/contain no-repeat}
+.fact-plane{width:22px;height:19px;background:currentColor;mask:url('https://cos.merakt.cn/images/card/airplane.svg') center/contain no-repeat}
 .fact-card .fact-label{font-size:11px;color:var(--muted)}
 .fact-card h3{font:500 20px/1.4 var(--body);margin:9px 0 20px;overflow-wrap:anywhere;min-height:56px}
 .fact-tally{display:flex;align-items:baseline;gap:10px;margin-bottom:18px}

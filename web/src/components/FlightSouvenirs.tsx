@@ -1,3 +1,4 @@
+import { airlineLogoURL } from '@/lib/assets'
 import AircraftLabel from './AircraftLabel'
 import FlightNumber from './FlightNumber'
 import AircraftPortrait from './AircraftPortrait'
@@ -41,7 +42,7 @@ export default function FlightSouvenirs({souvenirs,airportName,open,filterRoute}
         { code: 'FLEET FAVOURITE', kind: 'aircraft', model: { aircraft: souvenirs.topAircraft?.name === 'Airbus A321' ? 'Airbus A321neo LR' : souvenirs.topAircraft?.name }, label: '最常乘坐的机型', value: souvenirs.topAircraft?.name, count: souvenirs.topAircraft?.count, unit: '次乘坐', note: '按已记录的机型统计' },
         { code: 'FAMILIAR TAIL', kind: 'tail', model: souvenirs.topRegistrationFlight, label: '又遇见这架飞机', value: souvenirs.topRegistration?.name, count: souvenirs.topRegistration?.count, unit: '次相遇', note: '按已记录的注册号统计' },
       ].filter(item => item.value).map(item => <article className={`fact-card fact-${item.kind}`} key={item.label}><header><span>{item.code}</span><i aria-hidden="true" className="fact-plane" /></header><span className="fact-label">{item.label}</span><h3 className={item.kind === 'carrier' ? 'fact-carrier-identity' : undefined}>{item.kind === 'carrier' && carrier ? <>
-        <img className={carrier.icao === 'CES' ? 'carrier-wordmark' : 'carrier-mark'} src={carrier.icao === 'CES' ? '/airlines/CES-wordmark.svg' : `/airlines/${carrier.icao}.${carrier.icao === 'HDA' ? 'svg' : 'png'}`} alt={item.value} />
+        <img className={carrier.icao === 'CES' ? 'carrier-wordmark' : 'carrier-mark'} src={airlineLogoURL(carrier.icao, true)} alt={item.value} />
         {alliance && <img className={`carrier-alliance alliance-${alliance.key}`} src={alliance.src} alt={alliance.name} />}
       </> : item.kind === 'aircraft' ? <AircraftLabel aircraft={item.value} /> : item.value}</h3>{item.kind === 'tail' && item.model?.aircraft && <span className="fact-tail-aircraft"><AircraftLabel aircraft={item.model.aircraft} /></span>}{item.model && <AircraftPortrait flight={item.model} />}<div className="fact-tally"><strong>{item.count}</strong><span>{item.unit}</span></div><footer><span>{item.note}</span><i className="fact-barcode" aria-hidden="true" /></footer></article>)}</div>
       <p className="souvenir-method">根据已完成的飞行记录整理；最远航程按机场间距离估算。 </p>

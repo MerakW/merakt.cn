@@ -122,8 +122,8 @@ html[data-theme=dark] .arrival-time-delayed{color:#ff9a9f}
 .departure-board .arrival-time-delayed{color:#ffd0d4}
 .departure-bottomline strong>small{font-size:12px;margin-left:4px}
 @media(prefers-reduced-motion:no-preference){
- .aircraft-portrait .aircraft-canvas{animation:aircraft-float 5.5s ease-in-out infinite paused}
- .aircraft-portrait[data-active=true] .aircraft-canvas{animation-play-state:running}
+ .aircraft-portrait[data-animated=true] .aircraft-canvas{animation:aircraft-float 5.5s ease-in-out infinite paused}
+ .aircraft-portrait[data-animated=true][data-active=true] .aircraft-canvas{animation-play-state:running}
  ::view-transition-old(root){animation:theme-out .32s ease both}
  ::view-transition-new(root){animation:theme-in .38s ease both}
 }

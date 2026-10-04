@@ -1,3 +1,4 @@
+import { airlineLogoURL } from '@/lib/assets'
 import { flightAlliance } from '@/lib/flights/alliances'
 import { flightIdentity } from '@/lib/flights/airlines'
 
@@ -5,7 +6,7 @@ export default function FlightNumber({ flight }: { flight: {airline?: string | n
   const identity = flightIdentity(flight)
   const alliance = flightAlliance(flight)
   return <span className="flight-number" title={identity.airline?.name}>
-    {identity.airline && <img className="airline-logo" src={`/airlines/${identity.airline.icao === 'ANA' ? 'ANA-symbol.svg' : `${identity.airline.icao}.${identity.airline.icao === 'HDA' ? 'svg' : 'png'}`}`} alt={identity.airline.name} width="27" height="24" />}
+    {identity.airline && <img className="airline-logo" src={airlineLogoURL(identity.airline.icao)} alt={identity.airline.name} width="27" height="24" />}
     <span>{identity.label}</span>
     {alliance && <img className={`alliance-logo alliance-${alliance.key}`} src={alliance.src} alt={alliance.name} title={alliance.name} width={alliance.key === 'star' ? 32 : 21} height="21" />}
   </span>

@@ -1,4 +1,6 @@
 'use client'
+
+import { imageURL } from '@/lib/assets'
 import { useState } from 'react'
 type Entry = { id:number; name:string; message:string; date:string }
 type Airport = { iata:string; city:string; name:string }
@@ -8,7 +10,7 @@ export default function CheckinDesk({ entries, airports }: { entries:Entry[]; ai
   const airport=airports.find(a=>a.iata===base.toUpperCase().trim())
   const code=airport?.iata || '–––'
   const pass=<div className={`visitor-boarding-pass airways-pass ${issued?'pass-issued':''}`}>
-    <div className="pass-band"><div className="airways-brand"><img src="/images/card/merak-mark.svg" width={32} height={29} alt="" /><span>MERAK AIRWAYS<small>THE PAW-LACE™ SUITE</small></span></div><span>登机牌<br />BOARDING PASS</span></div>
+    <div className="pass-band"><div className="airways-brand"><img src={imageURL('/images/card/merak-mark.svg')} width={32} height={29} alt="" /><span>MERAK AIRWAYS<small>THE PAW-LACE™ SUITE</small></span></div><span>登机牌<br />BOARDING PASS</span></div>
     <div className="airways-body"><div className="pass-main"><div className="pass-passenger"><span>PASSENGER / 旅客</span><strong>{name.trim()||'你的名字'}</strong></div>
     <div className="pass-route"><div><strong>{code}</strong><span>{airport?.city||'你的 Base 机场'}</span></div><div className="pass-flight-line" aria-hidden="true">✈</div><div><strong>HGH</strong><span>杭州 · 萧山</span></div></div>
     <div className="pass-details"><div><span>航班 / FLIGHT</span><b>MK 518</b></div><div><span>登机口 / GATE</span><b>HELLO</b></div><div><span>座位 / SEAT</span><b>1A</b></div></div>

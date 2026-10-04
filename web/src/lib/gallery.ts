@@ -1,3 +1,4 @@
+import { imageURL } from './assets'
 import type { Album, Media } from '@/payload-types'
 
 export interface GalleryPhoto {
@@ -6,7 +7,7 @@ export interface GalleryPhoto {
 }
 export interface GalleryAlbum { id: number; slug: string; title: string; date: string; description: string; photos: GalleryPhoto[] }
 export function safeLink(value?: string | null) { return value && /^https?:\/\//i.test(value) ? value : undefined }
-const mediaPath = (filename: string) => `/api/media/file/${encodeURIComponent(filename)}`
+const mediaPath = (filename: string) => imageURL(`/api/media/file/${encodeURIComponent(filename)}`)
 
 export function publicPhoto(value: number | Media | null | undefined, caption?: string | null, credit?: string | null, source?: string | null): GalleryPhoto | null {
   if (!value || typeof value !== 'object' || value.visibility !== 'public' || !value.filename) return null

@@ -1,3 +1,4 @@
+import { imageURL } from '../assets'
 import { flightIdentity } from './airlines'
 
 type Alliance = 'skyteam' | 'star' | 'oneworld'
@@ -18,5 +19,5 @@ export function flightAlliance(flight: {airline?: string | null; flightNumber?: 
   const date = flight.date || '9999-12-31'
   if (date < membership.from || (membership.until && date >= membership.until)) return undefined
   const transition = icao === 'CSN' && date >= '2019-01-01'
-  return { key: membership.alliance, name: names[membership.alliance] + (membership.partner ? ' · 优连伙伴' : transition ? ' · 退出过渡期' : ''), src: `/alliances/${membership.alliance === 'star' ? 'star-updated' : membership.alliance}.${membership.alliance === 'skyteam' ? 'png' : 'svg'}` }
+  return { key: membership.alliance, name: names[membership.alliance] + (membership.partner ? ' · 优连伙伴' : transition ? ' · 退出过渡期' : ''), src: imageURL(`/alliances/${membership.alliance === 'star' ? 'star-updated' : membership.alliance}.${membership.alliance === 'skyteam' ? 'png' : 'svg'}`) }
 }
