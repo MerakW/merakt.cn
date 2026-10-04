@@ -13,3 +13,8 @@ export function airlineLogoURL(icao: string, wordmark = false): string {
   const file = wordmark && icao === 'CES' ? 'CES-wordmark' : icao
   return imageURL(`/airlines/${file}.svg`)
 }
+
+/** Only reviewed public paths from the legacy fursuit collection are accepted. */
+export function legacyImageURL(path?: string | null): string | undefined {
+  return path && /^\/images\/fursuitfriday\/[A-Za-z0-9_.-]+$/.test(path) ? imageURL(path) : undefined
+}

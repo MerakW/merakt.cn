@@ -8,7 +8,8 @@
 @media(max-width:1150px){
  .site-nav{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 16px}
  .site-nav .brand{grid-column:1;grid-row:1;min-width:0}
- .site-nav .theme-control{position:static;grid-column:2;grid-row:1;margin:0;padding:0}
+ .site-nav .nav-tools{grid-column:2;grid-row:1;gap:0}
+ .site-nav .theme-control{position:static;margin:0;padding:0}
  .site-nav .theme-control button{width:44px;height:44px}
  .site-nav nav{grid-column:1 / -1;grid-row:2;min-width:0;justify-content:space-between;gap:10px;flex-wrap:nowrap}
  .site-nav nav a{white-space:nowrap}
@@ -91,7 +92,7 @@ html[data-theme=dark] .fact-carrier .alliance-skyteam{filter:none;opacity:1}
 .distance-thread>span{position:relative}
 
 /* Visit-scoped theme toggle and flight presentation. */
-.theme-control{border:0;padding-left:8px}
+.theme-control{border:0;padding:0}
 .theme-control button{width:40px;height:40px}
 .departure-board{--ice:#dceaff;--paper:#fff}
 .departure-board .signal-dot{background:#65d6a0}

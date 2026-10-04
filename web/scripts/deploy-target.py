@@ -53,15 +53,19 @@ def switch(release):
 
 
 def healthy():
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    last_error = '尚未收到响应'
     for _ in range(45):
         try:
-            with urllib.request.urlopen('http://127.0.0.1:3000/api/flights?limit=1', timeout=3) as response:
+            with opener.open('http://127.0.0.1:3000/api/flights?limit=1', timeout=3) as response:
                 body = json.load(response)
-                if response.status == 200 and isinstance(body.get('docs'), list):
+                if response.status == 200 and isinstance(body, dict) and isinstance(body.get('docs'), list):
                     return True
-        except (OSError, ValueError):
-            pass
+                last_error = f'HTTP {response.status}，响应不含有效 docs 列表'
+        except (OSError, ValueError) as error:
+            last_error = f'{type(error).__name__}: {error}'
         time.sleep(1)
+    print('云端健康检查最后错误（直连本机，未使用代理）：', last_error, flush=True)
     return False
 
 

@@ -1,4 +1,4 @@
-import { imageURL } from './assets'
+import { imageURL, legacyImageURL } from './assets'
 import type { Album, Media } from '@/payload-types'
 
 export interface GalleryPhoto {
@@ -12,11 +12,12 @@ const mediaPath = (filename: string) => imageURL(`/api/media/file/${encodeURICom
 export function publicPhoto(value: number | Media | null | undefined, caption?: string | null, credit?: string | null, source?: string | null): GalleryPhoto | null {
   if (!value || typeof value !== 'object' || value.visibility !== 'public' || !value.filename) return null
   const display = value.sizes?.display, thumbnail = value.sizes?.thumbnail
-  const src = mediaPath(value.filename)
+  const legacy = legacyImageURL(value.legacyPath)
+  const src = legacy || mediaPath(value.filename)
   return {
-    id: value.id, src, display: display?.filename ? mediaPath(display.filename) : src,
-    thumbnail: thumbnail?.filename ? mediaPath(thumbnail.filename) : src,
-    srcSet: [thumbnail, display].filter(size => size?.filename && size.width).map(size => `${mediaPath(size!.filename!)} ${size!.width}w`).join(', ') || undefined,
+    id: value.id, src, display: legacy || (display?.filename ? mediaPath(display.filename) : src),
+    thumbnail: legacy || (thumbnail?.filename ? mediaPath(thumbnail.filename) : src),
+    srcSet: legacy ? undefined : [thumbnail, display].filter(size => size?.filename && size.width).map(size => `${mediaPath(size!.filename!)} ${size!.width}w`).join(', ') || undefined,
     width: value.width || 1600, height: value.height || 1000, alt: value.alt,
     caption: caption || '', credit: credit || value.credit || undefined, source: safeLink(source || value.source), video: value.mimeType?.startsWith('video/') || false,
   }

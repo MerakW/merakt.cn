@@ -109,15 +109,20 @@ def start(config_path, assets, host, port, public_url=None):
         '-p', f'{host}:{port}:3000', '--env-file', env_file,
         '--mount', f'type=bind,source={app},target=/app', '--mount', f'type=bind,source={data},target=/data',
         '-w', '/app', 'node:22-bookworm-slim', 'node', 'start-production.mjs')
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    last_error = '尚未收到响应'
     for _ in range(60):
         try:
-            with urllib.request.urlopen(listen_url + '/api/flights?limit=1', timeout=3) as response:
-                if response.status == 200 and isinstance(json.load(response).get('docs'), list):
+            with opener.open(listen_url + '/api/flights?limit=1', timeout=3) as response:
+                body = json.load(response)
+                if response.status == 200 and isinstance(body, dict) and isinstance(body.get('docs'), list):
                     print(f'后端预览已启动（HTTPS 代理请单独确认）：{url}\n后台：{url}/admin\n独立数据：{data}\n停止：./deploy.sh preview-stop（保留数据）\n本次未连接或上传云端。')
                     return
-        except (OSError, ValueError):
-            pass
+                last_error = f'HTTP {response.status}，响应不含有效 docs 列表'
+        except (OSError, ValueError) as error:
+            last_error = f'{type(error).__name__}: {error}'
         time.sleep(1)
+    print('预览健康检查最后错误（直连本机，未使用代理）：', last_error, flush=True)
     run('docker', 'logs', '--tail', '60', NAME)
     raise RuntimeError('预览健康检查未通过；容器和独立数据已保留，可检查日志或 preview-stop。')
 

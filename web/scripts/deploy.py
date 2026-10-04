@@ -79,15 +79,21 @@ def smoke(archive, root):
             '-e', 'SERVER_URL=http://127.0.0.1:3000', '-e', 'HOSTNAME=0.0.0.0', '-e', 'PORT=3000',
             'node:22-bookworm-slim', 'node', 'start-production.mjs')
         port = capture('docker', 'port', name, '3000/tcp').rsplit(':', 1)[1]
+        # Health checks target a local container, never the system HTTP proxy.
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        last_error = '尚未收到响应'
         for attempt in range(60):
             try:
-                with urllib.request.urlopen(f'http://127.0.0.1:{port}/api/flights?limit=1', timeout=3) as response:
-                    if response.status == 200 and isinstance(json.load(response).get('docs'), list):
+                with opener.open(f'http://127.0.0.1:{port}/api/flights?limit=1', timeout=3) as response:
+                    body = json.load(response)
+                    if response.status == 200 and isinstance(body, dict) and isinstance(body.get('docs'), list):
                         print('运行包预检通过：空库自动初始化、API 可访问。')
                         return
-            except (OSError, ValueError):
-                pass
+                    last_error = f'HTTP {response.status}，响应不含有效 docs 列表'
+            except (OSError, ValueError) as error:
+                last_error = f'{type(error).__name__}: {error}'
             time.sleep(1)
+        print('运行包预检最后错误（直连本机，未使用代理）：', last_error, flush=True)
         run('docker', 'logs', '--tail', '60', name)
         raise RuntimeError('运行包预检失败，未上传云端。')
     finally:

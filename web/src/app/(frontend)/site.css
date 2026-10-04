@@ -25,12 +25,13 @@ img,svg { max-width:100%; }
 .site-nav nav a { padding:8px 0; position:relative; }
 .site-nav nav a::after { content:''; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--blue); transform:scaleX(0); transform-origin:left; transition:transform .18s; }
 .site-nav nav a:hover::after { transform:scaleX(1); }
+.nav-tools { display:flex; align-items:center; gap:16px; flex:none; }
 .nav-location { font:10px var(--mono); letter-spacing:.06em; color:var(--muted); }
 .nav-location>span { color:var(--blue); padding-inline:8px; }
 .site-main { max-width:1440px; margin:0 auto; padding:0 48px; }
 .skip-link { position:fixed; top:8px; left:8px; z-index:50; padding:8px 16px; background:var(--paper); transform:translateY(-160%); }
 .skip-link:focus { transform:none; }
-.site-footer { max-width:1328px; margin:70px auto 0; padding:30px 0; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:20px; color:var(--muted); font-size:11px; }
+.site-footer { max-width:1440px; margin:70px auto 0; padding:30px 48px; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:20px; color:var(--muted); font-size:11px; }
 .site-footer strong { color:var(--ink); font:500 25px var(--display); }
 .site-footer div { display:flex; gap:24px; align-items:center; }
 .preview-strip { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:15px 0 0; font-size:10px; color:var(--muted); }
@@ -94,7 +95,7 @@ img,svg { max-width:100%; }
 .empty-list { padding:30px 18px; font-size:13px; color:var(--muted); border-bottom:1px solid var(--line); }
 @keyframes detail-in { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
 @media(min-width:1600px) { .site-main { padding-top:20px; } }
-@media(max-width:1000px) { .site-nav { padding-inline:28px; } .site-main { padding-inline:28px; } .site-footer { margin-inline:28px; } .nav-location { display:none; } .flight-table-head,.flight-row { gap:14px; grid-template-columns:1.1fr 1.4fr 1fr 1.5fr .7fr 20px; } }
+@media(max-width:1000px) { .site-nav { padding-inline:28px; } .site-main { padding-inline:28px; } .site-footer { padding-inline:28px; } .nav-location { display:none; } .flight-table-head,.flight-row { gap:14px; grid-template-columns:1.1fr 1.4fr 1fr 1.5fr .7fr 20px; } }
 @media(max-width:680px) {
   .site-nav { padding:20px; flex-wrap:wrap; gap:18px; } .brand { font-size:28px; } .brand img { width:25px; height:28px; }
   .site-nav nav { gap:19px; font-size:12px; flex-wrap:wrap; }
@@ -107,9 +108,9 @@ img,svg { max-width:100%; }
   .flight-row>time { grid-column:1; grid-row:1; font-size:10px; } .row-route { grid-column:1; grid-row:2; gap:14px; } .row-route strong { font-size:27px; }
   .row-flight { grid-column:2; grid-row:2; font-size:10px; text-align:right; } .row-aircraft { display:none; } .state-label { grid-column:2; grid-row:1; text-align:right; font-size:10px; } .row-toggle { grid-column:3; grid-row:1 / span 2; padding-left:10px; }
   .flight-entry.expanded .flight-row { padding-inline:12px; } .flight-detail { grid-template-columns:1fr; padding:0 12px 23px; gap:5px; } .route-map { min-height:170px; } .detail-copy { padding:15px 5px 0; } .detail-copy h3 { font-size:17px; }
-  .site-footer { margin:45px 20px 0; flex-direction:column; padding-block:25px; } .site-footer div { flex-wrap:wrap; gap:10px 20px; }
+  .site-footer { margin:45px auto 0; flex-direction:column; padding:25px 20px; } .site-footer div { flex-wrap:wrap; gap:10px 20px; }
 }
-@media(max-width:360px) { .site-nav { padding-inline:16px; } .site-nav nav { gap:13px; } .site-main { padding-inline:16px; } }
+@media(max-width:360px) { .site-nav { padding-inline:16px; } .site-nav nav { gap:13px; } .site-main { padding-inline:16px; } .site-footer { padding-inline:16px; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
 
 .import-page { max-width:900px; margin:40px auto; }
