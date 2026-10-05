@@ -8,7 +8,7 @@ const models: Record<string, string> = {
   '777300': '777-300_white', '777300ER': '777-300_white',
   '7878': '787-8_white', '7879': '787-9_white', '78710': '787-10_white_sm',
   A320: 'a320_white', A320NEO: 'A320_NEO_CFM_LEAP_white_sm',
-  A321: 'airbus_a321_white_cm56_engines', A321NEO: 'A321_NEO_CFM_LEAP_white_sm', A321LR: 'A321_NEO_LR_CFM_LEAP_white_sm', A321NEOLR: 'A321_NEO_LR_CFM_LEAP_white_sm',
+  A321: 'airbus_a321_white_cm56_engines', A321NEO: 'A321_NEO_LR_CFM_LEAP_white_sm', A321LR: 'A321_NEO_LR_CFM_LEAP_white_sm', A321NEOLR: 'A321_NEO_LR_CFM_LEAP_white_sm',
   A330200: 'A330-200_RR_white', A330300: 'A330-300_RR_white', A340600: 'A340-600_white_sm',
   A350900: 'A350-900_white', A380: 'A380-800_white', A380800: 'A380-800_white', C919: 'C919_white',
 }

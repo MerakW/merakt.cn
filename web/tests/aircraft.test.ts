@@ -14,7 +14,7 @@ test('uses the nearest available model and accepts common short codes', () => {
   for(const aircraft of ['A319n','Airbus A319neo']) assert.match(aircraftModel({aircraft})!.file,/A320_NEO/)
   assert.match(aircraftModel({aircraft:'Boeing 737-700'})!.file,/737-800/)
   assert.match(aircraftModel({aircraft:'Airbus A330'})!.file,/A330-300/)
-  assert.match(aircraftModel({aircraft:'Airbus A321neo'})!.file,/A321_NEO_CFM_LEAP/)
+  assert.match(aircraftModel({aircraft:'Airbus A321neo'})!.file,/A321_NEO_LR_CFM_LEAP/)
   assert.match(aircraftModel({aircraft:'Airbus A321LR'})!.file,/A321_NEO_LR_CFM_LEAP/)
   assert.match(aircraftModel({aircraft:'789',airline:'ANA'})!.file,/787-8_ANA/)
   assert.match(aircraftModel({aircraft:'788'})!.file,/787-8_white/)
