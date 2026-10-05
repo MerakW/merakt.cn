@@ -197,15 +197,37 @@
 
 /* A320 LED equipment profile. Step timing preserves the two separate flashes:
    0–50 ms ON, 50–110 OFF, 110–160 ON, then OFF until the next 1000 ms cycle.
-   Both channels start on the same CSS timeline; the beacon is offset by 500 ms. */
+   Tail: 0–110 ms ON. All channels share a timeline; beacon offset is 500 ms. */
 .aircraft-lights{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible;pointer-events:none;visibility:hidden}
-.aircraft-wing-pulse,.aircraft-beacon-pulse{opacity:0;animation-duration:1s;animation-timing-function:steps(1,end);animation-iteration-count:infinite;animation-play-state:paused}
+.aircraft-wing-pulse,.aircraft-tail-pulse,.aircraft-beacon-pulse{opacity:0;animation-duration:var(--aircraft-light-cycle,1s);animation-timing-function:steps(1,end);animation-iteration-count:infinite;animation-play-state:paused}
 .aircraft-wing-pulse{animation-name:a320-wing-pulse}
+.aircraft-tail-pulse{animation-name:a320-tail-pulse}
 .aircraft-beacon-pulse{animation-name:a320-beacon-pulse}
 .aircraft-portrait[data-animated=true][data-active=true][data-light-ready=true] .aircraft-lights{visibility:visible}
 .aircraft-portrait[data-animated=true][data-active=true][data-light-ready=true] .aircraft-lights>g{animation-play-state:running}
 @keyframes a320-wing-pulse{0%,11%{opacity:1}5%,16%,100%{opacity:0}}
+@keyframes a320-tail-pulse{0%{opacity:1}11%,100%{opacity:0}}
 @keyframes a320-beacon-pulse{0%,70%,100%{opacity:0}50%{opacity:1}}
+/* Provisional Boeing samples: classic 1400 ms / LED 1200 ms cycles.
+   White pulses: 60 / 80 ms. Red pulses: 100 / 250 ms, half-cycle offset.
+   These values are not verified OEM or registration-specific timing. */
+.aircraft-lights[data-profile=boeing-strobe]{--aircraft-light-cycle:1.4s}
+.aircraft-lights[data-profile=boeing-strobe] .aircraft-wing-pulse,.aircraft-lights[data-profile=boeing-strobe] .aircraft-tail-pulse{animation-name:boeing-strobe-white}
+.aircraft-lights[data-profile=boeing-strobe] .aircraft-beacon-pulse{animation-name:boeing-strobe-red}
+.aircraft-lights[data-profile=boeing-led]{--aircraft-light-cycle:1.2s}
+.aircraft-lights[data-profile=boeing-led] .aircraft-wing-pulse,.aircraft-lights[data-profile=boeing-led] .aircraft-tail-pulse{animation-name:boeing-led-white}
+.aircraft-lights[data-profile=boeing-led] .aircraft-beacon-pulse{animation-name:boeing-led-red}
+@keyframes boeing-strobe-white{0%{opacity:1}4.286%,100%{opacity:0}}
+@keyframes boeing-strobe-red{0%,57.143%,100%{opacity:0}50%{opacity:1}}
+@keyframes boeing-led-white{0%{opacity:1}6.667%,100%{opacity:0}}
+@keyframes boeing-led-red{0%,70.833%,100%{opacity:0}50%{opacity:1}}
+/* C919 fitted to user footage at 60 fps, inclusive illuminated frames.
+   Red starts 24:29 / 25:37 / 26:41: mean 66-frame cycle, mean 14/3-frame ON.
+   White starts 25:02 / 26:07: 65-frame cycle, 3-frame ON; first offset 33 frames.
+   A footage estimate, not an OEM or registration-independent timing claim. */
+.aircraft-lights[data-profile=comac-observed]{--aircraft-light-cycle:1.1s}
+.aircraft-lights[data-profile=comac-observed] .aircraft-wing-pulse,.aircraft-lights[data-profile=comac-observed] .aircraft-tail-pulse{animation-name:comac-observed-white;animation-duration:1.083333333s;animation-delay:.55s}
+.aircraft-lights[data-profile=comac-observed] .aircraft-beacon-pulse{animation-name:comac-observed-red;animation-duration:1.1s;animation-delay:0s}
+@keyframes comac-observed-white{0%{opacity:1}4.615384615%,100%{opacity:0}}
+@keyframes comac-observed-red{0%{opacity:1}7.070707071%,100%{opacity:0}}
 @media(prefers-reduced-motion:reduce){.aircraft-portrait .aircraft-lights{display:none}.aircraft-lights>g{animation:none}}
-.aircraft-light-preview{padding:40px 0}.aircraft-light-preview h1{font:500 clamp(32px,5vw,56px) var(--display);margin:18px 0}.aircraft-light-preview>p{max-width:65ch;font-size:14px;line-height:1.8;color:var(--muted)}.aircraft-light-samples{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:35px 0}.aircraft-light-samples article{min-width:0}.aircraft-light-samples h2{font-size:16px;font-weight:500;margin-bottom:16px}.aircraft-light-samples .aircraft-detail{min-height:245px;max-width:none}.aircraft-light-preview .aircraft-preview{max-width:420px;margin:20px 0;padding:20px;background:var(--paper);border:1px solid var(--line);border-radius:6px}.aircraft-light-preview .aircraft-credit{font-size:11px}
-@media(max-width:850px){.aircraft-light-samples{grid-template-columns:1fr}.aircraft-light-samples .aircraft-detail{max-width:460px;min-height:0}}
