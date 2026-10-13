@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { createHash } from 'node:crypto'
-import { validDate, localToUTC } from './time'
+import { validDate, localToUTC, validateActualTimes } from './time'
 import type { Airport, FlightRecord, ImportPreview } from './types'
 
 const REQUIRED = ['Date', 'From', 'To']
@@ -63,11 +63,14 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
     // Flighty may export a destination-local arrival for a diverted flight. Require review
     // if the two airports use different zones; never silently guess an actual arrival zone.
     const diverted = row['Diverted To'] ? airports.get(row['Diverted To']) : undefined
-    if (diverted && to && diverted.timeZone !== to.timeZone && row['Gate Arrival (Actual)']) {
+    if (diverted && to && diverted.timeZone !== to.timeZone && (row['Gate Arrival (Actual)'] || row['Landing (Actual)'])) {
       issue('Gate Arrival (Actual)', 'diversion-timezone', '备降机场时区不同，请确认实际到达时间使用哪个机场时区')
     }
     const actualArrivalUTC = convert('Gate Arrival (Actual)', diverted ?? to)
+    const takeoffUTC = convert(row['Take off (Actual)'] ? 'Take off (Actual)' : 'Takeoff (Actual)', from)
     const landingUTC = convert('Landing (Actual)', diverted ?? to)
+    try { validateActualTimes({ actualDepartureUTC, takeoffUTC, touchdownUTC: landingUTC, actualArrivalUTC }) }
+    catch (error) { issue('Landing (Actual)', 'invalid-actual-order', (error as Error).message) }
     if (departureUTC && arrivalUTC && Date.parse(arrivalUTC) <= Date.parse(departureUTC)) {
       issue('Gate Arrival (Scheduled)', 'arrival-before-departure', '计划到达必须晚于计划出发，请检查日期和时区')
     }
@@ -101,7 +104,7 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
       state, visibility: 'private',
       departureLocal: row['Gate Departure (Scheduled)'] || undefined,
       arrivalLocal: row['Gate Arrival (Scheduled)'] || undefined,
-      departureUTC, arrivalUTC, actualDepartureUTC, actualArrivalUTC,
+      departureUTC, arrivalUTC, actualDepartureUTC, actualArrivalUTC, takeoffUTC, touchdownUTC: landingUTC,
       departureTimeZone: from?.timeZone, arrivalTimeZone: to?.timeZone,
       aircraft: row['Aircraft Type Name'] || undefined, registration: row['Tail Number'] || undefined,
       // Source notes remain private until the owner chooses public copy.

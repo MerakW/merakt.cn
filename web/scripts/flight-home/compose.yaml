@@ -1,0 +1,24 @@
+services:
+  flight-logger:
+    build: .
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 75s
+    env_file: .env
+    environment:
+      FLIGHT_WORKER_PRIVATE_KEY_FILE: /run/keys/worker-private.pem
+      BARK_KEY_FILE: /run/secrets/bark-key
+    volumes:
+      - ./keys/worker-private.pem:/run/keys/worker-private.pem:ro
+      - ./secrets:/run/secrets:ro
+    healthcheck:
+      test: ["CMD", "node", "worker.mjs", "--check"]
+      interval: 60s
+      timeout: 25s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"

@@ -17,6 +17,7 @@ export default withPayload({
   outputFileTracingExcludes: {
     '/*': ['./.data/**/*', './.env*', './tests/**/*', './scripts/**/*'],
   },
+  outputFileTracingIncludes: { '/*': ['./src/lib/flights/fr24_fetch.py'] },
   poweredByHeader: false,
   turbopack: { root: dirname(fileURLToPath(import.meta.url)) },
   // Build in CI/local; the 2 GB production host only runs the resulting image.

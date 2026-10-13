@@ -6,12 +6,14 @@ project_dir="$(cd "$(dirname "$0")/.." && pwd)"
 output_dir="$project_dir/../../outputs/releases"
 assets_dir=""
 check_only=false
+source_only=false
 usage() {
   cat <<'HELP'
-Usage: bash scripts/package-linux.sh [--assets /path/to/reviewed-public] [--output /path] [--check]
+Usage: bash scripts/package-linux.sh [--assets /path/to/reviewed-public] [--output /path] [--check] [--source-only]
 Build a Linux AMD64 Node 22 standalone archive using local Docker on Ubuntu or macOS.
 --assets: optional, explicitly reviewed public assets only; no assets copied by default.
 --check: stage and inspect inputs without Docker, downloads, or a build.
+--source-only: export reviewed build inputs for a separate local Linux builder.
 Requires local Docker Engine/Desktop (running) and Python 3. No push/upload occurs.
 HELP
 }
@@ -22,12 +24,13 @@ while [ "$#" -gt 0 ]; do
       if [ "$1" = --assets ]; then assets_dir="$2"; else output_dir="$2"; fi
       shift 2 ;;
     --check) check_only=true; shift ;;
+    --source-only) source_only=true; shift ;;
     -h|--help) usage; exit 0 ;;
     *) usage; exit 2 ;;
   esac
 done
 command -v python3 >/dev/null || { echo 'Python 3 is required.' >&2; exit 1; }
-if [ "$check_only" = false ]; then
+if [ "$check_only" = false ] && [ "$source_only" = false ]; then
   command -v docker >/dev/null || { echo '请先安装并启动 Docker Engine（Ubuntu）或 Docker Desktop（Mac），再运行本脚本。可用 --check 检查打包范围。' >&2; exit 1; }
   [ "$(docker context show)" = default ] || [ "$(docker context show)" = desktop-linux ] || { echo '仅允许本地 default / desktop-linux Docker context，避免将代码发往远程构建机。' >&2; exit 1; }
   case "${DOCKER_HOST:-}" in ''|unix://*) ;; *) echo '请移除远程 DOCKER_HOST。' >&2; exit 1;; esac
@@ -65,20 +68,32 @@ print('Staged source files:', sum(p.is_file() for p in source.rglob('*')))
 print('Public assets:', sum(p.is_file() for p in (source/'public').rglob('*')))
 print('Excluded: environment files, databases, CSV, internal Markdown and development dependencies.')
 PY
+if [ "$source_only" = true ]; then
+  mkdir -p "$output_dir"
+  tar -czf "$output_dir/merak-source.tar.gz" -C "$package_stage/source" .
+  echo "源码构建包：$output_dir/merak-source.tar.gz；不含私有配置、数据或未审核素材。"
+  exit 0
+fi
 if [ "$check_only" = true ]; then echo '输入范围检查完成；未运行构建。'; exit 0; fi
 mkdir -p "$package_stage/export"
-# This official image is downloaded if absent. All compilation happens locally.
+# Python is needed only by the transport tests in the builder; cloud runtime stays Node-only.
+docker build --platform linux/amd64 -t merak-build-local - <<'DOCKER'
+FROM node:22-bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends python3 && rm -rf /var/lib/apt/lists/*
+DOCKER
+# All compilation happens locally.
 docker run --rm --platform linux/amd64 \
   --user "$(id -u):$(id -g)" -e npm_config_cache=/tmp/npm-cache \
   --mount "type=bind,source=$package_stage/source,target=/app" \
   --mount "type=bind,source=$package_stage/export,target=/export" \
   -w /app -e NEXT_TELEMETRY_DISABLED=1 -e GIT_SHA="${GIT_SHA:-}" \
-  node:22-bookworm-slim bash -eu -o pipefail -c '
+  merak-build-local bash -eu -o pipefail -c '
     export PAYLOAD_SECRET="$(node -e "process.stdout.write(require(\"crypto\").randomBytes(32).toString(\"hex\"))")"
     export DATABASE_URL=file:/app/.data/build.db
     export SERVER_URL=http://127.0.0.1:3000
     npm ci
     npm test
+    npm run test:flight-worker
     npm run build
     mkdir -p .next/standalone/.next
     cp -R .next/static .next/standalone/.next/static

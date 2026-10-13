@@ -31,9 +31,12 @@ export interface FlightRecord {
   arrivalUTC?: string
   actualDepartureUTC?: string
   actualArrivalUTC?: string
+  takeoffUTC?: string
+  touchdownUTC?: string
   departureTimeZone?: string
   arrivalTimeZone?: string
   aircraft?: string
+  aircraftCode?: string
   registration?: string
   note?: string
   // Never serialize this field through public endpoints or public components.

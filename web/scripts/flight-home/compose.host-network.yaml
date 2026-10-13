@@ -1,0 +1,6 @@
+# Optional Linux override for hosts whose proxy/TUN interferes with Docker bridge traffic.
+# Copy to compose.override.yaml only on the affected host.
+services:
+  flight-logger:
+    network_mode: host
+    user: "${FLIGHT_LOGGER_UID:-1000}:${FLIGHT_LOGGER_GID:-1000}"
