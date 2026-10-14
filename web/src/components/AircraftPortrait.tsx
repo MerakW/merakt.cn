@@ -4,6 +4,7 @@ import { imageURL } from '@/lib/assets'
 
 import AircraftLabel from './AircraftLabel'
 import AircraftLights from './AircraftLights'
+import AircraftSkeleton from './AircraftSkeleton'
 import { useEffect, useRef, useState } from 'react'
 import { aircraftModel, type FlightAircraft } from '@/lib/flights/aircraft'
 import { aircraftLightLayout } from '@/lib/flights/aircraft-lights'
@@ -40,7 +41,7 @@ export default function AircraftPortrait({ flight, detailed = false, animate = f
   return <span ref={root} className={`aircraft-portrait ${detailed ? 'aircraft-detail' : 'aircraft-preview'}`} data-animated={animate} data-active={animate && active} data-light-ready={loadedFile === imageSource}>
     {detailed && <><span className="aircraft-sky" aria-hidden="true"><span className="aircraft-stars" /><span className="aircraft-clouds" /><span className="aircraft-clouds aircraft-clouds-near" /></span><span className="aircraft-heading"><span><small>AIRCRAFT</small><strong><AircraftLabel aircraft={flight.aircraft} light /></strong></span><span className="aircraft-registration">{flight.registration || ''}</span></span></>}
     <span className="aircraft-window"><span className="aircraft-canvas">
-      {loadedFile !== imageSource && <span className="loading-skeleton" aria-hidden="true" />}
+      {loadedFile !== imageSource && <AircraftSkeleton />}
       <img ref={image} src={imageSource} width="1600" height="800" loading="lazy" decoding="async" style={{ opacity: loadedFile === imageSource ? 1 : 0 }} alt={detailed ? `${flight.aircraft} · ${model.livery}${model.family ? ' · 近似机型示意' : ''}` : ''} onLoad={() => setLoadedFile(imageSource)} onError={() => setFailed(true)} />
       {lights && <AircraftLights key={model.file} layout={lights} />}
     </span></span>
