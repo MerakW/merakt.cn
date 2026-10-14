@@ -9,9 +9,9 @@ import { useEffect, useRef, useState } from 'react'
 import { aircraftModel, type FlightAircraft } from '@/lib/flights/aircraft'
 import { aircraftLightLayout } from '@/lib/flights/aircraft-lights'
 
-export default function AircraftPortrait({ flight, detailed = false, animate = false, previewSrc }: { flight: FlightAircraft; detailed?: boolean; animate?: boolean; previewSrc?: string }) {
+export default function AircraftPortrait({ flight, detailed = false, animate = false }: { flight: FlightAircraft; detailed?: boolean; animate?: boolean }) {
   const model = aircraftModel(flight)
-  const imageSource = model ? (process.env.NODE_ENV === 'development' && previewSrc ? previewSrc : imageURL(model.file)) : ''
+  const imageSource = model ? imageURL(model.file) : ''
   const lights = animate && model ? aircraftLightLayout(model) : undefined
   const root = useRef<HTMLSpanElement>(null)
   const image = useRef<HTMLImageElement>(null)
