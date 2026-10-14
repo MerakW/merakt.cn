@@ -18,11 +18,12 @@ export default function AircraftPortrait({ flight, detailed = false, animate = f
   const [loadedFile, setLoadedFile] = useState('')
   useEffect(() => { setFailed(false) }, [model?.file])
   useEffect(() => {
-    // A cached SSR image can finish before hydration attaches React's load handler.
+    // Cached success AND failure can finish before React attaches image handlers.
     // Check the image itself and never carry readiness across model URLs.
     const element = image.current
-    if (model && element?.complete && element.naturalWidth > 0 && element.getAttribute('src') === imageURL(model.file)) {
-      setLoadedFile(model.file)
+    if (model && element?.complete && element.getAttribute('src') === imageURL(model.file)) {
+      if (element.naturalWidth > 0) setLoadedFile(model.file)
+      else setFailed(true)
     }
   }, [model?.file, failed])
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function AircraftPortrait({ flight, detailed = false, animate = f
     {detailed && <><span className="aircraft-sky" aria-hidden="true"><span className="aircraft-stars" /><span className="aircraft-clouds" /><span className="aircraft-clouds aircraft-clouds-near" /></span><span className="aircraft-heading"><span><small>AIRCRAFT</small><strong><AircraftLabel aircraft={flight.aircraft} light /></strong></span><span className="aircraft-registration">{flight.registration || ''}</span></span></>}
     <span className="aircraft-window"><span className="aircraft-canvas">
       {loadedFile !== model.file && <span className="loading-skeleton" aria-hidden="true" />}
-      <img ref={image} src={imageURL(model.file)} width="1600" height="800" loading="lazy" decoding="async" alt={detailed ? `${flight.aircraft} · ${model.livery}${model.family ? ' · 近似机型示意' : ''}` : ''} onLoad={() => setLoadedFile(model.file)} onError={() => setFailed(true)} />
+      <img ref={image} src={imageURL(model.file)} width="1600" height="800" loading="lazy" decoding="async" style={{ opacity: loadedFile === model.file ? 1 : 0 }} alt={detailed ? `${flight.aircraft} · ${model.livery}${model.family ? ' · 近似机型示意' : ''}` : ''} onLoad={() => setLoadedFile(model.file)} onError={() => setFailed(true)} />
       {lights && <AircraftLights key={model.file} layout={lights} />}
     </span></span>
   </span>

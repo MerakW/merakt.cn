@@ -13,7 +13,7 @@ function ImageWithPlaceholder({ onLoad, onError, ...props }: Props) {
   return <span className="loading-image" data-state={state}>
     {state === 'loading' && <span className="loading-skeleton" aria-hidden="true" />}
     {state === 'failed' && <span className="image-unavailable" role="img" aria-label={props.alt || '图片暂不可用'}>图片暂不可用</span>}
-    <img {...props} ref={image} onLoad={event => { setState('ready'); onLoad?.(event) }} onError={event => { setState('failed'); onError?.(event) }} />
+    <img {...props} ref={image} style={{ ...props.style, visibility: state === 'ready' ? 'visible' : 'hidden' }} onLoad={event => { setState('ready'); onLoad?.(event) }} onError={event => { setState('failed'); onError?.(event) }} />
   </span>
 }
 
