@@ -13,7 +13,9 @@
     "import:preview": "node --import tsx scripts/preview-flighty.ts",
     "build:qa": "NEXT_DIST_DIR=.next-qa next build --webpack",
     "start:qa": "NEXT_DIST_DIR=.next-qa DATABASE_URL=file:./.data/browser-qa/test.db MEDIA_DIR=./.data/browser-qa/media SERVER_URL=http://127.0.0.1:3002 next start --hostname 127.0.0.1 --port 3002",
-    "package:linux": "bash scripts/package-linux.sh"
+    "package:linux": "bash scripts/package-linux.sh",
+    "package:flight-home": "node scripts/package-flight-home.mjs",
+    "test:flight-worker": "node --import tsx tests/flight-worker.integration.ts"
   },
   "engines": {
     "node": ">=22.13.0 <25"

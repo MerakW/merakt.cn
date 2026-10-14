@@ -11,11 +11,22 @@ type Preview = {
 const states: Record<string, string> = { planned: '计划中', completed: '已完成', cancelled: '已取消', unconfirmed: '待确认' }
 
 export default function FlightImport() {
+  const [backfill, setBackfill] = useState<{ total: number; withSource: number; updated?: number; updates: { id: number | string; date: string; from: string; to: string; flightNumber?: string; fields: string[] }[]; issues: { id: number | string; message: string }[] } | null>(null)
   const [csv, setCSV] = useState('')
   const [filename, setFilename] = useState('')
   const [preview, setPreview] = useState<Preview | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  async function recover(action: 'preview' | 'commit') {
+    setBusy(true); setError('')
+    try {
+      const response = await fetch(`/api/flights/backfill?action=${action}`, { method: 'POST' })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || '补齐失败，请重试。')
+      setBackfill(data)
+    } catch (error) { setError(error instanceof Error ? error.message : '网络异常，请重试。') }
+    finally { setBusy(false) }
+  }
   async function submit(action: 'preview' | 'commit') {
     setBusy(true); setError('')
     try {
@@ -30,6 +41,17 @@ export default function FlightImport() {
     <a className="text-link" href="/admin/collections/flights">← 飞行记录管理</a>
     <div className="page-heading"><div><p className="eyebrow">FLIGHT LOG / IMPORT</p><h1>把飞行带回来。</h1></div></div>
     <p>选择 Flighty 导出的 CSV，先核对航段，再导入。新记录默认仅自己可见，可在后台逐条或批量选择公开。</p>
+    <section className="import-upload" aria-label="补齐历史实际时间">
+      <h2>补齐历史实际时间</h2>
+      <p>从网站已保存的 Flighty 原始行恢复出位、起飞、接地与入位时间。只填空缺，保留现有时间、公开范围与备注，无需再次上传 CSV。</p>
+      <button className="solid-button" disabled={busy} onClick={() => recover('preview')}>{busy ? '正在处理…' : '检查可补齐的记录'}</button>
+      {backfill && <div aria-live="polite">
+        <p>{backfill.updated != null ? `已补齐 ${backfill.updated} 条记录。` : `${backfill.total} 条记录中 ${backfill.withSource} 条保留了原始数据，可补齐 ${backfill.updates.length} 条。`}</p>
+        {!!backfill.updates.length && <details><summary>查看补齐明细</summary>{backfill.updates.map(flight => <p key={flight.id}>{flight.date} · {flight.from} → {flight.to} · {flight.flightNumber || '—'}：{flight.fields.join('、')}</p>)}</details>}
+        {!!backfill.issues.length && <details open><summary>{backfill.issues.length} 条需要人工核对，已跳过</summary>{backfill.issues.map(issue => <p key={issue.id}><a href={`/admin/collections/flights/${issue.id}`}>记录 {issue.id}</a>：{issue.message}</p>)}</details>}
+        {backfill.updated == null && !!backfill.updates.length && <button className="solid-button" disabled={busy} onClick={() => recover('commit')}>补齐 {backfill.updates.length} 条记录</button>}
+      </div>}
+    </section>
     <div className="import-upload">
       <label htmlFor="flight-csv">Flighty CSV 文件 <span>最多 2 MB · 1,000 行</span></label>
       <input id="flight-csv" type="file" accept=".csv,text/csv" disabled={busy} onChange={async event => {
@@ -42,7 +64,7 @@ export default function FlightImport() {
       }} />
       <button className="solid-button" disabled={!csv || busy} onClick={() => submit('preview')}>{busy ? '正在处理…' : '预览导入'}</button>
     </div>
-    <p className="import-help">自动识别 Date → 日期、From / To → 机场、Gate Departure / Arrival → 两地当地时间。订票编号、座位与原始备注保存在私有信息中。</p>
+    <p className="import-help">自动识别两地当地时间：Gate Departure → 出位、Take off → 起飞、Landing → 接地、Gate Arrival → 入位。订票编号、座位与原始备注保存在私有信息中。</p>
     {error && <p role="alert" className="import-error">{error}</p>}
     {preview && <div aria-live="polite">
       {preview.imported != null ? <div className="import-success"><h2>已保存 {preview.imported} 条私有记录。</h2><p>跳过 {preview.duplicates.length} 条重复记录。你可以继续编辑、关联旅行，或选择哪些航段公开。</p><a className="text-link" href="/admin/collections/flights">管理飞行记录 ↗</a></div> : <>

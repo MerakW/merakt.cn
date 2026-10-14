@@ -76,6 +76,8 @@ export interface Config {
     notes: Note;
     events: Event;
     checkins: Checkin;
+    'flight-sync-jobs': FlightSyncJob;
+    'flight-worker-replays': FlightWorkerReplay;
     passkeys: Passkey;
     'passkey-challenges': PasskeyChallenge;
     'payload-kv': PayloadKv;
@@ -94,6 +96,8 @@ export interface Config {
     notes: NotesSelect<false> | NotesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     checkins: CheckinsSelect<false> | CheckinsSelect<true>;
+    'flight-sync-jobs': FlightSyncJobsSelect<false> | FlightSyncJobsSelect<true>;
+    'flight-worker-replays': FlightWorkerReplaysSelect<false> | FlightWorkerReplaysSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     'passkey-challenges': PasskeyChallengesSelect<false> | PasskeyChallengesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -231,13 +235,19 @@ export interface Flight {
    */
   departureLocal?: string | null;
   arrivalLocal?: string | null;
+  actualDepartureUTC?: string | null;
+  takeoffUTC?: string | null;
+  touchdownUTC?: string | null;
+  actualArrivalUTC?: string | null;
   departureUTC?: string | null;
   arrivalUTC?: string | null;
-  actualDepartureUTC?: string | null;
-  actualArrivalUTC?: string | null;
   departureTimeZone?: string | null;
   arrivalTimeZone?: string | null;
   aircraft?: string | null;
+  /**
+   * 例如 C919、B738。
+   */
+  aircraftCode?: string | null;
   registration?: string | null;
   trip?: (number | null) | Trip;
   photos?: (number | Media)[] | null;
@@ -376,7 +386,7 @@ export interface Event {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 访客提交默认待审核。只有状态为「通过」的留言才会公开。
+ * 待审核留言可在列表中一键批准；多条留言可勾选后批量编辑审核状态。只有「通过」的留言才会公开。
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "checkins".
@@ -388,6 +398,55 @@ export interface Checkin {
   status: 'pending' | 'approved' | 'rejected';
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * 雷达抓取与次日入位校准的持久化队列。服务重启后继续处理到期任务。
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flight-sync-jobs".
+ */
+export interface FlightSyncJob {
+  id: number;
+  key: string;
+  flightNumber: string;
+  flight?: (number | null) | Flight;
+  phase: 'Awaiting_Radar' | 'Pending_Gate_Calibration' | 'Archived' | 'Needs_Review';
+  request:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  calibrationRunAt?: string | null;
+  nextRunAt?: string | null;
+  attempts?: number | null;
+  calibrationAttempts?: number | null;
+  lastError?: string | null;
+  evidence?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  leaseUntil?: string | null;
+  leaseToken?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flight-worker-replays".
+ */
+export interface FlightWorkerReplay {
+  id: number;
+  nonce: string;
+  expiresAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -611,13 +670,16 @@ export interface FlightsSelect<T extends boolean = true> {
   state?: T;
   departureLocal?: T;
   arrivalLocal?: T;
+  actualDepartureUTC?: T;
+  takeoffUTC?: T;
+  touchdownUTC?: T;
+  actualArrivalUTC?: T;
   departureUTC?: T;
   arrivalUTC?: T;
-  actualDepartureUTC?: T;
-  actualArrivalUTC?: T;
   departureTimeZone?: T;
   arrivalTimeZone?: T;
   aircraft?: T;
+  aircraftCode?: T;
   registration?: T;
   trip?: T;
   photos?: T;
@@ -732,6 +794,35 @@ export interface CheckinsSelect<T extends boolean = true> {
   status?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flight-sync-jobs_select".
+ */
+export interface FlightSyncJobsSelect<T extends boolean = true> {
+  key?: T;
+  flightNumber?: T;
+  flight?: T;
+  phase?: T;
+  request?: T;
+  calibrationRunAt?: T;
+  nextRunAt?: T;
+  attempts?: T;
+  calibrationAttempts?: T;
+  lastError?: T;
+  evidence?: T;
+  leaseUntil?: T;
+  leaseToken?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flight-worker-replays_select".
+ */
+export interface FlightWorkerReplaysSelect<T extends boolean = true> {
+  nonce?: T;
+  expiresAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

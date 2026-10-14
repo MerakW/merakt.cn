@@ -1,0 +1,16 @@
+.flight-time-field { margin-bottom: 20px; min-width: 0; }
+.flight-time-field input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--theme-elevation-150); border-radius: 4px; background: var(--theme-input-bg); color: var(--theme-text); font: inherit; color-scheme: light dark; }
+.flight-time-field input:focus-visible, .checkin-approve:focus-visible { outline: 2px solid var(--theme-text); outline-offset: 3px; }
+.flight-time-field input:disabled { opacity: .6; }
+.flight-time-field .field-description { margin-top: 8px; }
+.flight-time-inputs { display: grid; grid-template-columns: minmax(140px, 1.3fr) minmax(100px, 1fr) auto; gap: 8px; align-items: center; }
+.flight-time-inputs input { min-width: 0; }
+.flight-time-clear { min-height: 44px; padding: 8px; border: 0; background: transparent; color: var(--theme-text); font: inherit; cursor: pointer; }
+.flight-time-clear:disabled { opacity: .5; cursor: default; }
+.flight-time-clear:focus-visible { outline: 2px solid var(--theme-text); outline-offset: 2px; }
+@media (max-width: 600px) { .flight-time-inputs { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .flight-time-clear { grid-column: 2; justify-self: end; min-height: 36px; } }
+.checkin-quick-status { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.checkin-approve { min-height: 36px; padding: 6px 12px; border: 1px solid var(--theme-elevation-300); border-radius: 4px; color: var(--theme-text); background: var(--theme-elevation-50); font: inherit; white-space: nowrap; cursor: pointer; }
+.checkin-approve:hover { background: var(--theme-elevation-100); }
+.checkin-approve:disabled { opacity: .6; cursor: wait; }
+.admin-tool-error { color: var(--theme-error-500); }

@@ -31,9 +31,12 @@ export function publicFlight(flight: FlightRecord) {
     arrivalUTC: dateHidden ? undefined : flight.arrivalUTC,
     actualDepartureUTC: dateHidden ? undefined : flight.actualDepartureUTC,
     actualArrivalUTC: dateHidden ? undefined : flight.actualArrivalUTC,
+    takeoffUTC: dateHidden ? undefined : flight.takeoffUTC,
+    touchdownUTC: dateHidden ? undefined : flight.touchdownUTC,
     departureTimeZone: dateHidden ? undefined : flight.departureTimeZone,
     arrivalTimeZone: dateHidden ? undefined : flight.arrivalTimeZone,
     aircraft: flight.aircraft,
+    aircraftCode: flight.aircraftCode,
     registration: formatRegistration(flight.registration) || undefined,
     note: dateHidden ? undefined : flight.note,
   }
@@ -60,6 +63,6 @@ export function selectFeaturedFlight(flights: FlightRecord[], now = new Date()) 
   }).sort((a, b) => departureInstant(a)! - departureInstant(b)!)
   if (upcoming[0]) return { kind: 'upcoming' as const, flight: publicFlight(upcoming[0]) }
   const history = visible.filter(flight => flight.state === 'completed')
-    .sort((a, b) => (b.actualArrivalUTC || b.arrivalUTC || b.date).localeCompare(a.actualArrivalUTC || a.arrivalUTC || a.date))
+    .sort((a, b) => (b.actualArrivalUTC || b.touchdownUTC || b.arrivalUTC || b.date).localeCompare(a.actualArrivalUTC || a.touchdownUTC || a.arrivalUTC || a.date))
   return history[0] ? { kind: 'latest' as const, flight: publicFlight(history[0]) } : null
 }
