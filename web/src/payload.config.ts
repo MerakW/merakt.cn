@@ -25,7 +25,7 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET,
   cookiePrefix: process.env.SERVER_URL === 'http://127.0.0.1:3002' ? 'merak-qa' : 'payload',
   serverURL: process.env.SERVER_URL || 'http://127.0.0.1:3000',
-  admin: { user: 'users', dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink'] } },
+  admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
   i18n: { supportedLanguages: { zh }, fallbackLanguage: 'zh' },
   collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, FlightSyncJobs, FlightWorkerReplays, Passkeys, PasskeyChallenges],
   endpoints: flightSyncEndpoints,

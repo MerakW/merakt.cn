@@ -67,6 +67,6 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
       </div>
     </form>
     {error && <p className="photo-publish-error" role="alert">{error}</p>}
-    {result && <div className="photo-publish-success" role="status"><strong>{result.duplicate ? '这条毛五已经发布。' : '发布好了。'}</strong><a href={result.url}>查看这条毛五 ↗</a><button type="button" onClick={() => { setFile(null); setCaption(''); setDate(today()); setResult(null) }}>再发一条</button></div>}
+    {result && <div className="photo-publish-success" role="status"><strong>{result.duplicate ? '这条毛五已经发布。' : '发布好了。'}</strong><a href={result.url}>查看这条毛五 ↗︎</a><button type="button" onClick={() => { setFile(null); setCaption(''); setDate(today()); setResult(null) }}>再发一条</button></div>}
   </section>
 }

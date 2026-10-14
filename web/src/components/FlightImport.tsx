@@ -67,7 +67,7 @@ export default function FlightImport() {
     <p className="import-help">自动识别两地当地时间：Gate Departure → 出位、Take off → 起飞、Landing → 接地、Gate Arrival → 入位。订票编号、座位与原始备注保存在私有信息中。</p>
     {error && <p role="alert" className="import-error">{error}</p>}
     {preview && <div aria-live="polite">
-      {preview.imported != null ? <div className="import-success"><h2>已保存 {preview.imported} 条私有记录。</h2><p>跳过 {preview.duplicates.length} 条重复记录。你可以继续编辑、关联旅行，或选择哪些航段公开。</p><a className="text-link" href="/admin/collections/flights">管理飞行记录 ↗</a></div> : <>
+      {preview.imported != null ? <div className="import-success"><h2>已保存 {preview.imported} 条私有记录。</h2><p>跳过 {preview.duplicates.length} 条重复记录。你可以继续编辑、关联旅行，或选择哪些航段公开。</p><a className="text-link" href="/admin/collections/flights">管理飞行记录 ↗︎</a></div> : <>
         <div className="import-summary"><h2>核对 {filename}</h2><p>{preview.totalRows} 行 · 新增 {preview.flights.length} 条 · 重复 {preview.duplicates.length} 条</p></div>
         {!!preview.duplicates.length && <details><summary>已识别的重复行</summary><p>{preview.duplicates.map(d => `${d.row}${d.firstRow ? `（与第 ${d.firstRow} 行相同）` : '（已有记录）'}`).join('、')}</p></details>}
         {!!preview.issues.length && <div className="import-issues"><h3>需要留意</h3><ul>{preview.issues.map((issue, i) => <li key={i}>第 {issue.row} 行{issue.field ? ` · ${issue.field}` : ''}：{issue.message}{issue.severity === 'error' ? '（请修正后重新上传）' : ''}</li>)}</ul></div>}

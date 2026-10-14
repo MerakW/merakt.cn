@@ -220,3 +220,6 @@
   .souvenir-piece:hover,.baggage-tag:hover { transform:none; }
   .archive-detail { animation:none; }
 }
+
+.flight-operational-times{margin:20px 0;border-top:1px solid var(--line);padding-top:16px}
+.flight-operational-times h4{font-size:11px;font-weight:500;color:var(--muted);margin:0 0 12px}

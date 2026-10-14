@@ -65,7 +65,7 @@ export default function FlightBoard({ flights, featured, airports, preview = fal
       <div className="departure-bottomline">
         <div><span>{departure?.label} · 当地</span><strong>{departure?.clock}</strong></div>
         <div><span>{arrival?.label} · 当地</span><strong className={arrivalDelayMinutes(spotlight) > 0 && arrival?.label === '实际到达' ? 'arrival-time-delayed' : undefined}>{arrival?.clock}{arrivalDelayMinutes(spotlight) > 0 && arrival?.label === '实际到达' && <small>（+{arrivalDelayMinutes(spotlight)}min）</small>}</strong></div>
-        <span className="board-stamp">{featured.kind === 'upcoming' ? 'NEXT DEPARTURE' : 'LANDED & LOGGED'}<i aria-hidden="true">↗</i></span>
+        <span className="board-stamp">{featured.kind === 'upcoming' ? 'NEXT DEPARTURE' : 'LANDED & LOGGED'}<i aria-hidden="true">↗︎</i></span>
       </div>
       </div>
       <aside className="ticket-stub">

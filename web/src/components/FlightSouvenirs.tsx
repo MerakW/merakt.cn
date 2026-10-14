@@ -1,3 +1,4 @@
+import PlaneIcon from '@/components/PlaneIcon'
 import { airlineLogoURL } from '@/lib/assets'
 import AircraftLabel from './AircraftLabel'
 import FlightNumber from './FlightNumber'
@@ -19,7 +20,7 @@ export default function FlightSouvenirs({souvenirs,airportName,open,filterRoute}
       <div className="souvenir-pieces">
         {souvenirs.familiar && <button className="souvenir-piece familiar-ticket" onClick={() => filterRoute(souvenirs.familiar!.key)}>
           <span className="piece-eyebrow">ON REPEAT <span>最常飞的航线</span></span>
-          <span className="piece-route">{souvenirs.familiar.from}<i>↔</i>{souvenirs.familiar.to}</span>
+          <span className="piece-route">{souvenirs.familiar.from}<i>↔︎</i>{souvenirs.familiar.to}</span>
           <span className="piece-cities">{airportName(souvenirs.familiar.from)} · {airportName(souvenirs.familiar.to)}</span>
           {souvenirs.mostFlown && <span className="piece-flight"><FlightNumber flight={souvenirs.mostFlown.flight} /><small>这条航线上坐过 {souvenirs.mostFlown.count} 次</small></span>}
           <span className="repeat-count"><strong>{souvenirs.familiar.count}</strong><span>次单程飞行<br />含两个方向</span><small>查看记录</small></span>
@@ -32,7 +33,7 @@ export default function FlightSouvenirs({souvenirs,airportName,open,filterRoute}
         {souvenirs.farthest && <button className="souvenir-piece far-ticket" onClick={() => open(souvenirs.farthest!.flight)}>
           <span className="piece-eyebrow">LONGEST ROUTE <span>最远的一程</span></span>
           <span className="distance-number">{Math.round(souvenirs.farthest.km).toLocaleString('en-US')}<small>KM</small></span>
-          <span className="distance-thread" aria-hidden="true"><svg viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M0 15H138M162 15H300" /></svg><span>✈</span></span>
+          <span className="distance-thread" aria-hidden="true"><svg viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M0 15H138M162 15H300" /></svg><span><PlaneIcon /></span></span>
           <span className="piece-route">{souvenirs.farthest.flight.from}<i>→</i>{landingAirport(souvenirs.farthest.flight)}</span>
           <span className="piece-flight"><FlightNumber flight={souvenirs.farthest.flight} /></span><span className="piece-foot">起终点大圆距离估算<span>查看航程</span></span>
         </button>}
