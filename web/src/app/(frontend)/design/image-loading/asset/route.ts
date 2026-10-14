@@ -9,6 +9,6 @@ export async function GET(request: Request) {
   if (mode !== 'ready') await new Promise(resolve => setTimeout(resolve, 5000))
   const headers = { 'Cache-Control': 'no-store' }
   if (mode === 'failed') return new Response(null, { status: 404, headers })
-  const file = await readFile(join(process.cwd(), 'public', 'aircraft', 'a320_white.webp'))
+  const file = await readFile(join(process.cwd(), 'public', 'aircraft', 'A350-900_white.webp'))
   return new Response(new Uint8Array(file), { headers: { ...headers, 'Content-Type': 'image/webp' } })
 }

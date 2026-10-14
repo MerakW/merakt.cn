@@ -2,8 +2,8 @@
 
 import { useId } from 'react'
 
-// A local silhouette remains available even while the CDN image is unavailable.
-const silhouette = 'M82 490Q100 467 169 443L224 412Q246 404 286 404H1255L1428 214H1506L1440 421L1514 438V456L1458 468L1340 486Q1210 528 990 541H291Q143 541 88 510Z M505 514L930 443L967 425L947 459L748 535L663 548Z M527 523Q527 514 542 514H660Q675 514 680 533V566Q675 580 657 580H541Q527 580 527 566Z'
+// A350-inspired side profile, available locally before any CDN image loads.
+const silhouette = 'M83 491Q95 473 133 454Q158 426 205 413Q241 403 279 403H1216Q1270 403 1353 423L1515 432V447L1423 470Q1298 507 1157 527Q1099 539 971 539H243Q125 536 91 518Q82 510 83 491Z M1246 404L1439 224Q1448 219 1464 219H1514L1442 429Z M1319 444L1484 423L1515 428L1468 449L1370 476Z M670 483L977 440Q1003 437 1024 413L1064 387L1072 390L1040 427Q1027 439 1005 445L787 506L718 529Z M505 514Q513 496 553 490Q604 479 676 495L684 502V558Q685 575 654 575H576Q556 573 552 558V540L526 535Z'
 
 export default function AircraftSkeleton() {
   const id = useId().replaceAll(':', '')
@@ -14,6 +14,6 @@ export default function AircraftSkeleton() {
     </defs>
     <path d={silhouette} className="aircraft-skeleton-body" />
     <g clipPath={`url(#${id}-outline)`}><rect className="aircraft-skeleton-sweep" x="-1600" y="0" width="1600" height="800" fill={`url(#${id}-shine)`} /></g>
-    <path d="M245 457H1195M551 523V570M664 530V566" fill="none" stroke="var(--paper)" strokeWidth="5" opacity=".4" />
+    <path d="M245 455H1190M558 500V560M679 506V559M127 455L145 449H160" fill="none" stroke="var(--paper)" strokeWidth="5" opacity=".4" />
   </svg>
 }
