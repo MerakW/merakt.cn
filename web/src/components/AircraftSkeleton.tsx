@@ -3,7 +3,7 @@
 import { useId } from 'react'
 
 // A350-inspired side profile, available locally before any CDN image loads.
-const silhouette = 'M83 491Q95 473 133 454Q158 426 205 413Q241 403 279 403H1216Q1270 403 1353 423L1515 432V447L1423 470Q1298 507 1157 527Q1099 539 971 539H243Q125 536 91 518Q82 510 83 491Z M1246 404L1439 224Q1448 219 1464 219H1514L1442 429Z M1319 444L1484 423L1515 428L1468 449L1370 476Z M670 483L977 440Q1003 437 1024 413L1064 387L1072 390L1040 427Q1027 439 1005 445L787 506L718 529Z M505 514Q513 496 553 490Q604 479 676 495L684 502V558Q685 575 654 575H576Q556 573 552 558V540L526 535Z'
+const silhouette = 'M83 491Q94 472 128 455Q150 428 195 414Q226 405 274 404L1257 404L1436 227Q1447 220 1462 220H1511L1448 422L1513 427V443L1466 460L1362 481Q1260 513 1122 531Q1082 536 1025 536H687V556Q687 574 660 574H578Q555 572 554 555V539H261Q144 536 99 521Q82 515 83 491Z'
 
 export default function AircraftSkeleton() {
   const id = useId().replaceAll(':', '')
@@ -14,6 +14,6 @@ export default function AircraftSkeleton() {
     </defs>
     <path d={silhouette} className="aircraft-skeleton-body" />
     <g clipPath={`url(#${id}-outline)`}><rect className="aircraft-skeleton-sweep" x="-1600" y="0" width="1600" height="800" fill={`url(#${id}-shine)`} /></g>
-    <path d="M245 455H1190M558 500V560M679 506V559M127 455L145 449H160" fill="none" stroke="var(--paper)" strokeWidth="5" opacity=".4" />
+    <path d="M127 454Q139 444 150 446L161 450Q167 454 160 459L142 458" fill="none" stroke="var(--muted)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" opacity=".65" />
   </svg>
 }
