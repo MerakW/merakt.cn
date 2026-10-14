@@ -1,9 +1,10 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type MouseEvent } from 'react'
 export default function ThemeControl() {
  const [dark,setDark] = useState(false)
  const fadeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
- useEffect(()=>()=>{if(fadeTimer.current)clearTimeout(fadeTimer.current);document.documentElement.classList.remove('theme-fading')},[])
+ const transition = useRef<ViewTransition | null>(null)
+ useEffect(()=>()=>{if(fadeTimer.current)clearTimeout(fadeTimer.current);transition.current?.skipTransition();document.documentElement.classList.remove('theme-fading');delete document.documentElement.dataset.themeTransition},[])
  useEffect(()=>{
   const media=matchMedia('(prefers-color-scheme: dark)')
   const apply=()=>{
@@ -15,11 +16,29 @@ export default function ThemeControl() {
   apply();media.addEventListener('change',apply)
   return ()=>media.removeEventListener('change',apply)
  },[])
- function toggle(){
+ async function toggle(event: MouseEvent<HTMLButtonElement>){
+  if(transition.current) return
   const next=!dark
   const apply=()=>{setDark(next);try{sessionStorage.setItem('merak-visit-theme',next?'dark':'light')}catch{};document.documentElement.dataset.theme=next?'dark':'light'}
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { apply(); return }
-  if (document.startViewTransition) document.startViewTransition(apply)
+  if (document.startViewTransition) {
+   const rect=event.currentTarget.getBoundingClientRect()
+   const x=rect.left+rect.width/2,y=rect.top+rect.height/2
+   const radius=Math.hypot(Math.max(x,innerWidth-x),Math.max(y,innerHeight-y))
+   document.documentElement.dataset.themeTransition='radial'
+   const current=document.startViewTransition(apply)
+   transition.current=current
+   try {
+    await current.ready
+    const animation=document.documentElement.animate(
+     {clipPath:[`circle(0px at ${x}px ${y}px)`,`circle(${radius}px at ${x}px ${y}px)`]},
+     {duration:650,easing:'cubic-bezier(.22,1,.36,1)',fill:'both',pseudoElement:'::view-transition-new(root)'}
+    )
+    await animation.finished
+    await current.finished
+   } catch { current.skipTransition() }
+   finally { transition.current=null;delete document.documentElement.dataset.themeTransition }
+  }
   else {
    if(fadeTimer.current)clearTimeout(fadeTimer.current)
    document.documentElement.classList.add('theme-fading')

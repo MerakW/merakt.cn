@@ -125,11 +125,11 @@ html[data-theme=dark] .arrival-time-delayed{color:#ff9a9f}
 @media(prefers-reduced-motion:no-preference){
  .aircraft-portrait[data-animated=true] .aircraft-canvas{animation:aircraft-float 5.5s ease-in-out infinite paused}
  .aircraft-portrait[data-animated=true][data-active=true] .aircraft-canvas{animation-play-state:running}
- ::view-transition-old(root){animation:theme-out .32s ease both}
- ::view-transition-new(root){animation:theme-in .38s ease both}
 }
 @keyframes aircraft-float{0%,100%{transform:translateY(2px) rotate(.15deg)}50%{transform:translateY(-3px) rotate(-.15deg)}}
-@keyframes theme-out{to{opacity:0}}
-@keyframes theme-in{from{opacity:0}to{opacity:1}}
+html[data-theme-transition=radial]::view-transition-group(root){animation-duration:0s}
+html[data-theme-transition=radial]::view-transition-old(root),html[data-theme-transition=radial]::view-transition-new(root){animation:none;mix-blend-mode:normal}
+html[data-theme-transition=radial]::view-transition-old(root){z-index:0}
+html[data-theme-transition=radial]::view-transition-new(root){z-index:1}
 
 @media(prefers-reduced-motion:no-preference){html.theme-fading *,html.theme-fading *::before,html.theme-fading *::after{transition:background-color .35s ease,color .35s ease,border-color .35s ease,box-shadow .35s ease!important}}

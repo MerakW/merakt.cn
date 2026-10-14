@@ -12,6 +12,7 @@ import './checkin-terminal.css'
 import './cover-lounge.css'
 import './aircraft.css'
 import './theme.css'
+import './home-depth.css'
 
 export const metadata: Metadata = { title: { default: 'Merak · 数字围场', template: '%s · Merak' }, description: 'Merak 的飞行、毛五影像与生活记录。', icons: { icon: { url: imageURL('/images/card/merak-mark.svg'), type: 'image/svg+xml' } } }
 
