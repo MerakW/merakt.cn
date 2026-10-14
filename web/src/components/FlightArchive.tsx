@@ -1,5 +1,6 @@
 'use client'
 import AircraftLabel from './AircraftLabel'
+import AutoLoadMore from './AutoLoadMore'
 import FlightCollection from './FlightCollection'
 import { matchesCollection, type CollectionFilter } from '@/lib/flights/collection'
 import { flightTime, arrivalDelayMinutes } from '@/lib/flights/display-time'
@@ -100,7 +101,7 @@ export default function FlightArchive({ flights, airports, airportName, souvenir
         </li>
       })}</ol>
       {entries.length === 0 && <p className="empty-list">没有符合条件的航程。试试其他年份或机场。</p>}
-      <div className="archive-pagination"><span>{visible.length} / {entries.length} 条</span>{visible.length < entries.length && <button onClick={() => { setLimit(value => value + batchSize); setFocusTarget(entries[limit]?.index ?? null) }}>再看 {Math.min(batchSize, entries.length - visible.length)} 条</button>}{visible.length >= entries.length && entries.length > 0 && <span>已显示全部记录</span>}</div>
+      <AutoLoadMore visible={visible.length} total={entries.length} onLoad={() => setLimit(value => Math.min(value + batchSize, entries.length))} />
     </section>
   </>
 }
