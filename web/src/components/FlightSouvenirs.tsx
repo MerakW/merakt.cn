@@ -1,3 +1,4 @@
+import ArrowIcon from '@/components/ArrowIcon'
 import PlaneIcon from '@/components/PlaneIcon'
 import { airlineLogoURL } from '@/lib/assets'
 import AircraftLabel from './AircraftLabel'
@@ -27,14 +28,14 @@ export default function FlightSouvenirs({souvenirs,airportName,open,filterRoute}
         </button>}
         {souvenirs.first && <button className="souvenir-piece first-ticket" onClick={() => open(souvenirs.first!)}>
           <span className="piece-eyebrow">FIRST ON RECORD</span><span className="first-ticket-title">最早的<br />一条记录</span>
-          <span className="piece-route">{souvenirs.first.from}<i>→</i>{landingAirport(souvenirs.first)}</span>
+          <span className="piece-route">{souvenirs.first.from}<i><ArrowIcon /></i>{landingAirport(souvenirs.first)}</span>
           <span className="piece-flight"><FlightNumber flight={souvenirs.first} /></span><span className="piece-foot"><time>{dateLabel(souvenirs.first.date)}</time><span>查看航程</span></span>
         </button>}
         {souvenirs.farthest && <button className="souvenir-piece far-ticket" onClick={() => open(souvenirs.farthest!.flight)}>
           <span className="piece-eyebrow">LONGEST ROUTE <span>最远的一程</span></span>
           <span className="distance-number">{Math.round(souvenirs.farthest.km).toLocaleString('en-US')}<small>KM</small></span>
           <span className="distance-thread" aria-hidden="true"><svg viewBox="0 0 300 30" preserveAspectRatio="none"><path d="M0 15H138M162 15H300" /></svg><span><PlaneIcon /></span></span>
-          <span className="piece-route">{souvenirs.farthest.flight.from}<i>→</i>{landingAirport(souvenirs.farthest.flight)}</span>
+          <span className="piece-route">{souvenirs.farthest.flight.from}<i><ArrowIcon /></i>{landingAirport(souvenirs.farthest.flight)}</span>
           <span className="piece-flight"><FlightNumber flight={souvenirs.farthest.flight} /></span><span className="piece-foot">起终点大圆距离估算<span>查看航程</span></span>
         </button>}
       </div>

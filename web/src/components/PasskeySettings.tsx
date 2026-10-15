@@ -1,4 +1,5 @@
 'use client'
+import ArrowIcon from '@/components/ArrowIcon'
 import { useEffect, useState } from 'react'
 import { passkeyError, passkeyRequest, registerPasskey } from '@/lib/passkey-client'
 
@@ -24,5 +25,5 @@ export default function PasskeySettings({ initialKeys }: { initialKeys: Key[] })
       setBusy(true); setMessage('')
       try { await passkeyRequest('remove', { id: key.id }); await refresh(); setMessage('通行密钥已删除。') }
       catch (error) { setMessage(passkeyError(error)) } finally { setBusy(false) }
-    }}>删除</button></li>)}</ul>{!keys.length && <p>尚未绑定通行密钥。密码登录始终可用。</p>}<a href="/manage">返回管理首页 ↗︎</a></section>
+    }}>删除</button></li>)}</ul>{!keys.length && <p>尚未绑定通行密钥。密码登录始终可用。</p>}<a href="/manage">返回管理首页 <ArrowIcon direction="up-right" /></a></section>
 }

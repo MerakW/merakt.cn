@@ -1,4 +1,5 @@
 'use client'
+import ArrowIcon from '@/components/ArrowIcon'
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import type { GalleryAlbum } from '@/lib/gallery'
 
@@ -40,7 +41,7 @@ export default function HomeGallery({ albums, total }: { albums: GalleryAlbum[];
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
   }
   return <section className="home-photos home-gallery" aria-labelledby="home-photos-heading">
-    <header className="home-gallery-heading"><h2 id="home-photos-heading">FURSUIT FRIDAY<span>另一面的我。</span></h2><div className="home-gallery-controls"><button type="button" aria-label="上一组毛五影像" disabled={progress <= 0} onClick={() => slide(-1)}>←</button><button type="button" aria-label="下一组毛五影像" disabled={progress >= 100} onClick={() => slide(1)}>→</button><a href="/fursuitfriday">全部影像 ↗</a></div></header>
+    <header className="home-gallery-heading"><h2 id="home-photos-heading">FURSUIT FRIDAY<span>另一面的我。</span></h2><div className="home-gallery-controls"><button type="button" aria-label="上一组毛五影像" disabled={progress <= 0} onClick={() => slide(-1)}><ArrowIcon direction="left" /></button><button type="button" aria-label="下一组毛五影像" disabled={progress >= 100} onClick={() => slide(1)}><ArrowIcon /></button><a href="/fursuitfriday">全部影像 <ArrowIcon direction="up-right" /></a></div></header>
     <div ref={rail} className="home-gallery-rail" onScroll={update} onPointerDown={event => { suppressClick.current=false; if (event.pointerType === 'mouse' && event.button === 0) drag.current = { x: event.clientX, left: event.currentTarget.scrollLeft, moved: false } }} onPointerMove={move} onPointerUp={stop} onPointerLeave={event => { if (!event.currentTarget.hasPointerCapture(event.pointerId)) drag.current=null }} onPointerCancel={event => { stop(event); suppressClick.current=false }} onClickCapture={event => { if (suppressClick.current) { event.preventDefault(); suppressClick.current=false } }}>
       {albums.map((album, index) => {
         const photo = album.photos[0]
@@ -50,7 +51,7 @@ export default function HomeGallery({ albums, total }: { albums: GalleryAlbum[];
           {photo.credit && <span className="home-gallery-credit">摄影 {photo.credit}</span>}
         </a>
       })}
-      <a className="home-gallery-all" href="/fursuitfriday"><span>ALL {total}</span><b aria-hidden="true">→</b><small>走进全部影像</small></a>
+      <a className="home-gallery-all" href="/fursuitfriday"><span>ALL {total}</span><b aria-hidden="true"><ArrowIcon /></b><small>走进全部影像</small></a>
     </div>
     <div className="home-gallery-progress" role="progressbar" aria-label="影像浏览进度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><i style={{ transform: `scaleX(${progress / 100})` }}/></div>
   </section>

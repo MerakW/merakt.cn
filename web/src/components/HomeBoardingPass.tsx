@@ -1,4 +1,5 @@
 'use client'
+import ArrowIcon from '@/components/ArrowIcon'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { imageURL } from '@/lib/assets'
 
@@ -33,6 +34,6 @@ export default function HomeBoardingPass() {
       <dl><div><dt>旅客</dt><dd>你的名字</dd></div><div><dt>航班</dt><dd>MK 518</dd></div><div><dt>座位</dt><dd>1A</dd></div></dl>
       <p>给你留了一个靠窗的位置。</p>
     </div>
-    <div className="home-pass-stub"><span>GATE<strong>HELLO</strong></span><div className="home-pass-barcode" aria-hidden="true"/><span className="home-pass-action">领取登机牌 <b aria-hidden="true">↗</b></span></div>
+    <div className="home-pass-stub"><span>GATE<strong>HELLO</strong></span><div className="home-pass-barcode" aria-hidden="true"/><span className="home-pass-action">领取登机牌 <b aria-hidden="true"><ArrowIcon direction="up-right" /></b></span></div>
   </a></div>
 }

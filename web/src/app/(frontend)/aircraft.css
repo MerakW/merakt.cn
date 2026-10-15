@@ -50,7 +50,7 @@
 .archive-tags .ticket-face .aircraft-canvas{max-width:300px;flex:0 1 300px}
 .archive-tags .ticket-face .tag-bottom{margin:0 -18px 0 -26px;padding:12px 18px 13px 26px;background:#f6f8fc;border-top:1px dashed #becde1;min-height:61px;margin-top:auto}
 .archive-tags .ticket-face .tag-open{display:inline-flex;gap:6px;align-items:center}
-.archive-tags .ticket-face .tag-open::after{content:'↗';font-size:14px;color:#7896c3}
+.archive-tags .ticket-face .tag-open::after{content:'';display:inline-block;width:1em;height:1em;background:currentColor;color:#7896c3;clip-path:polygon(20% 15%,85% 15%,85% 80%,73% 80%,73% 36%,22% 87%,13% 78%,64% 27%,20% 27%)}
 .archive-tags .ticket-face .tag-perforation{bottom:64px}
 .archive-detail{grid-template-columns:minmax(0,1.12fr) minmax(0,1fr) minmax(0,1fr);gap:24px;padding:22px;align-items:stretch}
 .archive-detail>.aircraft-detail{max-width:none;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;min-width:0}

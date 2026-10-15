@@ -1,4 +1,5 @@
 'use client'
+import ArrowIcon from '@/components/ArrowIcon'
 
 import { useState } from 'react'
 import type { ImportIssue } from '@/lib/flights/types'
@@ -38,7 +39,7 @@ export default function FlightImport() {
     finally { setBusy(false) }
   }
   return <section className="import-page">
-    <a className="text-link" href="/admin/collections/flights">← 飞行记录管理</a>
+    <a className="text-link" href="/admin/collections/flights"><ArrowIcon direction="left" /> 飞行记录管理</a>
     <div className="page-heading"><div><p className="eyebrow">FLIGHT LOG / IMPORT</p><h1>把飞行带回来。</h1></div></div>
     <p>选择 Flighty 导出的 CSV，先核对航段，再导入。新记录默认仅自己可见，可在后台逐条或批量选择公开。</p>
     <section className="import-upload" aria-label="补齐历史实际时间">
@@ -47,7 +48,7 @@ export default function FlightImport() {
       <button className="solid-button" disabled={busy} onClick={() => recover('preview')}>{busy ? '正在处理…' : '检查可补齐的记录'}</button>
       {backfill && <div aria-live="polite">
         <p>{backfill.updated != null ? `已补齐 ${backfill.updated} 条记录。` : `${backfill.total} 条记录中 ${backfill.withSource} 条保留了原始数据，可补齐 ${backfill.updates.length} 条。`}</p>
-        {!!backfill.updates.length && <details><summary>查看补齐明细</summary>{backfill.updates.map(flight => <p key={flight.id}>{flight.date} · {flight.from} → {flight.to} · {flight.flightNumber || '—'}：{flight.fields.join('、')}</p>)}</details>}
+        {!!backfill.updates.length && <details><summary>查看补齐明细</summary>{backfill.updates.map(flight => <p key={flight.id}>{flight.date} · {flight.from} <ArrowIcon /> {flight.to} · {flight.flightNumber || '—'}：{flight.fields.join('、')}</p>)}</details>}
         {!!backfill.issues.length && <details open><summary>{backfill.issues.length} 条需要人工核对，已跳过</summary>{backfill.issues.map(issue => <p key={issue.id}><a href={`/admin/collections/flights/${issue.id}`}>记录 {issue.id}</a>：{issue.message}</p>)}</details>}
         {backfill.updated == null && !!backfill.updates.length && <button className="solid-button" disabled={busy} onClick={() => recover('commit')}>补齐 {backfill.updates.length} 条记录</button>}
       </div>}
@@ -67,11 +68,11 @@ export default function FlightImport() {
     <p className="import-help">自动识别两地当地时间：Gate Departure → 出位、Take off → 起飞、Landing → 接地、Gate Arrival → 入位。订票编号、座位与原始备注保存在私有信息中。</p>
     {error && <p role="alert" className="import-error">{error}</p>}
     {preview && <div aria-live="polite">
-      {preview.imported != null ? <div className="import-success"><h2>已保存 {preview.imported} 条私有记录。</h2><p>跳过 {preview.duplicates.length} 条重复记录。你可以继续编辑、关联旅行，或选择哪些航段公开。</p><a className="text-link" href="/admin/collections/flights">管理飞行记录 ↗︎</a></div> : <>
+      {preview.imported != null ? <div className="import-success"><h2>已保存 {preview.imported} 条私有记录。</h2><p>跳过 {preview.duplicates.length} 条重复记录。你可以继续编辑、关联旅行，或选择哪些航段公开。</p><a className="text-link" href="/admin/collections/flights">管理飞行记录 <ArrowIcon direction="up-right" /></a></div> : <>
         <div className="import-summary"><h2>核对 {filename}</h2><p>{preview.totalRows} 行 · 新增 {preview.flights.length} 条 · 重复 {preview.duplicates.length} 条</p></div>
         {!!preview.duplicates.length && <details><summary>已识别的重复行</summary><p>{preview.duplicates.map(d => `${d.row}${d.firstRow ? `（与第 ${d.firstRow} 行相同）` : '（已有记录）'}`).join('、')}</p></details>}
         {!!preview.issues.length && <div className="import-issues"><h3>需要留意</h3><ul>{preview.issues.map((issue, i) => <li key={i}>第 {issue.row} 行{issue.field ? ` · ${issue.field}` : ''}：{issue.message}{issue.severity === 'error' ? '（请修正后重新上传）' : ''}</li>)}</ul></div>}
-        <div className="import-records">{preview.flights.map((flight, i) => <div key={i}><time>{flight.date}</time><strong>{flight.from} → {flight.to}</strong><span>{flight.flightNumber || '—'}</span><span>{states[flight.state]}</span></div>)}</div>
+        <div className="import-records">{preview.flights.map((flight, i) => <div key={i}><time>{flight.date}</time><strong>{flight.from} <ArrowIcon /> {flight.to}</strong><span>{flight.flightNumber || '—'}</span><span>{states[flight.state]}</span></div>)}</div>
         <button className="solid-button" disabled={busy || !preview.valid || !preview.flights.length} onClick={() => submit('commit')}>{busy ? '正在保存…' : `导入 ${preview.flights.length} 条，设为私有`}</button>
       </>}
     </div>}

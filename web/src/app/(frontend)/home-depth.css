@@ -4,7 +4,7 @@
 .home-page>section { max-width:1344px; margin-inline:auto; width:calc(100% - var(--cover-gutter)*2); }
 .home-page #home-content { margin-top:64px; scroll-margin-top:24px; }
 .home-page .paddock-cover {
-  display:block; height:100svh; min-height:720px; padding:0; border-radius:0;
+  display:block; height:var(--stable-cover-height,100svh); min-height:720px; padding:0; border-radius:0;
   background:#05080f; color:#eef2f9; isolation:isolate;
 }
 .home-page .paddock-cover::after {
@@ -50,10 +50,10 @@
 .home-page .cover-wordmark {
   position:absolute; left:calc(var(--cover-gutter) - .02em); bottom:82px; margin:0;
   display:flex; font:600 min(27vw,48svh)/.86 var(--display); letter-spacing:-.025em;
-  color:#eef2f9; z-index:3; pointer-events:none; overflow:hidden; padding-top:.05em;
+  color:#eef2f9; z-index:3; pointer-events:none; overflow:hidden; padding-top:.05em; contain:paint;
   transform:translate3d(var(--title-x,0px),var(--title-y,0px),0);
 }
-.cover-wordmark>span { display:inline-block; animation:cover-letter-arrive 1.1s cubic-bezier(.22,1,.36,1) both; }
+.cover-wordmark>span { display:inline-block; animation:cover-letter-arrive 1.1s cubic-bezier(.22,1,.36,1) backwards; }
 .cover-wordmark>span:last-child { color:#ff7a4d; }
 .home-page .cover-bottom {
   position:absolute; inset:auto 0 0; min-height:52px; padding:15px var(--cover-gutter);
@@ -107,7 +107,7 @@ body:has(.home-page[data-over-cover=true][data-scrolled=false]) .site-nav {
   .home-page .cover-bottom { font-size:9px; }
 }
 @media(max-width:580px) {
-  .home-page .paddock-cover { height:100svh; min-height:820px; }
+  .home-page .paddock-cover { height:var(--stable-cover-height,100svh); min-height:820px; }
   .home-page .cover-coordinate { font-size:9px; }
   .home-page .cover-copy { top:166px; width:calc(100% - var(--cover-gutter)*2); max-width:34ch; }
   .home-page .cover-greeting { font-size:21px; margin-bottom:12px; }
@@ -163,7 +163,7 @@ html[data-theme=light] body:has(.home-page[data-over-cover=true][data-scrolled=f
 .home-flight h3 { font:500 30px var(--display); margin:0; }
 .home-flight-overview { display:block; }
 .home-flight-overview .route-map-panel { display:flex; flex-direction:column; min-width:0; }
-.home-flight-overview .overview-map { --home-map-bg:color-mix(in srgb,var(--ice) 25%,var(--canvas)); flex:1; min-height:390px; border-radius:10px; background:var(--home-map-bg); }
+.home-flight-overview .overview-map { --home-map-bg:color-mix(in srgb,var(--ice) 25%,var(--canvas)); min-height:0; border-radius:10px; background:var(--home-map-bg); }
 .home-flight-overview .overview-map text { stroke:var(--home-map-bg); stroke-width:2.5px; }
 .home-flight-overview .map-toolbar { flex-wrap:wrap; gap:12px; }
 .home-flight-overview .map-airport-tabs button { min-height:44px; padding:9px 16px; }
@@ -216,7 +216,6 @@ html[data-theme=light] body:has(.home-page[data-over-cover=true][data-scrolled=f
   .home-flight-section>.section-heading { align-items:start; flex-direction:column; gap:20px; }
   .home-flight-section>.section-heading h2 { font-size:24px; }
   .home-flight-section .home-flight { padding:24px; }
-  .home-flight-overview .overview-map { min-height:280px; }
   .home-recent-flights>a { grid-template-columns:90px minmax(0,1fr); gap:12px; }
   .home-recent-flights strong { justify-self:end; font-size:28px; gap:12px; }
   .home-recent-flights .flight-number { font-size:10px; }
@@ -339,4 +338,60 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
 @media(prefers-reduced-motion:reduce) {
   .home-gallery-visual img,.home-gallery-controls button,.overview-map .map-route-line,.overview-map .map-airport-point,.overview-map .map-airport-point text,.map-airport-tabs button { transition:none; }
   .home-gallery-card:hover img { transform:none; }
+}
+
+/* Keep the SVG and its container at the same ratio on mobile and desktop. */
+.overview-map { min-height:0; }
+.overview-map > svg { position:static; display:block; width:100%; height:auto; max-height:none; aspect-ratio:800/390; }
+.ready-matrix { position:static; display:block; width:90px; height:21px; color:#aee7c7; }
+.ui-arrow { position:static; display:inline-block; width:1em; height:1em; max-width:none; vertical-align:-.12em; flex:none; overflow:visible; }
+@keyframes ready-status-pulse {
+  0%, 100% { opacity:1; transform:scale(1); }
+  50% { opacity:.3; transform:scale(.85); }
+}
+@media (prefers-reduced-motion:no-preference) {
+  .flight-counter[data-revealed=true] .counter-led > i { animation:ready-status-pulse 1.8s ease-in-out infinite; }
+  .home-page[data-over-cover=true] :is(.cover-wordmark,.cover-photo,.speed-tunnel) { will-change:transform; }
+}
+
+/* Scroll translation is independent of pointer transforms and letter arrivals. */
+/* One transform moves the whole word; completed letter entrances release theirs. */
+@keyframes home-title-parallax {
+  from { transform:translate3d(var(--title-x,0px),0,0); }
+  to { transform:translate3d(var(--title-x,0px),calc(var(--parallax-height) * .32),0); }
+}
+@keyframes home-photo-parallax {
+  from { translate:0 0; }
+  to { translate:0 calc(var(--parallax-height) * -.18); }
+}
+@keyframes home-field-parallax {
+  from { translate:0 0; }
+  to { translate:0 calc(var(--parallax-height) * .12); }
+}
+@media (prefers-reduced-motion:no-preference) {
+  .home-page .paddock-cover[data-native-parallax] .cover-wordmark { animation-name:home-title-parallax; }
+  .home-page .paddock-cover[data-native-parallax] .cover-photo { animation-name:home-photo-parallax; }
+  .home-page .paddock-cover[data-native-parallax] .speed-tunnel { animation-name:home-field-parallax; }
+  .home-page .paddock-cover[data-native-parallax] :is(.cover-wordmark,.cover-photo,.speed-tunnel) {
+    animation-duration:auto;
+    animation-timing-function:linear;
+    animation-fill-mode:both;
+    animation-timeline:scroll(root block);
+    animation-range:var(--parallax-start) var(--parallax-end);
+    will-change:transform,translate;
+  }
+}
+
+@media (prefers-reduced-motion:no-preference) {
+  .home-page .paddock-cover[data-native-parallax] .cover-wordmark {
+    translate:none;
+    will-change:transform;
+  }
+}
+
+/* Keep the entrance clip only while letters are entering. */
+.home-page .cover-wordmark[data-entered=true] {
+  overflow:visible;
+  contain:layout style;
+  backface-visibility:hidden;
 }

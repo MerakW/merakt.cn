@@ -1,4 +1,5 @@
 'use client'
+import ArrowIcon from '@/components/ArrowIcon'
 
 import { imageURL } from '@/lib/assets'
 import AircraftLabel from './AircraftLabel'
@@ -65,7 +66,7 @@ export default function FlightBoard({ flights, featured, airports, preview = fal
       <div className="departure-bottomline">
         <div><span>{departure?.label} · 当地</span><strong>{departure?.clock}</strong></div>
         <div><span>{arrival?.label} · 当地</span><strong className={arrivalDelayMinutes(spotlight) > 0 && arrival?.label === '实际到达' ? 'arrival-time-delayed' : undefined}>{arrival?.clock}{arrivalDelayMinutes(spotlight) > 0 && arrival?.label === '实际到达' && <small>（+{arrivalDelayMinutes(spotlight)}min）</small>}</strong></div>
-        <span className="board-stamp">{featured.kind === 'upcoming' ? 'NEXT DEPARTURE' : 'LANDED & LOGGED'}<i aria-hidden="true">↗︎</i></span>
+        <span className="board-stamp">{featured.kind === 'upcoming' ? 'NEXT DEPARTURE' : 'LANDED & LOGGED'}<i aria-hidden="true"><ArrowIcon direction="up-right" /></i></span>
       </div>
       </div>
       <aside className="ticket-stub">

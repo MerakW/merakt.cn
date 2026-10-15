@@ -58,5 +58,5 @@ export default function FlightCounter({ km, flights, airports, airlines, distanc
 
 function ReadyMatrix() {
  const glyphs = ['11110100011000111110101001001010001','11111100001000011110100001000011111','01110100011000111111100011000110001','11110100011000110001100011000111110','10001100010101000100001000010000100']
- return <svg className="ready-matrix" viewBox="0 0 60 14" width="90" height="21" aria-hidden="true">{glyphs.flatMap((glyph,g) => [...glyph].map((on,i) => <circle key={`${g}-${i}`} cx={g*12+(i%5)*2+1} cy={Math.floor(i/5)*2+1} r=".65" fill={on === '1' ? '#aee7c7' : '#314442'} />))}</svg>
+ return <svg className="ready-matrix" viewBox="0 0 60 14" width="90" height="21" aria-hidden="true">{glyphs.flatMap((glyph,g) => [...glyph].flatMap((on,i) => on === '1' ? [<circle key={`${g}-${i}`} cx={g*12+(i%5)*2+1} cy={Math.floor(i/5)*2+1} r=".65" fill="currentColor" />] : []))}</svg>
 }

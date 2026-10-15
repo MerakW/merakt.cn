@@ -1,4 +1,5 @@
 'use client'
+import ArrowIcon from '@/components/ArrowIcon'
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
@@ -49,7 +50,7 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
     finally { submitting.current = false; setBusy(false) }
   }
   return <section className="photo-publish">
-    <a className="quiet-link" href="/manage">← 管理我的网站</a>
+    <a className="quiet-link" href="/manage"><ArrowIcon direction="left" /> 管理我的网站</a>
     <header><p className="kicker">FURSUITFRIDAY / NEW</p><h1>发一条毛五。</h1><p>一张照片，一段配文。上传后就会出现在毛五页。</p></header>
     {!configured && <p className="photo-publish-notice" role="status">图片上传服务尚未配置。你可以先选择图片、整理文案。</p>}
     <form onSubmit={submit}>
@@ -67,6 +68,6 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
       </div>
     </form>
     {error && <p className="photo-publish-error" role="alert">{error}</p>}
-    {result && <div className="photo-publish-success" role="status"><strong>{result.duplicate ? '这条毛五已经发布。' : '发布好了。'}</strong><a href={result.url}>查看这条毛五 ↗︎</a><button type="button" onClick={() => { setFile(null); setCaption(''); setDate(today()); setResult(null) }}>再发一条</button></div>}
+    {result && <div className="photo-publish-success" role="status"><strong>{result.duplicate ? '这条毛五已经发布。' : '发布好了。'}</strong><a href={result.url}>查看这条毛五 <ArrowIcon direction="up-right" /></a><button type="button" onClick={() => { setFile(null); setCaption(''); setDate(today()); setResult(null) }}>再发一条</button></div>}
   </section>
 }
