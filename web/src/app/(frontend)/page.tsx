@@ -1,6 +1,6 @@
 import ArrowIcon from '@/components/ArrowIcon'
 import { imageURL } from '@/lib/assets'
-import FlightNumber from '@/components/FlightNumber'
+import HomeFlights from '@/components/HomeFlights'
 import SpeedTunnel from '@/components/SpeedTunnel'
 import HomeMotion from '@/components/HomeMotion'
 import HomeBoardingPass from '@/components/HomeBoardingPass'
@@ -35,7 +35,7 @@ export default async function Home() {
   const intro = '「每个梦都像任意门，往不同世界。」'
   const visibleFlights = flights.flights.filter(flight => isFlightPublic(flight)).map(publicFlight)
   const completed = visibleFlights.filter(flight => flight.state === 'completed')
-  const usedCodes = new Set(completed.flatMap(flight => [flight.from, flight.divertedTo || flight.to]))
+  const usedCodes = new Set(visibleFlights.flatMap(flight => [flight.from, flight.to, flight.divertedTo].filter(Boolean) as string[]))
   const airports = [...usedCodes].flatMap(code => airportMap.has(code) ? [airportMap.get(code)!] : [])
   const stats = flightSouvenirs(visibleFlights, airports)
   const recentFlights = [...completed].sort((a,b) => b.date.localeCompare(a.date)).slice(0,4)
@@ -57,8 +57,9 @@ export default async function Home() {
     <section id="home-content" className="home-pass-invite" aria-labelledby="home-pass-heading"><div><h2 id="home-pass-heading"><span>YOU <ArrowIcon /> HGH</span>给你留了一个<br/>靠窗的位置。</h2><p>领一张写着你名字的登机牌，杭州见。</p></div><HomeBoardingPass/></section>
     <section className="home-flight-section" aria-labelledby="home-flight-heading">
       <div className="section-heading"><div><h2 id="home-flight-heading"><span>BETWEEN CITIES</span>在城市之间。</h2><p>坐过的航班，去过的机场。</p></div><a className="quiet-link" href="/flights">进入飞行日志 <ArrowIcon direction="up-right" /></a></div>
-      {featured && <div className="home-flight"><div><p className="kicker">{featured.kind === 'upcoming' ? '下一次出发' : '最近一次抵达'}</p><h3>{featured.flight.dateHidden ? '出发日期暂不公开' : featured.flight.date.replaceAll('-', '.')}</h3><p>{featured.flight.aircraft || '航程记录'}{featured.flight.registration && ` · ${featured.flight.registration}`}</p></div><a className="home-flight-route" href="/flights"><strong>{featured.flight.from}<i className="home-route-connector" aria-hidden="true" />{featured.flight.divertedTo || featured.flight.to}</strong><span className="home-flight-number"><FlightNumber flight={featured.flight} /></span><span>{airportMap.get(featured.flight.from)?.city} · {airportMap.get(featured.flight.divertedTo || featured.flight.to)?.city}</span></a></div>}
-      {stats.count > 0 ? <><div className="home-flight-overview"><FlightCounter km={stats.totalKm} flights={stats.count} airports={stats.airports.length} airlines={stats.airlineCount} distanceCount={stats.distanceCount}/><RouteMap flights={completed} airports={airports} overview /></div><div className="home-recent-flights" aria-label="近期已完成航程">{recentFlights.map(flight=><a href="/flights" key={flight.id}><time dateTime={flight.date}>{flight.date.replaceAll('-', '.')}</time><strong>{flight.from}<span aria-hidden="true"><ArrowIcon /></span>{flight.divertedTo || flight.to}</strong><FlightNumber flight={flight}/><span className="home-recent-aircraft">{flight.aircraft || '机型待补充'}</span><span className="home-recent-state">已抵达 <i aria-hidden="true"><ArrowIcon direction="up-right" /></i></span></a>)}</div></> : <p className="home-flights-empty">航程正在整理，公开后会显示在这里。</p>}
+      <HomeFlights featured={featured} recent={recentFlights} airports={airports}>
+        {stats.count > 0 ? <div className="home-flight-overview"><FlightCounter km={stats.totalKm} flights={stats.count} airports={stats.airports.length} airlines={stats.airlineCount} distanceCount={stats.distanceCount}/><RouteMap flights={completed} airports={airports} overview /></div> : <p className="home-flights-empty">航程正在整理，公开后会显示在这里。</p>}
+      </HomeFlights>
     </section>
     {latestPhotos.length > 0 && <HomeGallery albums={latestPhotos} total={albums.length}/> }
     <section className="home-journal"><span className="kicker">LOGBOOK</span><a href="/blog"><h2>有些话，慢慢写。</h2><span>翻开航行日志</span></a>{posts.docs[0] && <a className="home-post-preview" href={`/blog/${posts.docs[0].slug}`}><div><time>{posts.docs[0].date.slice(0,10).replaceAll("-", ".")}</time><h3>{posts.docs[0].title}</h3><p>{posts.docs[0].excerpt}</p></div><span>阅读</span></a>}</section>

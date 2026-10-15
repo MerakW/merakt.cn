@@ -168,8 +168,8 @@ html[data-theme=light] body:has(.home-page[data-over-cover=true][data-scrolled=f
 .home-flight-overview .map-toolbar { flex-wrap:wrap; gap:12px; }
 .home-flight-overview .map-airport-tabs button { min-height:44px; padding:9px 16px; }
 .home-recent-flights { margin-top:36px; border-top:1px solid var(--line); }
-.home-recent-flights>a { display:grid; grid-template-columns:120px 1fr 170px 1fr 80px; gap:24px; align-items:center; padding:22px 0; border-bottom:1px solid var(--line); transition:background .2s; }
-.home-recent-flights>a:hover { background:color-mix(in srgb,var(--ice) 18%,transparent); }
+.home-recent-flights>button { display:grid; grid-template-columns:120px 1fr 170px 1fr 80px; gap:24px; align-items:center; padding:22px 0; border-bottom:1px solid var(--line); transition:background .2s; }
+.home-recent-flights>button:hover { background:color-mix(in srgb,var(--ice) 18%,transparent); }
 .home-recent-flights time { color:var(--muted); font:11px var(--mono); }
 .home-recent-flights strong { display:flex; align-items:center; gap:20px; font:500 30px var(--display); color:var(--ink); }
 .home-recent-flights strong>span { font:16px var(--body); color:var(--muted); }
@@ -206,7 +206,7 @@ html[data-theme=light] body:has(.home-page[data-over-cover=true][data-scrolled=f
 @keyframes home-ticket-flight { 0% { transform:translateX(0); opacity:0; } 15%,85% { opacity:1; } 100% { transform:translateX(calc(100cqw - 28px)); opacity:0; } }
 @keyframes home-pass-arrive { from { opacity:.7; transform:translateY(12px) rotateX(-3deg); } to { opacity:1; transform:rotateX(0deg); } }
 @media(max-width:1000px) {
-  .home-recent-flights>a { grid-template-columns:100px 1fr 150px 1fr; gap:16px; }
+  .home-recent-flights>button { grid-template-columns:100px 1fr 150px 1fr; gap:16px; }
   .home-recent-state { display:none; }
   .home-page .home-pass-invite { grid-template-columns:1fr; gap:32px; }
   .home-pass-invite h2>br { display:none; }
@@ -216,7 +216,7 @@ html[data-theme=light] body:has(.home-page[data-over-cover=true][data-scrolled=f
   .home-flight-section>.section-heading { align-items:start; flex-direction:column; gap:20px; }
   .home-flight-section>.section-heading h2 { font-size:24px; }
   .home-flight-section .home-flight { padding:24px; }
-  .home-recent-flights>a { grid-template-columns:90px minmax(0,1fr); gap:12px; }
+  .home-recent-flights>button { grid-template-columns:90px minmax(0,1fr); gap:12px; }
   .home-recent-flights strong { justify-self:end; font-size:28px; gap:12px; }
   .home-recent-flights .flight-number { font-size:10px; }
   .home-recent-aircraft { text-align:right; font-size:10px; }
@@ -239,7 +239,7 @@ html[data-theme=light] body:has(.home-page[data-over-cover=true][data-scrolled=f
   .cover-ticker-track { animation:none; }
   .home-boarding-pass,.home-boarding-pass[data-arrived=true] { transform:none; animation:none; transition:none; }
   .home-pass-plane { animation:none; left:50%; transform:translateX(-50%); }
-  .home-recent-flights>a { transition:none; }
+  .home-recent-flights>button { transition:none; }
 }
 @media(max-width:380px) {
   .home-boarding-pass { grid-template-columns:minmax(0,1fr) 88px; }
@@ -309,7 +309,7 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
 .home-gallery-visual { position:relative; height:var(--photo-height); overflow:hidden; border-radius:6px; background:var(--ice); }
 .home-gallery-visual img { display:block; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.22,1,.36,1); user-select:none; }
 .home-gallery-card:hover img { transform:scale(1.025); }
-.home-gallery-visual::after { content:''; position:absolute; inset:0 0 auto; height:min(38%,160px); background:linear-gradient(180deg,#05080fb3 0%,#05080f80 55%,transparent 100%); pointer-events:none; }
+.home-gallery-visual::after { content:''; position:absolute; inset:0 0 auto; height:min(38%,160px); background:linear-gradient(180deg,#05080f70 0%,#05080f30 55%,transparent 100%); pointer-events:none; }
 .home-gallery-visual>span { position:absolute; z-index:1; top:12px; left:16px; color:#fff; font:600 64px/1 var(--display); pointer-events:none; }
 .home-gallery-caption { display:flex; justify-content:space-between; gap:16px; margin-top:15px; }
 .home-gallery-caption p { min-width:0; margin:0; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -395,3 +395,110 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
   contain:layout style;
   backface-visibility:hidden;
 }
+
+/* The homepage keeps flight details beside the journey that opened them. */
+.home-recent-flights>button { width:100%; border:0; border-bottom:1px solid var(--line); border-radius:0; background:none; text-align:left; font:inherit; cursor:pointer; color:var(--ink); }
+.home-recent-aircraft .aircraft-type-logo { max-width:min(100%,160px); height:18px; }
+.home-departure-display { margin-bottom:40px; background:color-mix(in srgb,var(--ice) 26%,var(--canvas)); border-radius:8px; overflow:hidden; }
+.home-departure-heading { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:20px 24px; border-bottom:1px solid var(--line); }
+.home-departure-heading h3 { display:flex; align-items:center; gap:10px; margin:0; font:500 17px var(--body); }
+.home-departure-heading>span { font:10px var(--mono); letter-spacing:.08em; color:var(--muted); }
+.home-departure-columns,.home-departure-row { display:grid; grid-template-columns:120px minmax(160px,1.4fr) minmax(110px,1fr) minmax(110px,1fr) 90px; gap:20px; align-items:center; padding-inline:24px; }
+.home-departure-columns { padding-block:13px; color:var(--muted); font:9px var(--mono); border-bottom:1px solid var(--line); }
+.home-departure-row { width:100%; text-align:left; padding-block:28px; background:none; border:0; border-radius:0; color:var(--ink); cursor:pointer; transition:background .2s; }
+.home-departure-row:hover { background:color-mix(in srgb,var(--blue) 6%,transparent); }
+.home-departure-row:focus-visible,.home-recent-flights>button:focus-visible { outline:2px solid var(--blue); outline-offset:-3px; }
+.home-departure-date { font:12px var(--mono); }
+.home-departure-row small { display:block; font:11px var(--body); color:var(--muted); margin-top:10px; }
+.home-departure-route strong { display:flex; align-items:center; gap:12px; font:500 42px/1 var(--display); letter-spacing:.02em; }
+.home-departure-route .ui-arrow { width:20px; color:var(--muted); }
+.home-departure-aircraft .aircraft-type-logo { height:20px; max-width:100%; }
+.home-departure-status { display:flex; gap:10px; align-items:center; justify-content:end; color:var(--blue); font:500 12px var(--body); white-space:nowrap; }
+.home-departure-note { display:flex; justify-content:space-between; gap:12px; margin:0; padding:12px 24px; border-top:1px solid var(--line); font:10px var(--body); color:var(--muted); }
+.home-flight-dialog { position:fixed; inset:auto; left:50%; transform:translateX(-50%); margin:0; width:min(1060px,calc(100% - 32px)); max-height:calc(100svh - 32px); padding:0; border:1px solid var(--line); border-radius:12px; background:var(--canvas); color:var(--ink); overflow:auto; overscroll-behavior:contain; }
+.home-flight-dialog::backdrop { background:#070e2066; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.home-flight-dialog[open] { animation:home-detail-appear .22s ease-out; }
+.home-flight-dialog>header { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 22px; border-bottom:1px solid var(--line); font:10px var(--mono); color:var(--muted); }
+.home-flight-dialog>header button { display:flex; align-items:center; gap:12px; min-height:44px; padding:0 8px; background:none; border:0; color:var(--ink); font:12px var(--body); cursor:pointer; }
+.home-flight-dialog>header button span { font-size:24px; }
+.home-flight-dialog .flight-detail { margin:0; border:0; background:none; }
+.home-dialog-credit { margin:0; padding:0 22px 16px; font-size:10px; color:var(--muted); }
+@keyframes home-detail-appear { from { opacity:0; transform:translate3d(-50%,10px,0); } to { opacity:1; transform:translate3d(-50%,0,0); } }
+@media(max-width:1000px) { .home-departure-columns,.home-departure-row { grid-template-columns:100px minmax(140px,1fr) 110px 110px; gap:16px; } .home-departure-columns>span:last-child,.home-departure-status { display:none; } }
+@media(max-width:700px) {
+ .home-departure-heading { padding:18px; align-items:start; }
+ .home-departure-heading>span { font-size:8px; }
+ .home-departure-heading h3 { font-size:14px; }
+ .home-departure-columns { display:none; }
+ .home-departure-row { grid-template-columns:minmax(0,1fr) minmax(0,1.4fr); gap:24px 12px; padding:24px 18px; }
+ .home-departure-route strong { justify-content:end; font-size:36px; gap:10px; }
+ .home-departure-route small { text-align:right; }
+ .home-departure-aircraft { justify-self:end; text-align:right; max-width:100%; }
+ .home-departure-aircraft .aircraft-type-logo { margin-left:auto; height:18px; }
+ .home-departure-note { padding:12px 18px; font-size:9px; }
+ .home-recent-aircraft .aircraft-type-logo { margin-left:auto; height:16px; }
+ .home-flight-dialog { width:calc(100% - 24px); max-height:calc(100svh - 32px); }
+ .home-flight-dialog>header { padding:8px 16px; }
+}
+@media(prefers-reduced-motion:reduce) { .home-flight-dialog[open] { animation:none; } .home-departure-row { transition:none; } }
+
+.home-departure-code { display:inline-flex; gap:3px; }
+.home-departure-code>b { position:relative; display:inline-block; padding:4px 5px 6px; border-radius:3px; background:color-mix(in srgb,var(--ink) 7%,transparent); font-weight:500; animation:home-screen-arrival .45s both; }
+.home-departure-code>b::after { content:''; position:absolute; inset:50% 0 auto; border-top:1px solid color-mix(in srgb,var(--canvas) 65%,transparent); }
+.home-recent-heading { display:flex; justify-content:space-between; gap:16px; align-items:center; padding:18px 0; border-bottom:1px solid var(--line); }
+.home-recent-heading h3 { margin:0; font:500 16px var(--body); }
+.home-recent-heading>span { color:var(--muted); font:10px var(--mono); letter-spacing:.08em; }
+@keyframes home-screen-arrival { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+@media(max-width:700px) { .home-departure-code { gap:2px; } .home-departure-code>b { padding:3px 4px 5px; } .home-departure-route strong { font-size:30px; gap:6px; } .home-departure-route .ui-arrow { width:16px; } }
+@media(prefers-reduced-motion:reduce) { .home-departure-code>b { animation:none; } }
+
+/* Recent journeys read as one airport display, with aligned rows and columns. */
+.home-departures-board { --board-surface:color-mix(in srgb,var(--ice) 22%,var(--canvas)); margin-top:36px; border:1px solid var(--line); border-radius:8px; overflow:hidden; background:var(--board-surface); }
+.home-departures-board .home-recent-heading { padding:20px 24px; background:color-mix(in srgb,var(--ink) 4%,var(--board-surface)); }
+.home-departures-board .home-recent-heading h3 { display:flex; align-items:center; gap:10px; }
+.home-board-columns,.home-departures-board>button.home-board-row { display:grid; grid-template-columns:110px minmax(115px,1fr) minmax(220px,1.6fr) minmax(110px,1fr) 74px; gap:20px; align-items:center; padding-inline:24px; }
+.home-board-columns { padding-block:12px; color:var(--muted); font:9px var(--mono); border-bottom:1px solid var(--line); }
+.home-departures-board>button.home-board-row { padding-block:22px; min-height:104px; transition:background .2s; }
+.home-departures-board>button.home-board-row:nth-of-type(even) { background:color-mix(in srgb,var(--ink) 3%,transparent); }
+.home-departures-board>button.home-board-row:hover { background:color-mix(in srgb,var(--blue) 9%,var(--board-surface)); }
+.home-board-row small { display:block; margin-top:8px; color:var(--muted); font:10px var(--mono); }
+.home-departures-board time { font-size:11px; color:var(--ink); white-space:nowrap; }
+.home-board-route { min-width:0; }
+.home-departures-board .home-board-route strong { justify-content:start; gap:12px; font:500 30px/1 var(--display); }
+.home-board-route>.ui-arrow,.home-board-route strong>.ui-arrow { width:16px; flex:none; color:var(--muted); }
+.home-board-route .home-departure-code { gap:2px; }
+.home-board-route .home-departure-code>b { padding:4px 5px 5px; }
+.home-board-state { text-align:right; color:var(--blue); font:500 12px var(--body); white-space:nowrap; }
+.home-board-state small { font-size:8px; }
+.home-board-note { display:flex; justify-content:space-between; gap:12px; margin:0; padding:12px 24px; color:var(--muted); font:10px var(--body); }
+.home-board-note>span { display:flex; align-items:center; gap:6px; }
+@media(max-width:1100px) and (min-width:701px) {
+ .home-board-columns,.home-departures-board>button.home-board-row { grid-template-columns:90px 105px minmax(170px,1.5fr) minmax(85px,1fr) 56px; gap:12px; padding-inline:18px; }
+ .home-departures-board .home-board-route strong { font-size:25px; gap:7px; }
+ .home-board-route .home-departure-code>b { padding-inline:3px; }
+}
+@media(max-width:700px) {
+ .home-departures-board .home-recent-heading { padding:18px 14px; }
+ .home-departures-board .home-recent-heading h3 { font-size:14px; }
+ .home-departures-board .home-recent-heading>span { font-size:8px; }
+ .home-board-columns,.home-departures-board>button.home-board-row { grid-template-columns:80px minmax(0,1fr) 48px; gap:12px 8px; padding-inline:14px; }
+ .home-board-columns>span:nth-child(2),.home-board-columns>span:nth-child(4) { display:none; }
+ .home-departures-board>button.home-board-row { padding-block:18px; }
+ .home-board-date { grid-column:1; grid-row:1; }
+ .home-board-route { grid-column:2; grid-row:1; }
+ .home-board-state { grid-column:3; grid-row:1; font-size:10px; }
+ .home-board-flight { grid-column:1; grid-row:2; }
+ .home-board-row .home-recent-aircraft { grid-column:2/4; grid-row:2; text-align:left; }
+ .home-board-row .home-recent-aircraft .aircraft-type-logo { margin-left:0; max-width:100%; }
+ .home-departures-board .home-board-route strong { font-size:24px; gap:5px; }
+ .home-board-route .home-departure-code { gap:1px; }
+ .home-board-route .home-departure-code>b { padding:3px 3px 4px; }
+ .home-board-route strong>.ui-arrow { width:12px; }
+ .home-board-route small { font:9px var(--body); overflow-wrap:anywhere; }
+ .home-departures-board time { font-size:9px; }
+ .home-board-date small { font-size:10px; }
+ .home-board-note { padding:12px 14px; font-size:9px; }
+ .home-board-note>span { max-width:44%; }
+}
+@media(prefers-reduced-motion:reduce) { .home-departures-board>button.home-board-row { transition:none; } }
+.home-departures-board .home-board-route strong>.home-departure-code { font:inherit; color:inherit; }

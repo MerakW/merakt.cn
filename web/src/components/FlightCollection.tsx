@@ -9,7 +9,7 @@ import ArchiveTabs from './ArchiveTabs'
 import { flightCollection, type CollectionFilter } from '@/lib/flights/collection'
 const alliances = [{key:'skyteam',name:'天合联盟'},{key:'star',name:'星空联盟'},{key:'oneworld',name:'寰宇一家'},{key:'others',name:'其他航司'}]
 export default function FlightCollection({flights,children,onSelect,selected}: {flights:DisplayFlight[];children:ReactNode;onSelect:(filter:CollectionFilter)=>void;selected:CollectionFilter|null}) {
- const [module,setModule] = useState<'airports'|'aircraft'|'airlines'>('airports')
+ const [module,setModule] = useState<'airports'|'aircraft'|'airlines'>('aircraft')
  const [maker,setMaker] = useState('all'), [alliance,setAlliance] = useState('all')
  const filterRef=useRef<HTMLDivElement>(null)
  useLayoutEffect(()=>{
