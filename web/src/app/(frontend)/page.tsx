@@ -5,6 +5,7 @@ import SpeedTunnel from '@/components/SpeedTunnel'
 import HomeMotion from '@/components/HomeMotion'
 import HomeBoardingPass from '@/components/HomeBoardingPass'
 import HomeGallery from '@/components/HomeGallery'
+import HomeTicker from '@/components/HomeTicker'
 import FlightCounter from '@/components/FlightCounter'
 import RouteMap from '@/components/RouteMap'
 import { getPayload } from 'payload'
@@ -51,7 +52,7 @@ export default async function Home() {
       </figure>
       <h1 className="cover-wordmark" aria-label="MERAK.">{Array.from('MERAK.').map((letter,index)=><span aria-hidden="true" key={index} style={{animationDelay:`${index * 65}ms`}}>{letter}</span>)}</h1>
       <a className="cover-scroll" href="#home-content" aria-label="向下浏览首页">SCROLL <span aria-hidden="true"><ArrowIcon direction="down" /></span></a>
-      <div className="cover-ticker" aria-label="杭州出发，航空、F1 与 Furry 的生活记录"><div className="cover-ticker-track" aria-hidden="true">{[0,1].map(copy=><div className="cover-ticker-group" key={copy}>{ticker.map(text=><span key={text}>{text}</span>)}</div>)}</div></div>
+      <HomeTicker items={ticker} />
     </header>
     <section id="home-content" className="home-pass-invite" aria-labelledby="home-pass-heading"><div><h2 id="home-pass-heading"><span>YOU <ArrowIcon /> HGH</span>给你留了一个<br/>靠窗的位置。</h2><p>领一张写着你名字的登机牌，杭州见。</p></div><HomeBoardingPass/></section>
     <section className="home-flight-section" aria-labelledby="home-flight-heading">
