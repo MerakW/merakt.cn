@@ -20,6 +20,10 @@ import './theme.css'
 import './home-depth.css'
 import './paddock.css'
 
+const formula1FontFaces = [['Regular',400],['Bold',700],['Black',900]].map(([variant,weight]) =>
+  `@font-face{font-family:Formula1;src:url("${imageURL(`/fonts/Formula1-${variant}.ttf`)}") format("truetype");font-weight:${weight};font-style:normal;font-display:swap}`
+).join('\n')
+
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = { title: { default: 'Merak · 数字围场', template: '%s · Merak' }, description: 'Merak 的飞行、毛五影像与生活记录。', icons: { icon: { url: imageURL('/images/card/merak-mark.svg'), type: 'image/svg+xml' } } }
@@ -28,7 +32,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
   const payload = await getPayload({ config })
   const [settings, notes] = await Promise.all([payload.findGlobal({ slug: 'site-settings', overrideAccess: false, depth: 0 }), payload.find({ collection:'notes',limit:1,sort:'-date',depth:0,overrideAccess:false })])
   const commit = process.env.NEXT_PUBLIC_COMMIT_SHA || ''
-  return <html lang="zh-CN" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{__html:`try{var t=sessionStorage.getItem('merak-visit-theme');document.documentElement.dataset.theme=t==='dark'||t==='light'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}`}} /></head><body>
+  return <html lang="zh-CN" suppressHydrationWarning><head><style>{formula1FontFaces}</style><script dangerouslySetInnerHTML={{__html:`try{var t=sessionStorage.getItem('merak-visit-theme');document.documentElement.dataset.theme=t==='dark'||t==='light'?t:matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}catch(e){document.documentElement.dataset.theme=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}`}} /></head><body>
     <a className="skip-link" href="#main">跳至内容</a>
     <header className="site-nav"><a className="brand" href="/" aria-label="Merak 首页"><span className="brand-wings" aria-hidden="true">//</span>MERAK<span className="brand-caption">DIGITAL<br />PADDOCK</span></a><SiteNav /><div className="nav-tools"><RaceControl mode={settings.trackMode} forza={settings.forzaFerrari} /><ThemeControl /></div></header>
     <main className="site-main" id="main" tabIndex={-1}>{children}</main>

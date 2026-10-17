@@ -86,15 +86,15 @@ ERS 显示 V8 堆内存余量；OT 显示本地资源模式或已确认的 CDN �
 
 运行 `cd web && npm run preview:lan` 即可自行构建并启动局域网预览，命令会自动检测当前局域网地址，按 Ctrl+C 停止。
 
-本地完整数据预览使用 SQLite 在线备份生成的 `.data/paddock-preview/merak.db` 快照及原有本地媒体。设置 `LOCAL_PREVIEW=1`、`NEXT_PUBLIC_LOCAL_MEDIA=1`、`DATABASE_URL=file:./.data/paddock-preview/merak.db`、`MEDIA_DIR=./.data/media`，将 `SERVER_URL` 指向局域网地址后，以 `--hostname 0.0.0.0` 启动。`NEXT_PUBLIC_LOCAL_MEDIA` 必须同时用于构建和运行。后台认证和公开范围仍生效，本地预览采用独立 Cookie 前缀。字体放在 `web/public/fonts/Formula1-{Regular,Bold,Black}.ttf`，随本地素材单独提供。
+本地完整数据预览使用 SQLite 在线备份生成的 `.data/paddock-preview/merak.db` 快照及原有本地媒体。设置 `LOCAL_PREVIEW=1`、`NEXT_PUBLIC_LOCAL_MEDIA=1`、`DATABASE_URL=file:./.data/paddock-preview/merak.db`、`MEDIA_DIR=./.data/media`，将 `SERVER_URL` 指向局域网地址后，以 `--hostname 0.0.0.0` 启动。`NEXT_PUBLIC_LOCAL_MEDIA` 必须同时用于构建和运行。后台认证和公开范围仍生效，本地预览采用独立 Cookie 前缀。本地字体放在 `web/public/fonts/Formula1-{Regular,Bold,Black}.ttf`；正式站上传至 COS，见下方素材上传说明。
 
 生产升级需执行 `20261016_160000_paddock` 数据迁移。先备份数据库，再运行 `npm run payload -- migrate`；配置 `MERAK_AUTO_MIGRATE=1` 的环境会在启动时执行迁移。自动旗语使用 2026 赛历，后续年份需更新 `web/src/lib/paddock.ts`。
 
 ## 围场素材上传 COS
 
-正式构建中，通行证的完整车队标识、TR 小盾徽和通行证 PNG 导出统一从 `https://cos.merakt.cn` 读取。`npm run preview:lan` 继续使用本地 `web/public/` 文件；正式构建和运行应将 `NEXT_PUBLIC_LOCAL_MEDIA` 留空或设为 `0`。
+正式构建中，通行证的完整车队标识、TR 小盾徽、F1 字体和通行证 PNG 导出统一从 `https://cos.merakt.cn` 读取。`npm run preview:lan` 继续使用本地 `web/public/` 文件；正式构建和运行应将 `NEXT_PUBLIC_LOCAL_MEDIA` 留空或设为 `0`。
 
-上传前准备以下 13 个文件。对象路径相对于 COS 根目录，勿额外加 `public/` 或 `cos-upload-paddock/` 前缀；目标存储桶使用现有 `cos.merakt.cn` 域名绑定的存储桶。上传文件来自同路径的 `web/public/`：
+上传前准备以下 16 个文件。对象路径相对于 COS 根目录，勿额外加 `public/` 或 `cos-upload-paddock/` 前缀；目标存储桶使用现有 `cos.merakt.cn` 域名绑定的存储桶。上传文件来自同路径的 `web/public/`：
 
 ```text
 team-logos/ferrari-full-dark.svg
@@ -110,15 +110,18 @@ team-logos/cadillac-full-dark.svg
 team-logos/racingbulls-full-dark.svg
 team-logos/ferrari-hq.svg
 alliances/star-tight.svg
+fonts/Formula1-Regular.ttf
+fonts/Formula1-Bold.ttf
+fonts/Formula1-Black.ttf
 ```
 
-前 11 个为通行证队标，第 12 个为 TR 法拉利小盾徽，最后一个为新版星盟标识。`*-full-source.svg`、旧 WebP 和其他小队徽无需上传。所有文件设置 `Content-Type: image/svg+xml`，沿用现有公开素材访问方式。例如 Ferrari 完整队标的最终地址应为 `https://cos.merakt.cn/team-logos/ferrari-full-dark.svg`。
+前 11 个为通行证队标，第 12 个为 TR 法拉利小盾徽，第 13 个为新版星盟标识，最后 3 个为 F1 字体。`*-full-source.svg`、旧 WebP 和其他小队徽无需上传。SVG 文件设置 `Content-Type: image/svg+xml`，TTF 字体设置 `Content-Type: font/ttf`，沿用现有公开素材访问方式。例如 Ferrari 完整队标的最终地址应为 `https://cos.merakt.cn/team-logos/ferrari-full-dark.svg`。
 
-通行证保存通过浏览器读取 SVG 后生成 PNG，因此需要 CORS：在 COS 存储桶的跨域访问配置中，允许来源填写 `https://merakt.cn`，如还使用其他正式站点域名则分别添加其完整 Origin；允许方法为 `GET`、`HEAD`，允许请求头可设为 `*`，缓存时间可设为 `600` 秒，无需携带 Cookie 或开放写入方法。参考[腾讯云 COS 跨域配置](https://cloud.tencent.com/document/product/436/43811)。
+跨域字体加载和通行证保存（读取 SVG 后生成 PNG）都需要 CORS：在 COS 存储桶的跨域访问配置中，允许来源填写 `https://merakt.cn`，如还使用其他正式站点域名则分别添加其完整 Origin；允许方法为 `GET`、`HEAD`，允许请求头可设为 `*`，缓存时间可设为 `600` 秒，无需携带 Cookie 或开放写入方法。参考[腾讯云 COS 跨域配置](https://cloud.tencent.com/document/product/436/43811)。
 
-若 `cos.merakt.cn` 前有 CDN，应确保最终响应包含与访问站点匹配的 `Access-Control-Allow-Origin`，可参考[腾讯云 CDN 响应头配置](https://cloud.tencent.com/document/product/228/41737)。更新文件或跨域响应头后，刷新对应 URL 的 CDN 缓存，再检查队标显示和“保存围场通行证 PNG”；仅能显示图片并不代表跨域读取已配置成功。
+若 `cos.merakt.cn` 前有 CDN，应确保最终响应包含与访问站点匹配的 `Access-Control-Allow-Origin`，可参考[腾讯云 CDN 响应头配置](https://cloud.tencent.com/document/product/228/41737)。更新文件或跨域响应头后，刷新对应 URL 的 CDN 缓存，再检查 F1 字体、队标显示和“保存围场通行证 PNG”；仅能显示图片并不代表跨域读取已配置成功。
 
-字体 `fonts/Formula1-{Regular,Bold,Black}.ttf` 和音效 `audio/team-radio.wav` 本次仍随站点部署。素材不纳入 Git，部署前需独立上传上述文件。
+字体正式地址例如 `https://cos.merakt.cn/fonts/Formula1-Bold.ttf`；音效 `audio/team-radio.wav` 仍随站点部署。素材不纳入 Git，部署前需独立上传上述文件。
 
 ## 署名
 
