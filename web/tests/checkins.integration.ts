@@ -13,8 +13,8 @@ const {default:config} = await import('../src/payload.config')
 const payload = await getPayload({config})
 try {
  const user = await payload.create({collection:'users',data:{name:'Test',email:'checkin@example.invalid',password:randomUUID()}})
- const invoke = async (data:unknown, origin=payload.config.serverURL) => {
-  const request=new Request(payload.config.serverURL+'/api/checkins/submit',{method:'POST',headers:{'Content-Type':'application/json',Origin:origin},body:JSON.stringify(data)})
+ const invoke = async (data:unknown, origin=payload.config.serverURL, host?:string) => {
+  const request=new Request(payload.config.serverURL+'/api/checkins/submit',{method:'POST',headers:{'Content-Type':'application/json',Origin:origin,...(host?{host}:{})},body:JSON.stringify(data)})
   const req=await createLocalReq({},payload);Object.assign(req,{headers:request.headers,body:request.body});return submitCheckin(req)
  }
  const data={name:'测试访客',message:'这是隔离测试',consent:true}
@@ -33,6 +33,24 @@ try {
  assert.equal(arrival.status,'pending')
  assert.equal((await invoke({...data,baseAirport:'ZZZ'})).status,400)
  assert.equal((await invoke({...data,baseAirport:'HGH',message:'x'.repeat(61)})).status,400)
+
+ const race={...data,mode:'race',team:'Ferrari',message:'下个赛季见'}
+ assert.equal((await invoke(race)).status,202)
+ const pass=(await payload.find({collection:'checkins',where:{message:{equals:'PADDOCK Ferrari → HANGZHOU GP\n下个赛季见'}}})).docs[0]
+ assert.equal(pass.status,'pending')
+ assert.equal((await invoke({...race,team:'Fake Team'})).status,400)
+ assert.equal((await invoke({...race,message:'x'.repeat(61)})).status,400)
+ assert.equal((await invoke({...race,consent:false})).status,400)
+ assert.equal((await invoke({...race,mode:'unknown'})).status,400)
+ assert.equal((await payload.find({collection:'checkins',overrideAccess:false})).totalDocs,0)
+
+ process.env.LOCAL_PREVIEW='1'
+ assert.equal((await invoke(data,'http://192.168.1.2:3003','192.168.1.2:3003')).status,202)
+ assert.equal((await invoke(data,'http://127.0.0.1:3003','127.0.0.1:3003')).status,202)
+ assert.equal((await invoke(data,'http://evil.invalid:3003','evil.invalid:3003')).status,403)
+ assert.equal((await invoke(data,'http://192.168.1.3:3003','192.168.1.2:3003')).status,403)
+ delete process.env.LOCAL_PREVIEW
+ assert.equal((await invoke(data,'http://192.168.1.2:3003','192.168.1.2:3003')).status,403)
 
  await payload.update({collection:'checkins',id:row.id,user:{...user,collection:'users'},overrideAccess:false,data:{status:'approved'}})
  assert.equal((await payload.find({collection:'checkins',overrideAccess:false})).totalDocs,1)

@@ -105,6 +105,6 @@ export default function RouteMap({ flights, airports, overview = false }: { flig
       {geometry.paths.map(({ key, d, active }, i) => d && <path key={key} d={d} pathLength={1} style={{ animationDelay: `${Math.min(i * 35, 600)}ms`, opacity: active ? overview ? selected === '*' ? .25 : .65 : 1 : 0 }} className="map-route-line" fill="none" vectorEffect="non-scaling-stroke" />)}
       {geometry.points.map(({ airport, point, active, labelVisible }, i) => <g className="map-airport-point" key={airport.iata} transform={`translate(${point[0]},${point[1]})`} style={{ opacity: active ? 1 : 0 }}><title>{`${airport.iata} · ${airport.name}`}</title><circle className="map-airport-pulse" r={(overview ? 6 : 10) * zoom} /><circle r={(overview ? 2.5 : 5) * zoom} className="map-airport" /><text x={overview ? 6 * zoom : i === 0 ? -10 : 10} y={overview ? -6 * zoom : -14} textAnchor={!overview && i === 0 ? 'end' : 'start'} style={{ fontSize: `${12 * zoom}px`, strokeWidth: overview ? `${2.5 * zoom}px` : undefined, opacity: labelVisible ? 1 : 0 }}>{airport.iata}</text></g>)}
     </svg>
-    <span className="map-caption">{overview ? selected === '*' ? 'ALL ROUTES' : `${selected} / ROUTES` : 'ROUTE STUDY'} <span>起终点示意</span></span>
-  </div>{overview && <p className="map-hint">一些出发，一些归来。点选机场，看看沿途去过哪里。</p>}</div>
+    <span className="map-caption">{overview ? selected === '*' ? 'ALL ROUTES' : `${selected} / ROUTES` : 'ROUTE STUDY'}</span>
+  </div>{overview && <p className="map-hint">点选机场查看航线。</p>}</div>
 }

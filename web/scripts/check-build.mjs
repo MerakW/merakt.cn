@@ -3,7 +3,8 @@
 import { readdir, rm, readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-const root = '.next/standalone'
+const dist = process.env.NEXT_DIST_DIR || '.next'
+const root = join(dist, 'standalone')
 for (const name of await readdir(root)) {
   if (name === '.env' || name.startsWith('.env.')) await rm(join(root, name))
 }
@@ -21,6 +22,6 @@ async function inspect(directory) {
 }
 await inspect(root)
 if (forbidden.length) throw new Error('部署包包含私有数据路径：' + forbidden.join(', '))
-const manifest = JSON.parse(await readFile('.next/required-server-files.json', 'utf8'))
+const manifest = JSON.parse(await readFile(join(dist, 'required-server-files.json'), 'utf8'))
 if (manifest.config.output !== 'standalone') throw new Error('缺少独立部署配置')
 console.log('部署包检查通过：未携带 dotenv、数据库或 CSV；运行时请注入环境变量。')

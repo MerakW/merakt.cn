@@ -15,7 +15,8 @@
     "start:qa": "NEXT_DIST_DIR=.next-qa DATABASE_URL=file:./.data/browser-qa/test.db MEDIA_DIR=./.data/browser-qa/media SERVER_URL=http://127.0.0.1:3002 next start --hostname 127.0.0.1 --port 3002",
     "package:linux": "bash scripts/package-linux.sh",
     "package:flight-home": "node scripts/package-flight-home.mjs",
-    "test:flight-worker": "node --import tsx tests/flight-worker.integration.ts"
+    "test:flight-worker": "node --import tsx tests/flight-worker.integration.ts",
+    "preview:lan": "node scripts/preview-lan.mjs"
   },
   "engines": {
     "node": ">=22.13.0 <25"

@@ -35,9 +35,11 @@ test('exact duplicate is skipped and identifies first source row', () => {
   const result = preview([base, base])
   assert.equal(result.flights.length, 1); assert.deepEqual(result.duplicates.map(d => [d.row, d.firstRow]), [[3, 2]])
 })
-test('same Flighty ID with conflicting values requires review instead of overwrite', () => {
+test('same Flighty ID conflicts are imported once and retained for review', () => {
   const result = preview([base, { ...base, Seat: '9C' }])
-  assert.equal(result.valid, false); assert.ok(result.issues.some(i => i.code === 'conflicting-duplicate'))
+  assert.equal(result.valid, true); assert.ok(result.issues.some(i => i.code === 'conflicting-duplicate' && i.severity === 'warning'))
+  assert.equal(result.flights.length, 1)
+  assert.equal(result.flights[0].privateDetails?.conflictingRows?.length, 1)
 })
 test('existing unchanged import is idempotent', () => {
   const first = preview([base])
@@ -70,9 +72,12 @@ test('fallback identity keeps different departures of same route distinct', () =
   const second = { ...first, 'Gate Departure (Scheduled)': '2026-09-20T10:00' }
   assert.equal(preview([first, second]).flights.length, 2)
 })
-test('impossible dates and arrival before departure are rejected', () => {
+test('impossible dates are rejected; conflicting scheduled arrival is flagged without blocking actual arrival', () => {
   assert.equal(validDate('2026-02-30'), false); assert.equal(validDate('2024-02-29'), true)
-  assert.equal(preview([{ ...base, 'Gate Arrival (Scheduled)': '2026-09-20T09:30' }]).valid, false)
+  const result = preview([{ ...base, 'Gate Arrival (Scheduled)': '2026-09-20T09:30' }])
+  assert.equal(result.valid, true)
+  assert.equal(result.flights[0].arrivalLocal, undefined)
+  assert.equal(result.flights[0].actualArrivalUTC, '2026-09-20T04:05:00Z')
 })
 test('cross-day arrival offset is based on local calendar dates', () => {
   assert.equal(arrivalDayOffset('2026-12-31', '2027-01-01T05:00'), 1)
@@ -133,4 +138,30 @@ test('planned schedule privacy removes every timestamp before serialization and 
   assert.equal(selectFeaturedFlight([planned],now)?.flight.dateHidden,true)
   assert.equal(publicFlight({...planned,hideSchedule:false}).date,'2099-12-31')
   assert.equal(publicFlight({...planned,state:'completed'}).date,'2099-12-31')
+})
+
+test('actual gate arrival wins over conflicting touchdown and departure, raw timestamps remain private', () => {
+  const row = { ...base, 'Landing (Actual)': '2026-09-20T14:00', 'Gate Departure (Actual)': '2026-09-20T15:00' }
+  const result = preview([row, { ...base, 'Flight Flighty ID': 'other-flight' }])
+  assert.equal(result.valid, true)
+  assert.equal(result.flights.length, 2)
+  const record = result.flights[0]
+  assert.equal(record.actualArrivalUTC, '2026-09-20T04:05:00Z')
+  assert.equal(record.touchdownUTC, undefined)
+  assert.equal(record.actualDepartureUTC, undefined)
+  assert.equal(record.privateDetails?.sourceRow?.['Landing (Actual)'], row['Landing (Actual)'])
+  assert.equal(record.privateDetails?.importIssues?.length, 2)
+  assert.equal('privateDetails' in publicFlight(record), false)
+})
+test('new export with actual arrival updates an existing plan and repeats are idempotent', () => {
+  const planned = preview([{ ...base, 'Gate Arrival (Actual)': '' }]).flights[0]
+  const incoming = previewFlightyCSV(Papa.unparse([base]), airports, { now, existing: [{ ...planned, id: 51 }] })
+  assert.equal(incoming.valid, true)
+  assert.equal(incoming.flights.length, 0)
+  assert.equal(incoming.updates[0].id, 51)
+  assert.equal(incoming.updates[0].actualArrivalUTC, '2026-09-20T04:05:00Z')
+  const repeated = previewFlightyCSV(Papa.unparse([base]), airports, { now, existing: incoming.updates })
+  assert.equal(repeated.updates.length, 0)
+  const older = previewFlightyCSV(Papa.unparse([planned.privateDetails!.sourceRow!]), airports, { now, existing: incoming.updates })
+  assert.equal(older.updates.length, 0)
 })

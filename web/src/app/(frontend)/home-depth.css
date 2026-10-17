@@ -502,3 +502,24 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
 }
 @media(prefers-reduced-motion:reduce) { .home-departures-board>button.home-board-row { transition:none; } }
 .home-departures-board .home-board-route strong>.home-departure-code { font:inherit; color:inherit; }
+
+@media(min-width:701px) and (max-width:1100px){
+ .home-board-columns,.home-departures-board>button.home-board-row{grid-template-columns:90px minmax(140px,1fr) minmax(180px,1.4fr) 60px;gap:12px;padding-inline:18px}
+ .home-board-columns>span:nth-child(4){display:none}
+ .home-board-date{grid-column:1;grid-row:1/3}.home-board-flight{grid-column:2;grid-row:1;min-width:0;align-self:end}
+ .home-board-route{grid-column:3;grid-row:1/3}.home-board-state{grid-column:4;grid-row:1/3}
+ .home-board-row .home-recent-aircraft{grid-column:2;grid-row:2;min-width:0;text-align:left;align-self:start}
+ .home-departures-board>button.home-board-row{row-gap:4px;grid-template-rows:minmax(24px,auto) 24px;padding-block:18px}
+ .home-board-row .flight-number{white-space:nowrap;font-size:11px}
+ .home-page .home-board-row .home-recent-aircraft .aircraft-type-logo{width:160px;max-width:100%;margin-left:0}
+}
+@media(max-width:700px){
+ .home-board-row .home-board-flight{grid-column:1/-1;grid-row:2}
+ .home-board-row .home-recent-aircraft{grid-column:1/-1;grid-row:3}
+}
+
+@media(min-width:480px) and (max-width:700px){
+ .home-board-row .home-board-flight{grid-column:2/4;grid-row:2;justify-self:end;align-self:center;max-width:100%}
+ .home-board-row .home-recent-aircraft{grid-column:1/3;grid-row:2;justify-self:start;align-self:center;max-width:160px}
+ .home-board-row .home-board-route small{text-align:right}
+}

@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import { createHash } from 'node:crypto'
-import { validDate, localToUTC, validateActualTimes } from './time'
+import { validDate, localToUTC } from './time'
 import type { Airport, FlightRecord, ImportPreview } from './types'
 
 const REQUIRED = ['Date', 'From', 'To']
@@ -9,7 +9,7 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
   now?: Date
   existing?: FlightRecord[]
 } = {}): ImportPreview {
-  const result: ImportPreview = { totalRows: 0, flights: [], duplicates: [], issues: [], valid: false }
+  const result: ImportPreview = { totalRows: 0, flights: [], updates: [], duplicates: [], issues: [], valid: false }
   const parsed = Papa.parse<Record<string, string>>(csv.replace(/^\uFEFF/, ''), {
     header: true,
     skipEmptyLines: 'greedy',
@@ -25,10 +25,10 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
   }
   if (result.issues.some(issue => issue.row === 1)) return result
 
-  const seen = new Map<string, { row?: number; signature: string }>()
+  const seen = new Map<string, { row?: number; signature: string; flight: FlightRecord }>()
   const signature = (record: Record<string, string>) => JSON.stringify(Object.keys(record).sort().map(key => [key, record[key]]))
   for (const flight of options.existing ?? []) {
-    seen.set(flight.importKey, { signature: flight.privateDetails?.sourceRow ? signature(flight.privateDetails.sourceRow) : '' })
+    seen.set(flight.importKey, { signature: flight.privateDetails?.sourceRow ? signature(flight.privateDetails.sourceRow) : '', flight })
   }
   const now = options.now ?? new Date()
 
@@ -53,29 +53,35 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
     const convert = (field: string, airport: Airport | undefined) => {
       if (!row[field] || !airport) return undefined
       try { return localToUTC(row[field], airport.timeZone) } catch {
-        issue(field, 'invalid-local-time', '本地时间无效或位于夏令时歧义区间，请核实后修正')
+        issue(field, 'invalid-local-time', '时间无法确认，暂不采用；原值保留在导入信息中。', 'warning')
         return undefined
       }
     }
-    const departureUTC = convert('Gate Departure (Scheduled)', from)
-    const arrivalUTC = convert('Gate Arrival (Scheduled)', to)
-    const actualDepartureUTC = convert('Gate Departure (Actual)', from)
-    // Flighty may export a destination-local arrival for a diverted flight. Require review
-    // if the two airports use different zones; never silently guess an actual arrival zone.
+    let departureUTC = convert('Gate Departure (Scheduled)', from)
+    let arrivalUTC = convert('Gate Arrival (Scheduled)', to)
+    let actualDepartureUTC = convert('Gate Departure (Actual)', from)
     const diverted = row['Diverted To'] ? airports.get(row['Diverted To']) : undefined
     if (diverted && to && diverted.timeZone !== to.timeZone && (row['Gate Arrival (Actual)'] || row['Landing (Actual)'])) {
-      issue('Gate Arrival (Actual)', 'diversion-timezone', '备降机场时区不同，请确认实际到达时间使用哪个机场时区')
+      issue('Gate Arrival (Actual)', 'diversion-timezone', '已按备降机场时区换算，原始到达时间的时区需要核对。', 'warning')
     }
     const actualArrivalUTC = convert('Gate Arrival (Actual)', diverted ?? to)
-    const takeoffUTC = convert(row['Take off (Actual)'] ? 'Take off (Actual)' : 'Takeoff (Actual)', from)
-    const landingUTC = convert('Landing (Actual)', diverted ?? to)
-    try { validateActualTimes({ actualDepartureUTC, takeoffUTC, touchdownUTC: landingUTC, actualArrivalUTC }) }
-    catch (error) { issue('Landing (Actual)', 'invalid-actual-order', (error as Error).message) }
-    if (departureUTC && arrivalUTC && Date.parse(arrivalUTC) <= Date.parse(departureUTC)) {
-      issue('Gate Arrival (Scheduled)', 'arrival-before-departure', '计划到达必须晚于计划出发，请检查日期和时区')
+    let takeoffUTC = convert(row['Take off (Actual)'] ? 'Take off (Actual)' : 'Takeoff (Actual)', from)
+    let landingUTC = convert('Landing (Actual)', diverted ?? to)
+    let next = actualArrivalUTC
+    const keepEarlier = (value: string | undefined, field: string) => {
+      if (value && next && Date.parse(value) > Date.parse(next)) {
+        issue(field, 'invalid-actual-order', '实际时间顺序冲突，优先保留实际入位及后续有效节点；此值仅保存在原始记录中。', 'warning')
+        return undefined
+      }
+      if (value) next = value
+      return value
     }
-    if (actualDepartureUTC && actualArrivalUTC && Date.parse(actualArrivalUTC) <= Date.parse(actualDepartureUTC)) {
-      issue('Gate Arrival (Actual)', 'arrival-before-departure', '实际到达必须晚于实际出发，请检查日期和时区')
+    landingUTC = keepEarlier(landingUTC, 'Landing (Actual)')
+    takeoffUTC = keepEarlier(takeoffUTC, 'Take off (Actual)')
+    actualDepartureUTC = keepEarlier(actualDepartureUTC, 'Gate Departure (Actual)')
+    if (departureUTC && arrivalUTC && Date.parse(arrivalUTC) <= Date.parse(departureUTC)) {
+      issue('Gate Arrival (Scheduled)', 'arrival-before-departure', '计划时间顺序冲突，暂不采用计划入位时间；实际入位不受影响。', 'warning')
+      arrivalUTC = undefined
     }
     const cancelled = row.Canceled?.toLowerCase() === 'true'
     let state: FlightRecord['state'] = 'unconfirmed'
@@ -88,22 +94,14 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
     const identity = [row.Date, row.Airline, row.Flight, row.From, row.To, row['Gate Departure (Scheduled)']].join('|')
     const importKey = sourceId ? `flighty:${sourceId}` : `route:${createHash('sha256').update(identity).digest('hex').slice(0, 32)}`
     const rowSignature = signature(row)
-    const prior = seen.get(importKey)
-    if (prior) {
-      if (prior.signature === rowSignature) result.duplicates.push({ row: line, firstRow: prior.row, importKey })
-      else issue('Flight Flighty ID', 'conflicting-duplicate', '相同记录标识存在不同数据，需要选择保留或更新，不能直接覆盖')
-      return
-    }
-    seen.set(importKey, { row: line, signature: rowSignature })
     if (result.issues.some(item => item.row === line && item.severity === 'error')) return
-
-    result.flights.push({
+    const flight: FlightRecord = {
       importKey, sourceId,
       date: row.Date, airline: row.Airline || undefined, flightNumber: row.Flight || undefined,
       from: row.From, to: row.To, divertedTo: row['Diverted To'] || undefined,
       state, visibility: 'private',
-      departureLocal: row['Gate Departure (Scheduled)'] || undefined,
-      arrivalLocal: row['Gate Arrival (Scheduled)'] || undefined,
+      departureLocal: departureUTC ? row['Gate Departure (Scheduled)'] : undefined,
+      arrivalLocal: arrivalUTC ? row['Gate Arrival (Scheduled)'] : undefined,
       departureUTC, arrivalUTC, actualDepartureUTC, actualArrivalUTC, takeoffUTC, touchdownUTC: landingUTC,
       departureTimeZone: from?.timeZone, arrivalTimeZone: to?.timeZone,
       aircraft: row['Aircraft Type Name'] || undefined, registration: row['Tail Number'] || undefined,
@@ -112,8 +110,63 @@ export function previewFlightyCSV(csv: string, airports: Map<string, Airport>, o
         pnr: row.PNR || undefined, seat: row.Seat || undefined, seatType: row['Seat Type'] || undefined,
         cabinClass: row['Cabin Class'] || undefined, reason: row['Flight Reason'] || undefined,
         sourceRow: row,
+        importIssues: result.issues.filter(item => item.row === line),
       },
-    })
+    }
+    const prior = seen.get(importKey)
+    if (prior && (prior.signature === rowSignature || prior.flight.privateDetails?.conflictingRows?.some(item => signature(item) === rowSignature))) {
+      result.duplicates.push({ row: line, firstRow: prior.row, importKey })
+      return
+    }
+    if (prior) {
+      issue('Flight Flighty ID', 'conflicting-duplicate', '同一航段数据不同：优先采用包含实际入位的记录；双方原始数据保留供核对。', 'warning')
+      const selected = flight.actualArrivalUTC ? flight : prior.flight
+      const merged: FlightRecord = { ...selected, id: prior.flight.id, privateDetails: {
+        ...selected.privateDetails,
+        importIssues: [...(prior.flight.privateDetails?.importIssues || []), ...result.issues.filter(item => item.row === line)],
+        conflictingRows: [...(prior.flight.privateDetails?.conflictingRows || []), ...(selected === flight && prior.flight.privateDetails?.sourceRow ? [prior.flight.privateDetails.sourceRow] : [row])],
+      } }
+      if (selected === flight && prior.flight.date === flight.date && prior.flight.from === flight.from && prior.flight.to === flight.to && (prior.flight.divertedTo || '') === (flight.divertedTo || '')) {
+        const fields = [['actualArrivalUTC', 'Gate Arrival (Actual)'], ['touchdownUTC', 'Landing (Actual)'], ['takeoffUTC', 'Take off (Actual)'], ['actualDepartureUTC', 'Gate Departure (Actual)']] as const
+        let later: string | undefined
+        for (const [field, source] of fields) {
+          if (!row[source] && !(field === 'takeoffUTC' && row['Takeoff (Actual)'])) merged[field] ||= prior.flight[field]
+          if (merged[field] && later && Date.parse(merged[field]!) > Date.parse(later)) {
+            merged[field] = undefined
+            issue(source, 'existing-time-conflict', '已有时间与本次实际入位冲突，原值保留在历史版本中。', 'warning')
+          }
+          if (merged[field]) later = merged[field]
+        }
+        for (const [field, source] of [['departureLocal', 'Gate Departure (Scheduled)'], ['arrivalLocal', 'Gate Arrival (Scheduled)']] as const) {
+          if (!row[source]) merged[field] ||= prior.flight[field]
+        }
+        if (merged.departureLocal && merged.arrivalLocal) {
+          try {
+            if (Date.parse(localToUTC(merged.arrivalLocal, to!.timeZone)) <= Date.parse(localToUTC(merged.departureLocal, from!.timeZone))) {
+              merged.arrivalLocal = undefined
+              merged.arrivalUTC = undefined
+              issue('Gate Arrival (Scheduled)', 'existing-schedule-conflict', '已有计划入位与本次计划出位冲突，暂不采用；实际入位不受影响。', 'warning')
+            }
+          } catch {
+            merged.departureLocal = undefined; merged.arrivalLocal = undefined
+            issue('Gate Arrival (Scheduled)', 'existing-schedule-invalid', '已有计划时间无效，暂不采用；原值保留在历史版本中。', 'warning')
+          }
+        }
+        merged.privateDetails!.importIssues = [...(prior.flight.privateDetails?.importIssues || []), ...result.issues.filter(item => item.row === line)]
+      }
+      if (merged.id != null) {
+        const position = result.updates.findIndex(item => item.id === merged.id)
+        if (position >= 0) result.updates[position] = merged
+        else result.updates.push(merged)
+      } else {
+        const position = result.flights.findIndex(item => item.importKey === importKey)
+        result.flights[position] = merged
+      }
+      seen.set(importKey, { row: line, signature: rowSignature, flight: merged })
+      return
+    }
+    seen.set(importKey, { row: line, signature: rowSignature, flight })
+    result.flights.push(flight)
   })
   result.valid = result.totalRows > 0 && !result.issues.some(issue => issue.severity === 'error')
   return result

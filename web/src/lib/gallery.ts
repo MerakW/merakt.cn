@@ -5,14 +5,14 @@ export interface GalleryPhoto {
   id: number; src: string; display: string; thumbnail: string; srcSet?: string; width: number; height: number;
   alt: string; caption: string; credit?: string; source?: string; video: boolean;
 }
-export interface GalleryAlbum { id: number; slug: string; title: string; date: string; description: string; photos: GalleryPhoto[] }
+export interface GalleryAlbum { id: number; slug: string; title: string; date: string; description: string; compound?: string | null; photos: GalleryPhoto[] }
 export function safeLink(value?: string | null) { return value && /^https?:\/\//i.test(value) ? value : undefined }
 const mediaPath = (filename: string) => imageURL(`/api/media/file/${encodeURIComponent(filename)}`)
 
 export function publicPhoto(value: number | Media | null | undefined, caption?: string | null, credit?: string | null, source?: string | null): GalleryPhoto | null {
   if (!value || typeof value !== 'object' || value.visibility !== 'public' || !value.filename) return null
   const display = value.sizes?.display, thumbnail = value.sizes?.thumbnail
-  const legacy = legacyImageURL(value.legacyPath)
+  const legacy = process.env.NEXT_PUBLIC_LOCAL_MEDIA === '1' ? undefined : legacyImageURL(value.legacyPath)
   const src = legacy || mediaPath(value.filename)
   return {
     id: value.id, src, display: legacy || (display?.filename ? mediaPath(display.filename) : src),
@@ -30,5 +30,5 @@ export function publicAlbum(album: Album): GalleryAlbum | null {
     return image ? [image] : []
   })
   if (!photos.length) { const cover = publicPhoto(album.cover, album.description, album.photographer); if (cover) photos.push(cover) }
-  return photos.length ? { id: album.id, slug: album.slug, title: album.title, date: album.date?.slice(0, 10) || '', description: album.description || '', photos } : null
+  return photos.length ? { id: album.id, slug: album.slug, title: album.title, date: album.date?.slice(0, 10) || '', description: album.description || '', compound: album.compound, photos } : null
 }

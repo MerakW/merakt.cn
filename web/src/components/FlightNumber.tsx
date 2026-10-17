@@ -8,6 +8,6 @@ export default function FlightNumber({ flight }: { flight: {airline?: string | n
   return <span className="flight-number" title={identity.airline?.name}>
     {identity.airline && <img className="airline-logo" src={airlineLogoURL(identity.airline.icao)} alt={identity.airline.name} width="27" height="24" />}
     <span>{identity.label}</span>
-    {alliance && <img className={`alliance-logo alliance-${alliance.key}`} src={alliance.src} alt={alliance.name} title={alliance.name} width={alliance.key === 'star' ? 32 : 21} height="21" />}
+    {alliance && <img className={`alliance-logo alliance-${alliance.key}`} src={alliance.src} alt={alliance.name} title={alliance.name} width="21" height="21" />}
   </span>
 }

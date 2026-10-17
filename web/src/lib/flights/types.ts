@@ -46,6 +46,8 @@ export interface FlightRecord {
     seatType?: string
     cabinClass?: string
     reason?: string
+    importIssues?: ImportIssue[]
+    conflictingRows?: Record<string, string>[]
     sourceRow?: Record<string, string>
   }
 }
@@ -61,6 +63,7 @@ export interface ImportIssue {
 export interface ImportPreview {
   totalRows: number
   flights: FlightRecord[]
+  updates: FlightRecord[]
   duplicates: { row: number; firstRow?: number; importKey: string }[]
   issues: ImportIssue[]
   valid: boolean

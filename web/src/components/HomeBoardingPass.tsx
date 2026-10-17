@@ -30,9 +30,9 @@ export default function HomeBoardingPass() {
   return <div ref={stage} className="home-pass-stage" onPointerMove={move} onPointerLeave={() => { ref.current?.removeAttribute('style'); if(stage.current)stage.current.dataset.hovered='false' }}><a ref={ref} href="/visitors" className="home-boarding-pass" data-arrived={arrived} aria-label="领取写着你名字的登机牌">
     <div className="home-pass-face">
       <header><strong>MERAK AIRWAYS</strong><span>VISITOR PASS</span></header>
-      <div className="home-pass-route"><b>YOU</b><span className="home-pass-track" aria-hidden="true"><img className="home-pass-plane" src={imageURL('/images/card/sf/airplane.png')} width="28" height="28" alt=""/></span><b>HGH</b></div>
+      <div className="home-pass-route"><b>YOU</b><span className="home-pass-track" aria-hidden="true"><img className="home-pass-plane" src={imageURL('/images/card/airplane.svg')} width="28" height="28" alt=""/></span><b>HGH</b></div>
       <dl><div><dt>旅客</dt><dd>你的名字</dd></div><div><dt>航班</dt><dd>MK 518</dd></div><div><dt>座位</dt><dd>1A</dd></div></dl>
-      <p>给你留了一个靠窗的位置。</p>
+
     </div>
     <div className="home-pass-stub"><span>GATE<strong>HELLO</strong></span><div className="home-pass-barcode" aria-hidden="true"/><span className="home-pass-action">领取登机牌 <b aria-hidden="true"><ArrowIcon direction="up-right" /></b></span></div>
   </a></div>

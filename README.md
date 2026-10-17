@@ -78,6 +78,18 @@ npm run package:linux -- --assets /path/to/public-assets --output /path/to/relea
 
 部署前需要配置固定密钥、持久化数据目录及运行环境变量，并按项目迁移流程更新数据库。真实凭据、数据库和私人素材应保存在自己的运行环境中。
 
+## 围场功能
+
+`/pit-wall` 合并运行遥测与管理入口；管理员登录后显示发布、审核和设置操作，`/manage` 跳转至该页。S / M / H / I 配方可在文章、相册与近况中选择。Team Radio 读取最新公开近况，使用 51 号，侧边按钮可开关；Escape 可关闭。只有文章详情显示标题与 Sector 阅读进度。
+
+ERS 显示 V8 堆内存余量；OT 显示本地资源模式或已确认的 CDN 配置；构建寿命优先使用 `DEPLOYED_AT`，否则读取实际构建时间。内容查询延迟来自公开日志计数查询，访问 Pit Wall 时采样，最多每分钟保存一次，保留 24 小时；不代表外部网络延迟或可用率。采样文件默认在 `.data/telemetry/content-latency.json`，可用 `CONTENT_TELEMETRY_FILE` 覆盖。
+
+运行 `cd web && npm run preview:lan` 即可自行构建并启动局域网预览，命令会自动检测当前局域网地址，按 Ctrl+C 停止。
+
+本地完整数据预览使用 SQLite 在线备份生成的 `.data/paddock-preview/merak.db` 快照及原有本地媒体。设置 `LOCAL_PREVIEW=1`、`NEXT_PUBLIC_LOCAL_MEDIA=1`、`DATABASE_URL=file:./.data/paddock-preview/merak.db`、`MEDIA_DIR=./.data/media`，将 `SERVER_URL` 指向局域网地址后，以 `--hostname 0.0.0.0` 启动。`NEXT_PUBLIC_LOCAL_MEDIA` 必须同时用于构建和运行。后台认证和公开范围仍生效，本地预览采用独立 Cookie 前缀。字体放在 `web/public/fonts/Formula1-{Regular,Bold,Black}.ttf`，随本地素材单独提供。
+
+生产升级需执行 `20261016_160000_paddock` 数据迁移。先备份数据库，再运行 `npm run payload -- migrate`；配置 `MERAK_AUTO_MIGRATE=1` 的环境会在启动时执行迁移。自动旗语使用 2026 赛历，后续年份需更新 `web/src/lib/paddock.ts`。
+
 ## 署名
 
 飞机插画： [Norebbo](https://www.norebbo.com/)。站点内的摄影作品按相册署名展示；源码、摄影作品、角色形象及第三方素材的使用权限应分别确认。

@@ -11,6 +11,7 @@ function summary(preview: ImportPreview) {
   return {
     totalRows: preview.totalRows, valid: preview.valid,
     flights: preview.flights.map(publicFlight),
+    updates: preview.updates.map(publicFlight),
     duplicates: preview.duplicates.map(({ row, firstRow }) => ({ row, firstRow })),
     issues: preview.issues,
   }
@@ -20,8 +21,7 @@ function summary(preview: ImportPreview) {
 export async function importFlights(req: PayloadRequest): Promise<Response> {
   if (!req.user) return json({ error: '请先登录管理后台。' }, 401)
   const origin = req.headers.get('origin')
-  const trustedOrigin = new URL(req.payload.config.serverURL).origin
-  if (origin !== trustedOrigin) return json({ error: '请从本站管理页面提交导入。' }, 403)
+  if (!origin || !req.payload.config.csrf.includes(origin)) return json({ error: '请从本站管理页面提交导入。' }, 403)
   if (!req.headers.get('content-type')?.startsWith('application/json')) return json({ error: '请提交 JSON 数据。' }, 415)
   const reader = req.body?.getReader()
   if (!reader) return json({ error: '未收到文件内容。' }, 400)
@@ -68,9 +68,21 @@ export async function importFlights(req: PayloadRequest): Promise<Response> {
         depth: 0, overrideAccess: false, req,
       })
     }
+    for (const flight of preview.updates) {
+      const { id, visibility: _visibility, ...data } = flight
+      const original = existing.docs.find(item => item.id === id)!
+      await req.payload.update({ collection: 'flights', id: id!, depth: 0, overrideAccess: false, req,
+        draft: original._status === 'draft',
+        data: { ...data, _status: original._status,
+          privateDetails: { ...(original.privateDetails as object || {}), ...Object.fromEntries(Object.entries(data.privateDetails || {}).filter(([, value]) => value !== undefined)) },
+          departureLocal: flight.departureLocal || null, arrivalLocal: flight.arrivalLocal || null,
+          actualDepartureUTC: flight.actualDepartureUTC || null, takeoffUTC: flight.takeoffUTC || null,
+          touchdownUTC: flight.touchdownUTC || null, actualArrivalUTC: flight.actualArrivalUTC || null,
+        } })
+    }
     await req.payload.db.commitTransaction(transactionID!)
     transactionID = undefined
-    return json({ ...summary(preview), imported: preview.flights.length })
+    return json({ ...summary(preview), imported: preview.flights.length, updated: preview.updates.length })
   } catch {
     if (transactionID != null) await req.payload.db.rollbackTransaction(transactionID)
     return json({ error: '导入未完成，本次更改已回滚。请稍后重新预览，已有记录不会被覆盖。' }, 409)

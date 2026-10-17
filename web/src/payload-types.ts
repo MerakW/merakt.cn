@@ -230,9 +230,6 @@ export interface Flight {
    * 这里是你的记录状态，不代表航空公司的实时运行状态。
    */
   state: 'planned' | 'completed' | 'cancelled' | 'unconfirmed';
-  /**
-   * 可留空；格式 2026-09-29T09:30。
-   */
   departureLocal?: string | null;
   arrivalLocal?: string | null;
   actualDepartureUTC?: string | null;
@@ -261,7 +258,7 @@ export interface Flight {
   importKey?: string | null;
   sourceId?: string | null;
   /**
-   * 原始记录、订票编号、座位等仅你可见。
+   * 原始记录、订票编号、座位等仅你可见。通常无需修改；补齐历史时间请进入 Flighty 导入页面。
    */
   privateDetails?:
     | {
@@ -302,6 +299,7 @@ export interface Album {
   slug: string;
   date?: string | null;
   description?: string | null;
+  compound?: ('auto' | 'S' | 'M' | 'H' | 'I') | null;
   cover?: (number | null) | Media;
   photographer?: string | null;
   photos?:
@@ -329,6 +327,7 @@ export interface Post {
   slug: string;
   date: string;
   excerpt?: string | null;
+  compound?: ('auto' | 'S' | 'M' | 'H' | 'I') | null;
   category?: ('技术' | '赛车' | '航空' | '生活') | null;
   cover?: (number | null) | Media;
   body: {
@@ -359,6 +358,9 @@ export interface Post {
 export interface Note {
   id: number;
   text: string;
+  teamReply?: string | null;
+  radioMessages?: { speaker: 'team' | 'driver'; message: string; id?: string | null }[] | null;
+  compound?: ('auto' | 'S' | 'M' | 'H' | 'I') | null;
   image?: (number | null) | Media;
   link?: string | null;
   date: string;
@@ -718,6 +720,7 @@ export interface AlbumsSelect<T extends boolean = true> {
   slug?: T;
   date?: T;
   description?: T;
+  compound?: T;
   cover?: T;
   photographer?: T;
   photos?:
@@ -744,6 +747,7 @@ export interface PostsSelect<T extends boolean = true> {
   slug?: T;
   date?: T;
   excerpt?: T;
+  compound?: T;
   category?: T;
   cover?: T;
   body?: T;
@@ -759,6 +763,9 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface NotesSelect<T extends boolean = true> {
   text?: T;
+  teamReply?: T;
+  radioMessages?: T | { speaker?: T; message?: T; id?: T };
+  compound?: T;
   image?: T;
   link?: T;
   date?: T;
@@ -896,6 +903,8 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface SiteSetting {
   id: number;
+  trackMode?: ('auto' | 'clear' | 'sc' | 'vsc' | 'pit') | null;
+  forzaFerrari?: boolean | null;
   title?: string | null;
   intro?: string | null;
   heroImage?: (number | null) | Media;
@@ -911,6 +920,8 @@ export interface SiteSetting {
  * via the `definition` "site-settings_select".
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
+  trackMode?: T;
+  forzaFerrari?: T;
   title?: T;
   intro?: T;
   heroImage?: T;

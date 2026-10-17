@@ -1,8 +1,9 @@
 /** Public image CDN used by the legacy site. Mirror public/ at the CDN root. */
-export const IMAGE_CDN_ORIGIN = 'https://cos.merakt.cn'
+export const IMAGE_CDN_ORIGIN = process.env.NEXT_PUBLIC_LOCAL_MEDIA === '1' ? '' : 'https://cos.merakt.cn'
 
 export function imageURL(path: string): string {
   if (!path.startsWith('/') || path.startsWith('//')) return path
+  if (!IMAGE_CDN_ORIGIN) return path
   // The legacy bucket stores this collection without the /images prefix.
   const cdnPath = path.startsWith('/images/fursuitfriday/') ? path.slice('/images'.length) : path
   return IMAGE_CDN_ORIGIN + cdnPath

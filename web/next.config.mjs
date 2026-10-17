@@ -11,7 +11,7 @@ if (!commit) {
 }
 export default withPayload({
   generateBuildId: async () => buildLabel,
-  env: { NEXT_PUBLIC_BUILD_LABEL: buildLabel, NEXT_PUBLIC_COMMIT_SHA: commit || '' },
+  env: { NEXT_PUBLIC_BUILD_AT: new Date().toISOString(), NEXT_PUBLIC_BUILD_LABEL: buildLabel, NEXT_PUBLIC_COMMIT_SHA: commit || '' },
   output: 'standalone',
   distDir: process.env.NEXT_DIST_DIR || '.next',
   outputFileTracingExcludes: {

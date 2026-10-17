@@ -84,7 +84,7 @@ export default function FlightBoard({ flights, featured, airports, preview = fal
 
     <div className="route-atlas-toggle"><div><span className="atlas-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="1.4"><path d="m3 7 8-3 10 3 8-3v21l-8 3-10-3-8 3Z M11 4v21 M21 7v21"/><path d="M7 19c5-12 10 4 18-7" strokeDasharray="2 2"/></svg></span><p>航线地图<span>{completed.length} 段已完成的飞行</span></p></div><button className="overview-button" aria-expanded={overview} aria-controls="flight-overview" onClick={() => setOverview(value => !value)}>{overview ? '收起航线' : '查看航线'} <span aria-hidden="true">{overview ? '−' : '+'}</span></button></div>
     {overview && <section className="overview-panel" id="flight-overview" aria-label="全部航线总览">
-      <div><h2>航线地图</h2><p>连线为起终点示意</p></div>
+      <div><h2>航线地图</h2></div>
       <RouteMap flights={completed} airports={airports} overview />
     </section>}
 

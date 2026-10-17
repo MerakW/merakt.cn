@@ -6,7 +6,8 @@ import type { FlightRecord } from './types'
 export async function backfillFlights(req: PayloadRequest): Promise<Response> {
   const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } })
   if (!req.user) return json({ error: '请先登录管理后台。' }, 401)
-  if (req.headers.get('origin') !== new URL(req.payload.config.serverURL).origin) return json({ error: '请从本站管理页面操作。' }, 403)
+  const origin = req.headers.get('origin')
+  if (!origin || !req.payload.config.csrf.includes(origin)) return json({ error: '请从本站管理页面操作。' }, 403)
   const action = req.url ? new URL(req.url).searchParams.get('action') : null
   if (!['preview', 'commit'].includes(action || '')) return json({ error: '操作无效。' }, 400)
   let transactionID: string | number | null | undefined

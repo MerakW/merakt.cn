@@ -48,7 +48,7 @@ const normalizeFlight: CollectionBeforeValidateHook = ({ data, originalDoc }) =>
 
 export const Flights: CollectionConfig = {
   slug: 'flights', labels: { singular: '航段', plural: '飞行记录' },
-  admin: { group: '飞行', useAsTitle: 'flightNumber', defaultColumns: ['date', 'from', 'to', 'flightNumber', 'state', 'visibility'] },
+  admin: { group: '飞行', useAsTitle: 'flightNumber', defaultColumns: ['date', 'from', 'to', 'flightNumber', 'state', 'privateDetails', 'visibility'] },
   access: { ...editingAccess, read: visiblePublished },
   endpoints: [{ path: '/import', method: 'post', handler: importFlights }, { path: '/backfill', method: 'post', handler: backfillFlights }],
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 20 },
@@ -65,6 +65,10 @@ export const Flights: CollectionConfig = {
     return doc
   }] },
   fields: [
+    { name: 'importReview', type: 'ui', label: '导入核对', admin: { components: {
+      Field: './components/admin/FlightImportReview#FlightImportReview',
+      Cell: './components/admin/FlightImportReview#FlightImportReviewCell',
+    } } },
     { type: 'row', fields: [
       { name: 'date', label: '航程日期', type: 'text', required: true, admin: { description: '出发机场当地日期，例如 2026-09-29。' } },
       { name: 'flightNumber', label: '航班号', type: 'text' },
@@ -106,7 +110,7 @@ export const Flights: CollectionConfig = {
     { name: 'importKey', type: 'text', unique: true, index: true, access: { read: adminField }, admin: { hidden: true } },
     { name: 'sourceId', type: 'text', access: { read: adminField }, admin: { hidden: true } },
     { type: 'collapsible', label: 'Flighty 原始导入信息', admin: { initCollapsed: true }, fields: [
-      { name: 'privateDetails', label: '私有导入信息', type: 'json', access: { read: adminField }, admin: { description: '原始记录、订票编号、座位等仅你可见。通常无需修改；补齐历史时间请进入 Flighty 导入页面。' } },
+      { name: 'privateDetails', label: '导入核对', type: 'json', access: { read: adminField }, admin: { components: { Cell: './components/admin/FlightImportReview#FlightImportReviewCell' }, description: '原始记录、订票编号、座位等仅你可见。通常无需修改；补齐历史时间请进入 Flighty 导入页面。' } },
     ] },
   ],
 }
