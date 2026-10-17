@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
 import { safeLink } from '@/lib/gallery'
+import { imageURL } from '@/lib/assets'
 
 export default function TeamRadio({ note }: { note?: { text: string; radioMessages?: { speaker: 'team' | 'driver'; message: string; id?: string | null }[] | null; date: string; link?: string | null } }) {
   const [open, setOpen] = useState(false)
@@ -34,7 +35,7 @@ export default function TeamRadio({ note }: { note?: { text: string; radioMessag
     {open && <aside id="team-radio-panel" className="radio-popup" aria-labelledby="radio-title">
       <button className="radio-close" onClick={close} aria-label="关闭车队电台">×</button>
       <div className="radio-broadcast"><h2 id="radio-title"><span>MERAK</span><br/>RADIO</h2>
-      <div className="radio-signal"><b>51</b><img src="/team-logos/ferrari-hq.svg" width="68" height="78" alt="Ferrari"/></div>
+      <div className="radio-signal"><b>51</b><img src={imageURL('/team-logos/ferrari-hq.svg')} width="68" height="78" alt="Ferrari"/></div>
       <div className="radio-wave" aria-hidden="true">{[48,83,100,100,84,90,74,57,52].map((height,i)=><span key={i} style={{'--wave-height':`${height}%`,'--wave-delay':`${i*-.17}s`} as CSSProperties}><i/><i/></span>)}</div></div>
       <div className="radio-conversation">{messages.map((message,index)=><blockquote key={message.id || index} data-speaker={message.speaker} aria-label={message.speaker==='team'?'车队发言':'车手发言'}>“{message.message}”</blockquote>)}</div>
       <footer><time>{note ? note.date.slice(0, 10).replaceAll('-', '.') : 'STANDBY'}</time><div><button onClick={() => void play()} aria-label="重播车队电台提示音">重播音效</button><button aria-pressed={muted} onClick={() => { setMuted(!muted); sound.current?.pause() }}>{muted ? '开启提示音' : '静音'}</button>{safeLink(note?.link) && <a href={safeLink(note?.link)}>原文 ↗</a>}</div></footer>

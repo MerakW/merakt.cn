@@ -1,9 +1,10 @@
+import { imageURL } from './assets'
 import { teamColors, teamLogos, teamLogoSize } from './paddock'
 import { westLakePath } from './west-lake-circuit'
 export type PassDetails = { mode: 'race' | 'flight'; name: string; team: string; airport: string; city: string; id: string }
 
 async function loadImage(src: string) {
-  const response = await fetch(src)
+  const response = await fetch(src, { mode: 'cors', credentials: 'omit' })
   if (!response.ok) throw new Error('图片资源未能载入，请重试。')
   const url = URL.createObjectURL(await response.blob())
   try {
@@ -37,7 +38,7 @@ export async function saveVisitorPass(details: PassDetails): Promise<Blob> {
     text('PADDOCK', 450, 200, 70, color, 'center'); text('CLUB', 450, 280, 70, color, 'center')
     text('HANGZHOU GRAND PRIX', 450, 350, 22, '#f1f2eb', 'center')
     if (teamLogos[details.team]) {
-      const logo = await loadImage(`/team-logos/${teamLogos[details.team]}-full-dark.svg`)
+      const logo = await loadImage(imageURL(`/team-logos/${teamLogos[details.team]}-full-dark.svg`))
       const size = teamLogoSize(details.team)
       const scale = Math.min(size.width * 900/330 / logo.width, size.height * 900/330 / logo.height)
       ctx.drawImage(logo, 450 - logo.width * scale / 2, 485 - logo.height * scale / 2, logo.width * scale, logo.height * scale)
