@@ -1,3 +1,4 @@
+import { imageURL } from '@/lib/assets'
 import TyreCompound from '@/components/TyreCompound'
 import { compoundFor, readingLabel, richTextContent } from '@/lib/paddock'
 import TitleReveal from '@/components/TitleReveal'
@@ -28,7 +29,7 @@ async function getPost(slug: string) {
 }
 export async function generateMetadata({ params }: { params: Promise<{slug: string}> }) {
   const post = await getPost((await params).slug)
-  return { title: post?.title || '文章未找到', description: post?.excerpt || undefined }
+  return { title: post?.title || '文章未找到', description: post?.excerpt || undefined, openGraph: { title: post?.title || '文章未找到', description: post?.excerpt || 'Merak 的航行日志', type: 'article', url: `https://merakt.cn/blog/${encodeURIComponent((await params).slug)}`, images: [{url:imageURL('/social/paddock-og.png'),width:1200,height:630}], ...(post?{publishedTime:post.date,modifiedTime:post.updatedAt}:{}) }, twitter: {card:'summary_large_image',title:post?.title,description:post?.excerpt||undefined,images:[imageURL('/social/paddock-og.png')]} }
 }
 export default async function PostPage({ params }: { params: Promise<{slug: string}> }) {
   const post = await getPost((await params).slug)

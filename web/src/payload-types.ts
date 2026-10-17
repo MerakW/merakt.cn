@@ -76,6 +76,7 @@ export interface Config {
     notes: Note;
     events: Event;
     checkins: Checkin;
+    'paddock-signals': PaddockSignal;
     'flight-sync-jobs': FlightSyncJob;
     'flight-worker-replays': FlightWorkerReplay;
     passkeys: Passkey;
@@ -96,6 +97,7 @@ export interface Config {
     notes: NotesSelect<false> | NotesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     checkins: CheckinsSelect<false> | CheckinsSelect<true>;
+    'paddock-signals': PaddockSignalsSelect<false> | PaddockSignalsSelect<true>;
     'flight-sync-jobs': FlightSyncJobsSelect<false> | FlightSyncJobsSelect<true>;
     'flight-worker-replays': FlightWorkerReplaysSelect<false> | FlightWorkerReplaysSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
@@ -178,6 +180,16 @@ export interface Media {
   id: number;
   alt: string;
   credit?: string | null;
+  exposure?: {
+    medium?: ('digital' | 'film') | null;
+    camera?: string | null;
+    lens?: string | null;
+    focalLength?: string | null;
+    filmStock?: string | null;
+    shutter?: string | null;
+    aperture?: string | null;
+    iso?: number | null;
+  };
   source?: string | null;
   visibility: 'private' | 'public';
   legacyPath?: string | null;
@@ -352,14 +364,28 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * 最新发布的近况显示在 Team Radio 小窗；在对话列表中添加段落并拖动排序。
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "notes".
  */
 export interface Note {
   id: number;
+  /**
+   * 首页近况正文；未添加 TR 对话时，也用作车手发言。
+   */
   text: string;
   teamReply?: string | null;
-  radioMessages?: { speaker: 'team' | 'driver'; message: string; id?: string | null }[] | null;
+  /**
+   * 拖动段落调整顺序。车队白色靠左，车手红色靠右。
+   */
+  radioMessages?:
+    | {
+        speaker: 'team' | 'driver';
+        message: string;
+        id?: string | null;
+      }[]
+    | null;
   compound?: ('auto' | 'S' | 'M' | 'H' | 'I') | null;
   image?: (number | null) | Media;
   link?: string | null;
@@ -398,6 +424,21 @@ export interface Checkin {
   name: string;
   message: string;
   status: 'pending' | 'approved' | 'rejected';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paddock-signals".
+ */
+export interface PaddockSignal {
+  id: number;
+  kind: 'reaction' | 'radio';
+  name?: string | null;
+  approved?: boolean | null;
+  value?: number | null;
+  subject?: string | null;
+  ticket: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -545,6 +586,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'checkins';
         value: number | Checkin;
+      } | null)
+    | ({
+        relationTo: 'paddock-signals';
+        value: number | PaddockSignal;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -619,6 +664,18 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   credit?: T;
+  exposure?:
+    | T
+    | {
+        medium?: T;
+        camera?: T;
+        lens?: T;
+        focalLength?: T;
+        filmStock?: T;
+        shutter?: T;
+        aperture?: T;
+        iso?: T;
+      };
   source?: T;
   visibility?: T;
   legacyPath?: T;
@@ -764,7 +821,13 @@ export interface PostsSelect<T extends boolean = true> {
 export interface NotesSelect<T extends boolean = true> {
   text?: T;
   teamReply?: T;
-  radioMessages?: T | { speaker?: T; message?: T; id?: T };
+  radioMessages?:
+    | T
+    | {
+        speaker?: T;
+        message?: T;
+        id?: T;
+      };
   compound?: T;
   image?: T;
   link?: T;
@@ -799,6 +862,20 @@ export interface CheckinsSelect<T extends boolean = true> {
   name?: T;
   message?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "paddock-signals_select".
+ */
+export interface PaddockSignalsSelect<T extends boolean = true> {
+  kind?: T;
+  name?: T;
+  approved?: T;
+  value?: T;
+  subject?: T;
+  ticket?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -7,6 +7,7 @@ import { buildConfig } from 'payload'
 import { zh } from '@payloadcms/translations/languages/zh'
 import sharp from 'sharp'
 import { Users, Trips, Albums, Posts, Notes, Events, SiteSettings } from './collections/Content'
+import { PaddockSignals } from './collections/PaddockSignals'
 import { Flights } from './collections/Flights'
 import { Checkins } from './collections/Checkins'
 import { Media } from './collections/Media'
@@ -28,7 +29,7 @@ export default buildConfig({
   csrf: process.env.LOCAL_PREVIEW === '1' ? ['http://127.0.0.1:3003', 'http://localhost:3003'] : [],
   admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
   i18n: { supportedLanguages: { zh }, fallbackLanguage: 'zh' },
-  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, FlightSyncJobs, FlightWorkerReplays, Passkeys, PasskeyChallenges],
+  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, Passkeys, PasskeyChallenges],
   endpoints: flightSyncEndpoints,
   onInit: startFlightSyncWorker,
   globals: [SiteSettings],

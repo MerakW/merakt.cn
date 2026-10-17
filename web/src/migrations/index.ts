@@ -1,13 +1,14 @@
-import * as radioMessages from './20261017_130000_radio_messages';
-import * as teamRadioReply from './20261017_120000_team_radio_reply';
 import * as migration_20261002_173728_initial_schema from './20261002_173728_initial_schema';
 import * as migration_20261004_160409_passkeys from './20261004_160409_passkeys';
 import * as migration_20261012_120000_flight_runway_times from './20261012_120000_flight_runway_times';
 import * as migration_20261012_121049_flight_sync_jobs from './20261012_121049_flight_sync_jobs';
 import * as migration_20261012_123531_flight_aircraft_code from './20261012_123531_flight_aircraft_code';
 import * as migration_20261013_040641_flight_worker_replays from './20261013_040641_flight_worker_replays';
-
-import * as paddock from './20261016_160000_paddock';
+import * as migration_20261016_160000_paddock from './20261016_160000_paddock';
+import * as migration_20261017_120000_team_radio_reply from './20261017_120000_team_radio_reply';
+import * as migration_20261017_130000_radio_messages from './20261017_130000_radio_messages';
+import * as migration_20261017_152556_paddock_interactions from './20261017_152556_paddock_interactions';
+import * as migration_20261017_155746_photo_equipment from './20261017_155746_photo_equipment';
 
 export const migrations = [
   {
@@ -38,9 +39,31 @@ export const migrations = [
   {
     up: migration_20261013_040641_flight_worker_replays.up,
     down: migration_20261013_040641_flight_worker_replays.down,
-    name: '20261013_040641_flight_worker_replays'
+    name: '20261013_040641_flight_worker_replays',
   },
-  { up: paddock.up, down: paddock.down, name: '20261016_160000_paddock' },
-  { up: teamRadioReply.up, down: teamRadioReply.down, name: '20261017_120000_team_radio_reply' },
-  { up: radioMessages.up, down: radioMessages.down, name: '20261017_130000_radio_messages' },
+  {
+    up: migration_20261016_160000_paddock.up,
+    down: migration_20261016_160000_paddock.down,
+    name: '20261016_160000_paddock',
+  },
+  {
+    up: migration_20261017_120000_team_radio_reply.up,
+    down: migration_20261017_120000_team_radio_reply.down,
+    name: '20261017_120000_team_radio_reply',
+  },
+  {
+    up: migration_20261017_130000_radio_messages.up,
+    down: migration_20261017_130000_radio_messages.down,
+    name: '20261017_130000_radio_messages',
+  },
+  {
+    up: migration_20261017_152556_paddock_interactions.up,
+    down: migration_20261017_152556_paddock_interactions.down,
+    name: '20261017_152556_paddock_interactions',
+  },
+  {
+    up: migration_20261017_155746_photo_equipment.up,
+    down: migration_20261017_155746_photo_equipment.down,
+    name: '20261017_155746_photo_equipment'
+  },
 ];

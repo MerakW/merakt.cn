@@ -131,3 +131,69 @@ audio/team-radio.wav
 ## 署名
 
 飞机插画： [Norebbo](https://www.norebbo.com/)。站点内的摄影作品按相册署名展示；源码、摄影作品、角色形象及第三方素材的使用权限应分别确认。
+
+## 围场互动与遥测
+
+Pit Wall 的五红灯挑战使用浏览器高精度计时，切到后台或失焦会取消当前发车。访客主动登记成绩后进入月榜和总榜（月榜按北京时间每月 1 日开始）；昵称在后台「围场互动」勾选公开后显示，此前使用访客编号。服务端校验一次性签名凭证、等待时间和成绩范围；这是休闲榜单，不是防作弊竞技排名。PTT 预设回电仅在当前窗口显示，不写入后台。部署时需执行新增迁移 `20261017_152556_paddock_interactions` 和 `20261017_155746_photo_equipment`，或使用既有自动迁移流程。
+
+照片角落以毛玻璃参数牌展示后台填写的拍摄信息。在「媒体库 → 拍摄参数」选择拍摄介质：数码显示已填写的相机、镜头、焦段、快门、光圈和 ISO；明确选择胶片后，仅显示相机、镜头和胶片型号。未填写的项目隐藏，不推断拍摄设备。已取消滤镜切换、直方图和 Boop。公共互动接口有进程内限流；部署代理应覆盖 `X-Real-IP`，不能直接信任客户端传入的同名头。
+
+首页航路简报直接从浏览器调用 `https://ipwho.is/` 获取城市级 IP 定位，不申请 GPS 权限，定位仅在当前页面内存中用于计算，不写入数据库或浏览器存储；坐标通过 POST 正文传递，避免进入 URL 访问日志。失败后可手动输入机场三字码。第三方定位服务仍会接收访问者 IP，因此页面承诺仅指本站不保存定位信息。第三方免费接口有额度和可用性限制，见 [IPWHOIS 文档](https://ipwhois.io/documentation)。距离按大圆航线估算，A350-900 时间按 900 km/h 加 1 小时起降余量估算，不代表真实航班。若配置 CSP，请允许 `connect-src https://ipwho.is https://cos.merakt.cn`。
+
+顶栏保留普通深浅模式和独立遥测按钮，两者互不影响。`Cmd/Ctrl + K` 打开塔台指令窗，`T` 开关遥测视图（输入框内不触发）。遥测标注包含边框的显示尺寸，单位为 CSS 像素；rAF Hz 是前台动画回调频率，不是 GPU 实际渲染帧率，受浏览器、显示器刷新率和省电策略影响，隐藏标签页时暂停采样。TR 的 PLAY RADIO 和开窗提示音使用原始 `audio/team-radio.wav`，Web Audio 分析真实音频驱动频谱；若跨域分析失败则回退到原始音频播放。红色车手文字、白色车队文字和访客回电按顺序逐字呈现，全部完成后显示大回复按钮；重播位于底部。
+
+分享卡片通过 `cd web && node scripts/generate-social-card.mjs` 生成 1200 × 630 PNG。生成文件位于 `web/public/social/paddock-og.png`，上传副本位于 `web/.data/cos-upload-paddock/social/paddock-og.png`。将其上传至 COS 的 `social/paddock-og.png`（`Content-Type: image/png`），正式站 OpenGraph / Twitter 元数据引用此 COS 地址。PNG 不提交 Git，部署前须独立上传；微信和 QQ 是否显示卡片由各平台抓取策略决定。
+
+驾驶舱作为独立彩蛋保留在塔台指令窗：搜索 `Cockpit` 或“驾驶舱”进入石墨面板／青绿仪表模式，`Exit Cockpit` 恢复之前的深浅模式。顶栏切换深浅模式也会退出驾驶舱。照片光圈统一显示为 `ƒ/2.8` 等格式。候机室切换有淡入位移动画，并保留已填写内容；减少动态效果偏好下不播放过渡。异常页面覆盖未知网址、页面渲染失败／离线及根布局异常，提供重试入口，不展示内部错误堆栈。
+
+### 故障页与发布维护
+
+- `/status-preview` 可切换 404、页面错误、离线和全局错误的视觉预览；预览不会制造真实故障。
+- `/maintenance-preview` 预览独立的 IN PIT / VSC 页面。真实维护响应为 503；预览本身为 200。
+- 当前发布流程在停旧服务后备份数据、切换版本并启动新服务，因此存在停机窗口，时长取决于数据备份及启动耗时。
+- 运行包包含 `maintenance/`，部署工具会在停止服务前复制至 `/opt/merak/maintenance`。需在现有 Nginx/OpenResty 应用代理 location 中加入 `proxy_intercept_errors on;` 和 `error_page 502 503 504 =503 /__maintenance.html;`，同一 server 块加入 `web/scripts/maintenance/nginx.conf` 中的精确 location。先执行代理配置检查，再 reload。若使用 1Panel 容器，需要将宿主机 `/opt/merak/maintenance` 只读挂载到代理容器同路径；不能用浏览器路径代替文件路径。尚未配置代理时，应用停止仍会显示默认网关错误。
+- TR 保留原提示音，音频开始后逐字显示内容；提示音结束后的波形为视觉动画。PTT 回复只追加到当前窗口，不提交数据库，重播或关闭后重新打开会清空。
+- 命令窗 `Enter Cockpit / Flight Deck` 进入独立导航和仪表布局；`Exit Flight Deck` 恢复正常界面。UTC 时钟是真实时间，不展示虚构飞行参数。
+
+### 本轮上线顺序与数据库迁移
+
+素材上传与数据库迁移是两个独立步骤。COS 存放图片、字体、音频；数据库迁移为反应挑战成绩和照片参数增加表及字段，不会把本地预览数据库上传到云端。
+
+1. 先上传上方清单的 COS 文件；已上传且内容未变的文件不用重复上传。本阶段新增 `social/paddock-og.png`。保持目录层级，上传到现有素材桶；覆盖同名对象后刷新对应 CDN URL 缓存。正式构建不要设置 `NEXT_PUBLIC_LOCAL_MEDIA=1`。
+2. 提交代码并推送到配置的部署 ref 后，在运行部署工具的机器进入 `web`，执行 `./deploy.sh check` 检查依赖，再执行 `./deploy.sh`。工具读取 `.env.deploy.json` 中的 ref；未提交的本地修改不会进入运行包。如果配置指向 `origin/main`，必须先将该版本推送到该分支。已有部署配置无需重新 init。
+3. 既有部署工具使用 `node start-production.mjs` 启动。启动检查确认生产迁移历史、生成迁移前 SQLite 一致性备份，并设置 `MERAK_AUTO_MIGRATE=1`。Payload 启动时执行尚未记录的迁移；成功后记录历史，后续启动不重复执行。使用此流程时**不需要再手动运行 migrate**。
+4. 本轮新增 `20261017_152556_paddock_interactions`（挑战成绩表、快门/光圈/ISO）及 `20261017_155746_photo_equipment`（拍摄介质、相机、镜头、焦段、胶片型号）。此前的围场迁移若未执行，也由历史检查识别为待执行项。本轮 TR 节奏、样式修正不新增数据库迁移。
+5. 在云服务器用 `docker logs --tail 100 merak-web` 查看启动及迁移结果，检查后台「媒体库 → 拍摄参数」和 Pit Wall 成绩功能。部署工具还会做 API 健康检查；失败则停止新版并保留备份，不自动擦除数据。若报告开发库/历史缺失，不要强行开启 push 或重置库，需要先转换数据库副本。
+6. 若云端不是由此工具管理（例如另建的 1Panel 容器），不要直接运行部署工具接管。使用生成包内的 `node start-production.mjs` 作为启动命令，保留原 PAYLOAD_SECRET、持久化数据库/媒体挂载与绝对路径配置。它会执行同一套备份及自动迁移流程。单独运行 `node server.js` 会跳过这层启动检查。
+
+部署工具在服务器保存全量数据备份至 `/opt/merak/backups/`，运行时迁移前数据库快照默认位于持久化数据目录的 `backups/`（受管部署为宿主机 `/opt/merak/data/backups/`）。需要回退时在部署工具所在机器执行 `./deploy.sh rollback --restore-data`，会恢复上一版程序及配套数据库，回退前的当前数据会另存；升级后新增内容不会出现在恢复后的旧库里。
+
+
+### 手动接入 IN PIT 维护页（1Panel / OpenResty）
+
+维护页是独立 HTML，不上传 COS，也不需要数据库迁移。它必须在 Node 应用停止时仍能由反向代理读取。
+
+1. 本地文件为 `web/scripts/maintenance/in-pit.html`。使用 1Panel 文件管理上传到服务器 `/opt/merak/maintenance/in-pit.html`（先建目录，文件权限 644）。既有 `deploy.sh` 发布工具会自动放置该文件，无需重复上传。
+2. 若 OpenResty 在容器中，在容器挂载设置中增加只读挂载：宿主机 `/opt/merak/maintenance` → 容器 `/opt/merak/maintenance`。只上传到宿主机但不挂载，容器无法读取。
+3. 编辑站点 Nginx 配置，在已有应用代理 `location /` 内加入下面两行，保留原有 proxy_pass：
+
+```nginx
+proxy_intercept_errors on;
+error_page 502 503 504 =503 /__maintenance.html;
+```
+
+4. 在同一个 `server` 块中、其他 location 外面加入：
+
+```nginx
+location = /__maintenance.html {
+    internal;
+    alias /opt/merak/maintenance/in-pit.html;
+    default_type text/html;
+    add_header Retry-After 30 always;
+    add_header Cache-Control "no-store" always;
+}
+```
+
+5. 在 1Panel 检查配置并重载 OpenResty。先用 `/maintenance-preview` 看外观；由于配置了 internal，直接访问 `/__maintenance.html` 返回 404 是正常行为。真实接管要在计划发布窗口观察应用暂时停止后的主站响应，预期状态码 503，内容为 IN PIT；不要为了预览随意停止生产服务。
+
+本轮分享图更新仍使用 `social/paddock-og.png` 对象路径，覆盖 COS 原文件并刷新该 URL 的 CDN 缓存即可。头像复用电子名片已有 `/images/card/avatar.webp`，无需新增上传。月榜/总榜仅修改查询范围，不新增迁移。

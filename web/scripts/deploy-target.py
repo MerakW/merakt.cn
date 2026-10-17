@@ -125,6 +125,9 @@ def activate(archive, digest, release_id, site_url):
         if not (release / file).is_file():
             raise RuntimeError('运行包不完整：' + file)
     setup(site_url)
+    maintenance = release / 'maintenance'
+    if maintenance.is_dir():
+        shutil.copytree(maintenance, BASE / 'maintenance', dirs_exist_ok=True)
     run('chown', '-R', '1000:1000', str(release), str(BASE / 'data'))
     previous = str(current.resolve()) if current.is_symlink() else None
     if prior.get('status') in ('failed', 'preparing') and not prior.get('previous'):

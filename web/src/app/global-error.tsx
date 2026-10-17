@@ -1,0 +1,6 @@
+'use client'
+export default function GlobalError({error,retry}:{error:Error & {digest?:string};retry:()=>void}) {
+ return <html lang="zh-CN"><head><title>连接中断 · Merak</title><meta name="viewport" content="width=device-width, initial-scale=1"/></head><body style={{margin:0,background:'#101821',color:'#e7edf3',fontFamily:'system-ui,sans-serif'}}><GlobalRecovery error={error} retry={retry}/></body></html>
+}
+
+export function GlobalRecovery({error,retry}:{error:Error & {digest?:string};retry:()=>void}) {return <main style={{maxWidth:760,margin:'0 auto',padding:'16vh 28px'}}><p style={{fontSize:12,letterSpacing:2,color:'#98acbe'}}>MERAK / PIT WALL</p><h1 style={{fontSize:'clamp(48px,12vw,100px)',margin:'20px 0'}}>RED FLAG.</h1><h2>站点暂时无法连接。</h2><p style={{color:'#a8b7c4',lineHeight:1.8}}>请稍后重试，或查看服务状态。</p><div style={{display:'flex',gap:16,flexWrap:'wrap',alignItems:'center',margin:'30px 0'}}><button onClick={()=>retry()} style={{padding:'14px 22px',border:'1px solid #8da4b9',background:'transparent',color:'inherit',borderRadius:6,cursor:'pointer',font:'inherit'}}>重新连接</button><a href="/" style={{color:'inherit'}}>返回围场</a><a href="https://status.merakt.cn/status/home" style={{color:'inherit'}}>服务状态</a></div>{error.digest&&<small style={{color:'#98acbe'}}>事件编号 / {error.digest}</small>}</main>}

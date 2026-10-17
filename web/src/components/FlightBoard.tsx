@@ -1,4 +1,5 @@
 'use client'
+import { useSearchParams } from 'next/navigation'
 import ArrowIcon from '@/components/ArrowIcon'
 
 import { imageURL } from '@/lib/assets'
@@ -9,7 +10,7 @@ import { flightTime, arrivalDelayMinutes } from '@/lib/flights/display-time'
 import FlightNumber from './FlightNumber'
 import TitleReveal from './TitleReveal'
 
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Airport } from '@/lib/flights/types'
 import type { publicFlight } from '@/lib/flights/public'
 import RouteMap from './RouteMap'
@@ -38,6 +39,8 @@ export default function FlightBoard({ flights, featured, airports, preview = fal
   preview?: boolean
 }) {
   const archiveRef = useRef<FlightArchiveHandle>(null)
+  const flightId=useSearchParams().get('flight')
+  useEffect(()=>{if(flightId){const flight=flights.find(f=>String(f.id)===flightId);if(flight)archiveRef.current?.open(flight)}},[flights,flightId])
   const [overview, setOverview] = useState(false)
   const airportIndex = useMemo(() => new Map(airports.map(a => [a.iata, a])), [airports])
   const years = useMemo(() => Array.from(new Set(flights.filter(f => f.date).map(f => f.date.slice(0, 4)))).sort().reverse(), [flights])

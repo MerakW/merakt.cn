@@ -3,7 +3,7 @@ import ArrowIcon from '@/components/ArrowIcon'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { imageURL } from '@/lib/assets'
 
-export default function HomeBoardingPass() {
+export default function HomeBoardingPass({base}:{base?:string}) {
   const ref = useRef<HTMLAnchorElement>(null)
   const stage = useRef<HTMLDivElement>(null)
   const [arrived, setArrived] = useState(false)
@@ -27,10 +27,10 @@ export default function HomeBoardingPass() {
     ref.current?.style.setProperty('--ticket-rise', '-3px')
     ref.current?.style.setProperty('--ticket-scale', '1.008')
   }
-  return <div ref={stage} className="home-pass-stage" onPointerMove={move} onPointerLeave={() => { ref.current?.removeAttribute('style'); if(stage.current)stage.current.dataset.hovered='false' }}><a ref={ref} href="/visitors" className="home-boarding-pass" data-arrived={arrived} aria-label="领取写着你名字的登机牌">
+  return <div ref={stage} className="home-pass-stage" onPointerMove={move} onPointerLeave={() => { ref.current?.removeAttribute('style'); if(stage.current)stage.current.dataset.hovered='false' }}><a ref={ref} href={base?`/visitors?base=${encodeURIComponent(base)}`:"/visitors"} className="home-boarding-pass" data-arrived={arrived} aria-label="领取写着你名字的登机牌">
     <div className="home-pass-face">
       <header><strong>MERAK AIRWAYS</strong><span>VISITOR PASS</span></header>
-      <div className="home-pass-route"><b>YOU</b><span className="home-pass-track" aria-hidden="true"><img className="home-pass-plane" src={imageURL('/images/card/airplane.svg')} width="28" height="28" alt=""/></span><b>HGH</b></div>
+      <div className="home-pass-route"><b>{base||'YOU'}</b><span className="home-pass-track" aria-hidden="true"><img className="home-pass-plane" src={imageURL('/images/card/airplane.svg')} width="28" height="28" alt=""/></span><b>HGH</b></div>
       <dl><div><dt>旅客</dt><dd>你的名字</dd></div><div><dt>航班</dt><dd>MK 518</dd></div><div><dt>座位</dt><dd>1A</dd></div></dl>
 
     </div>

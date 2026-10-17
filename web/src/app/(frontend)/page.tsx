@@ -1,3 +1,5 @@
+import ArrivalRadar from '@/components/ArrivalRadar'
+import Comms from '@/components/Comms'
 import TyreCompound from '@/components/TyreCompound'
 import { compoundFor, richTextContent } from '@/lib/paddock'
 import ArrowIcon from '@/components/ArrowIcon'
@@ -5,7 +7,6 @@ import { imageURL } from '@/lib/assets'
 import HomeFlights from '@/components/HomeFlights'
 import SpeedTunnel from '@/components/SpeedTunnel'
 import HomeMotion from '@/components/HomeMotion'
-import HomeBoardingPass from '@/components/HomeBoardingPass'
 import HomeGallery from '@/components/HomeGallery'
 import HomeTicker from '@/components/HomeTicker'
 import FlightCounter from '@/components/FlightCounter'
@@ -55,7 +56,7 @@ export default async function Home() {
       <a className="cover-scroll" href="#home-content" aria-label="向下浏览首页">FORMATION LAP <span aria-hidden="true"><ArrowIcon direction="down" /></span></a>
       <HomeTicker items={ticker} />
     </header>
-    <section id="home-content" className="home-pass-invite" aria-labelledby="home-pass-heading"><div><h2 id="home-pass-heading"><span>YOU <ArrowIcon /> HGH</span>给你留了一个<br/>靠窗的位置。</h2></div><HomeBoardingPass/></section>
+    <ArrivalRadar/>
     <section className="home-flight-section" aria-labelledby="home-flight-heading">
       <div className="section-heading"><div><h2 id="home-flight-heading"><span>BETWEEN CITIES</span>在城市之间。</h2><p>坐过的航班，去过的机场。</p></div><a className="quiet-link" href="/flights">进入飞行日志 <ArrowIcon direction="up-right" /></a></div>
       <HomeFlights featured={featured} recent={recentFlights} airports={airports}>
@@ -64,7 +65,7 @@ export default async function Home() {
     </section>
     {latestPhotos.length > 0 && <HomeGallery albums={latestPhotos} total={albums.length}/> }
     <section className="home-journal"><span className="kicker">LOGBOOK</span><a href="/blog"><h2>有些话，慢慢写。</h2><span>翻开航行日志</span></a>{posts.docs[0] && <a className="home-post-preview" href={`/blog/${posts.docs[0].slug}`}><TyreCompound compound={compoundFor(richTextContent(posts.docs[0].body),posts.docs[0].compound)} compact/><div><time>{posts.docs[0].date.slice(0,10).replaceAll("-", ".")}</time><h3>{posts.docs[0].title}</h3><p>{posts.docs[0].excerpt}</p></div><span>阅读</span></a>}</section>
-    <section id="about" className="home-about home-about-full" aria-labelledby="home-about-heading"><div><p className="kicker">ABOUT MERAK</p><h2 id="home-about-heading">Merak，<br />也叫米拉克。</h2></div><div><p>Merak 是北斗七星里的天璇。「米拉克」就是它的音译，叫哪个都行。</p><p>试问谁又能拒绝一堆会飞的铁鸟呢。<br />至于 F1，成为 Tifosi，这辈子真是有了。</p><div className="home-socials"><a href="https://qm.qq.com/cgi-bin/qm/qr?k=1540180211">QQ · 1540180211</a><a href="https://github.com/MerakW">GitHub · MerakW</a><a href="https://v.douyin.com/9FjfikdKPog">抖音 · @merak_w</a></div></div><a className="about-identity" href="/merak"><img src={imageURL('/identity/merak-avatar.webp')} width="768" height="768" alt="Merak 的蓝白狐狸角色" loading="lazy" /><span>HGH BASED / MERAK</span><strong>还有一些关于我的事 <ArrowIcon direction="up-right" /></strong></a></section>
+    <section id="about" className="home-about home-about-full" aria-labelledby="home-about-heading"><div><p className="kicker">ABOUT MERAK</p><h2 id="home-about-heading">Merak，<br />也叫米拉克。</h2></div><div><p>Merak 是北斗七星里的天璇。「米拉克」就是它的音译，叫哪个都行。</p><p>试问谁又能拒绝一堆会飞的铁鸟呢。<br />至于 F1，成为 Tifosi，这辈子真是有了。</p><Comms/></div><a className="about-identity" href="/merak"><img src={imageURL('/identity/merak-avatar.webp')} width="768" height="768" alt="Merak 的蓝白狐狸角色" loading="lazy" /><span>HGH BASED / MERAK</span><strong>还有一些关于我的事 <ArrowIcon direction="up-right" /></strong></a></section>
 
 
   </HomeMotion>

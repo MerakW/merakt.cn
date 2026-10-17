@@ -100,6 +100,7 @@ docker run --rm --platform linux/amd64 \
     cp -R public .next/standalone/public
     node -e "if(process.platform!==\"linux\"||process.arch!==\"x64\")process.exit(1);require(\"sharp\");console.log(\"Linux AMD64 native dependency check passed\")"
     cp scripts/start-production.mjs scripts/prepare-runtime.mjs .next/standalone/
+    cp -R scripts/maintenance .next/standalone/maintenance
     node --import tsx -e "import(\"./src/migrations/index.ts\").then(({migrations})=>require(\"fs\").writeFileSync(\".next/standalone/release.json\",JSON.stringify({migrations:migrations.map(m=>m.name)})))"
     test -f .next/standalone/server.js
     tar -czf /export/merak-linux-amd64.tar.gz -C .next/standalone .
