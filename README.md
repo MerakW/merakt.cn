@@ -92,9 +92,9 @@ ERS 显示 V8 堆内存余量；OT 显示本地资源模式或已确认的 CDN �
 
 ## 围场素材上传 COS
 
-正式构建中，通行证的完整车队标识、TR 小盾徽、F1 字体和通行证 PNG 导出统一从 `https://cos.merakt.cn` 读取。`npm run preview:lan` 继续使用本地 `web/public/` 文件；正式构建和运行应将 `NEXT_PUBLIC_LOCAL_MEDIA` 留空或设为 `0`。
+正式构建中，通行证的完整车队标识、TR 小盾徽、音效和 F1 字体统一从 `https://cos.merakt.cn` 读取；通行证 PNG 在浏览器中生成。`npm run preview:lan` 继续使用本地 `web/public/` 文件；正式构建和运行应将 `NEXT_PUBLIC_LOCAL_MEDIA` 留空或设为 `0`。
 
-上传前准备以下 16 个文件。对象路径相对于 COS 根目录，勿额外加 `public/` 或 `cos-upload-paddock/` 前缀；目标存储桶使用现有 `cos.merakt.cn` 域名绑定的存储桶。上传文件来自同路径的 `web/public/`：
+上传前准备以下 17 个文件。对象路径相对于 COS 根目录，勿额外加 `public/` 或 `cos-upload-paddock/` 前缀；目标存储桶使用现有 `cos.merakt.cn` 域名绑定的存储桶。上传文件来自同路径的 `web/public/`：
 
 ```text
 team-logos/ferrari-full-dark.svg
@@ -113,15 +113,20 @@ alliances/star-tight.svg
 fonts/Formula1-Regular.ttf
 fonts/Formula1-Bold.ttf
 fonts/Formula1-Black.ttf
+audio/team-radio.wav
 ```
 
-前 11 个为通行证队标，第 12 个为 TR 法拉利小盾徽，第 13 个为新版星盟标识，最后 3 个为 F1 字体。`*-full-source.svg`、旧 WebP 和其他小队徽无需上传。SVG 文件设置 `Content-Type: image/svg+xml`，TTF 字体设置 `Content-Type: font/ttf`，沿用现有公开素材访问方式。例如 Ferrari 完整队标的最终地址应为 `https://cos.merakt.cn/team-logos/ferrari-full-dark.svg`。
+前 11 个为通行证队标，第 12 个为 TR 法拉利小盾徽，第 13 个为新版星盟标识，另含 3 个 F1 字体、TR 音效。`*-full-source.svg`、旧 WebP 和其他小队徽无需上传。SVG 文件设置 `Content-Type: image/svg+xml`，TTF 字体设置 `Content-Type: font/ttf`，WAV 设置 `audio/wav`，沿用现有公开素材访问方式。例如 Ferrari 完整队标的最终地址应为 `https://cos.merakt.cn/team-logos/ferrari-full-dark.svg`。
 
 跨域字体加载和通行证保存（读取 SVG 后生成 PNG）都需要 CORS：在 COS 存储桶的跨域访问配置中，允许来源填写 `https://merakt.cn`，如还使用其他正式站点域名则分别添加其完整 Origin；允许方法为 `GET`、`HEAD`，允许请求头可设为 `*`，缓存时间可设为 `600` 秒，无需携带 Cookie 或开放写入方法。参考[腾讯云 COS 跨域配置](https://cloud.tencent.com/document/product/436/43811)。
 
 若 `cos.merakt.cn` 前有 CDN，应确保最终响应包含与访问站点匹配的 `Access-Control-Allow-Origin`，可参考[腾讯云 CDN 响应头配置](https://cloud.tencent.com/document/product/228/41737)。更新文件或跨域响应头后，刷新对应 URL 的 CDN 缓存，再检查 F1 字体、队标显示和“保存围场通行证 PNG”；仅能显示图片并不代表跨域读取已配置成功。
 
-字体正式地址例如 `https://cos.merakt.cn/fonts/Formula1-Bold.ttf`；音效 `audio/team-radio.wav` 仍随站点部署。素材不纳入 Git，部署前需独立上传上述文件。
+字体正式地址例如 `https://cos.merakt.cn/fonts/Formula1-Bold.ttf`；音效地址为 `https://cos.merakt.cn/audio/team-radio.wav`。素材不纳入 Git，部署前需独立上传上述文件。
+
+本次新增及今后新增的公开图片、视频、音频和字体通过 `web/src/lib/assets.ts` 的 `assetURL()` 使用 COS，`imageURL()` 保留为兼容别名。本地预览使用本地素材。既有服务器素材和既有字体保持原加载方式，不做迁移。
+
+保存通行证需要跨域读取队标及字体。队标展示与导出统一使用匿名 CORS，导出时重新读取资源，避免复用旧的非跨域图片缓存。若保存仍失败，请按提示区分字体或队标，检查该资源的最终 CDN 响应；`https://merakt.cn` 与 `https://www.merakt.cn` 是不同来源，实际使用的域名均须配置，或统一跳转到主域名。修改配置后刷新 CDN 缓存并重新加载页面。
 
 ## 署名
 

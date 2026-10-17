@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
 import { safeLink } from '@/lib/gallery'
-import { imageURL } from '@/lib/assets'
+import { imageURL, assetURL } from '@/lib/assets'
 
 export default function TeamRadio({ note }: { note?: { text: string; radioMessages?: { speaker: 'team' | 'driver'; message: string; id?: string | null }[] | null; date: string; link?: string | null } }) {
   const [open, setOpen] = useState(false)
@@ -27,7 +27,7 @@ export default function TeamRadio({ note }: { note?: { text: string; radioMessag
   if (pathname.startsWith('/manage') || pathname === '/pit-wall') return null
   const messages = note?.radioMessages?.length ? note.radioMessages : [{id: 'fallback', speaker: 'driver', message: note?.text || 'Copy, head down. Next year is our year.'}]
   return <div className="radio-dock" data-open={open}>
-    <audio ref={sound} src="/audio/team-radio.wav" preload="none" />
+    <audio ref={sound} src={assetURL('/audio/team-radio.wav')} preload="none" />
     <button ref={trigger} className="radio-toggle" aria-expanded={open} aria-controls="team-radio-panel" onClick={() => {
       if (open) close()
       else { setOpen(true); if (!muted) void play() }

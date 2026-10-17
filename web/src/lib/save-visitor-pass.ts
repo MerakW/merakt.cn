@@ -4,8 +4,13 @@ import { westLakePath } from './west-lake-circuit'
 export type PassDetails = { mode: 'race' | 'flight'; name: string; team: string; airport: string; city: string; id: string }
 
 async function loadImage(src: string) {
-  const response = await fetch(src, { mode: 'cors', credentials: 'omit' })
-  if (!response.ok) throw new Error('图片资源未能载入，请重试。')
+  let response: Response
+  try {
+    response = await fetch(src, { mode: 'cors', credentials: 'omit', cache: 'reload' })
+  } catch {
+    throw new Error('队标加载失败，请刷新页面后重试。若仍失败，请检查 CDN 是否允许当前站点跨域读取队标。')
+  }
+  if (!response.ok) throw new Error(`队标加载失败（${response.status}），请稍后重试。`)
   const url = URL.createObjectURL(await response.blob())
   try {
     const image = new Image()
@@ -15,7 +20,11 @@ async function loadImage(src: string) {
   } finally { URL.revokeObjectURL(url) }
 }
 export async function saveVisitorPass(details: PassDetails): Promise<Blob> {
-  await document.fonts.load('700 32px Formula1')
+  try {
+    await document.fonts.load('700 32px Formula1')
+  } catch {
+    throw new Error('F1 字体加载失败，请刷新页面后重试。若仍失败，请检查字体的 CDN 跨域配置。')
+  }
   await document.fonts.ready
   const race = details.mode === 'race'
   const canvas = document.createElement('canvas')
