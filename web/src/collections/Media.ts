@@ -4,8 +4,8 @@ import type { CollectionConfig } from 'payload'
 import { adminOnly, editingAccess } from '@/lib/access'
 
 export const Media: CollectionConfig = {
-  slug: 'media', labels: { singular: '媒体', plural: '媒体库' },
-  admin: { group: '内容', useAsTitle: 'alt' },
+  slug: 'media', labels: { singular: "ui.media", plural: "ui.mediaLibrary" },
+  admin: { group: "ui.content", useAsTitle: 'alt' },
   access: { ...editingAccess, read: ({ req }) => req.user ? true : { visibility: { equals: 'public' } } },
   upload: {
     staticDir: resolve(/* turbopackIgnore: true */ process.env.MEDIA_DIR || './.data/media'),
@@ -18,20 +18,21 @@ export const Media: CollectionConfig = {
     focalPoint: true,
   },
   fields: [
-    { name: 'alt', label: '图片说明', type: 'text', required: true },
-    { name: 'credit', label: '摄影署名', type: 'text' },
-    { name: 'exposure', label: '拍摄参数', type: 'group', fields: [
-      { name: 'medium', label: '拍摄介质', type: 'select', defaultValue: 'digital', options: [{label:'数码',value:'digital'},{label:'胶片',value:'film'}] },
-      { name: 'camera', label: '相机', type: 'text', maxLength: 80 },
-      { name: 'lens', label: '镜头', type: 'text', maxLength: 100 },
-      { name: 'focalLength', label: '焦段（如 85 mm）', type: 'text', maxLength: 24 },
-      { name: 'filmStock', label: '胶片型号', type: 'text', maxLength: 80, admin: { condition: (_, siblingData) => siblingData?.medium === 'film' } },
-      { name: 'shutter', label: '快门（如 1/250 s）', type: 'text', maxLength: 24 },
-      { name: 'aperture', label: '光圈（如 f/2.8）', type: 'text', maxLength: 24 },
+    { name: 'alt', label: "ui.imageDescription", type: 'text', required: true },
+    { name: 'altEn', label: 'admin.translation.imageDescription', type: 'text' },
+    { name: 'credit', label: "ui.photoCredit", type: 'text' },
+    { name: 'exposure', label: "ui.cameraSettings", type: 'group', fields: [
+      { name: 'medium', label: "ui.medium", type: 'select', defaultValue: 'digital', options: [{label:"ui.digital",value:'digital'},{label:"ui.film",value:'film'}] },
+      { name: 'camera', label: "ui.camera", type: 'text', maxLength: 80 },
+      { name: 'lens', label: "ui.lens", type: 'text', maxLength: 100 },
+      { name: 'focalLength', label: "ui.focalLengthEG85Mm", type: 'text', maxLength: 24 },
+      { name: 'filmStock', label: "ui.filmStock", type: 'text', maxLength: 80, admin: { condition: (_, siblingData) => siblingData?.medium === 'film' } },
+      { name: 'shutter', label: "ui.shutterSpeedEG1250S", type: 'text', maxLength: 24 },
+      { name: 'aperture', label: "ui.apertureEGF28", type: 'text', maxLength: 24 },
       { name: 'iso', label: 'ISO', type: 'number', min: 1, max: 3276800 },
     ] },
-    { name: 'source', label: '来源链接', type: 'text' },
-    { name: 'visibility', label: '媒体公开范围', type: 'select', required: true, defaultValue: 'private', options: [{ label: '私有', value: 'private' }, { label: '公开', value: 'public' }] },
+    { name: 'source', label: "ui.sourceLink", type: 'text' },
+    { name: 'visibility', label: "ui.mediaVisibility", type: 'select', required: true, defaultValue: 'private', options: [{ label: "ui.private2", value: 'private' }, { label: "ui.public", value: 'public' }] },
     { name: 'legacyPath', type: 'text', unique: true, access: { read: ({ req, doc }) => Boolean(req.user) || (doc?.visibility === 'public' && Boolean(legacyImageURL(doc?.legacyPath))) }, admin: { hidden: true } },
   ],
 }

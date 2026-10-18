@@ -16,7 +16,10 @@
     "package:linux": "bash scripts/package-linux.sh",
     "package:flight-home": "node scripts/package-flight-home.mjs",
     "test:flight-worker": "node --import tsx tests/flight-worker.integration.ts",
-    "preview:lan": "node scripts/preview-lan.mjs"
+    "preview:lan": "node scripts/preview-lan.mjs",
+    "i18n:generate": "node --import tsx scripts/generate-i18n.ts",
+    "prebuild": "npm run i18n:generate",
+    "prebuild:qa": "npm run i18n:generate"
   },
   "engines": {
     "node": ">=22.13.0 <25"

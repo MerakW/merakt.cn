@@ -179,6 +179,7 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
+  altEn?: string | null;
   credit?: string | null;
   exposure?: {
     medium?: ('digital' | 'film') | null;
@@ -230,7 +231,7 @@ export interface Media {
 export interface Flight {
   id: number;
   /**
-   * 出发机场当地日期，例如 2026-09-29。
+   * Local date at departure airport, e.g. 2026-09-29.
    */
   date: string;
   flightNumber?: string | null;
@@ -239,7 +240,7 @@ export interface Flight {
   to: string;
   divertedTo?: string | null;
   /**
-   * 这里是你的记录状态，不代表航空公司的实时运行状态。
+   * Your personal logbook status, not the carrier’s live operational status.
    */
   state: 'planned' | 'completed' | 'cancelled' | 'unconfirmed';
   departureLocal?: string | null;
@@ -254,7 +255,7 @@ export interface Flight {
   arrivalTimeZone?: string | null;
   aircraft?: string | null;
   /**
-   * 例如 C919、B738。
+   * e.g. C919, B738, A359.
    */
   aircraftCode?: string | null;
   registration?: string | null;
@@ -262,7 +263,7 @@ export interface Flight {
   photos?: (number | Media)[] | null;
   note?: string | null;
   /**
-   * 计划中的航段以 2026.**.** 显示日期，保留年份和当地起降时刻；完整日期、时间戳和备注不对访客公开。改为已完成后恢复日期；后台始终保留原始数据。
+   * When enabled, upcoming scheduled sectors mask the exact date as 2026.**.** publicly while retaining the year and local departure/arrival times. Full dates and notes remain hidden until the sector is marked Completed.
    */
   hideSchedule?: boolean | null;
   visibility: 'private' | 'public' | 'scheduled';
@@ -270,7 +271,7 @@ export interface Flight {
   importKey?: string | null;
   sourceId?: string | null;
   /**
-   * 原始记录、订票编号、座位等仅你可见。通常无需修改；补齐历史时间请进入 Flighty 导入页面。
+   * Raw CSV columns, PNR booking references and seat assignments are strictly private. Use the Flighty Import & Backfill tool to batch-restore historical OOOI times.
    */
   privateDetails?:
     | {
@@ -311,6 +312,14 @@ export interface Album {
   slug: string;
   date?: string | null;
   description?: string | null;
+  /**
+   * Optional. Leave blank to fall back to the original Chinese text in English mode.
+   */
+  titleEn?: string | null;
+  /**
+   * Optional. Leave blank to fall back to the original Chinese text in English mode.
+   */
+  descriptionEn?: string | null;
   compound?: ('auto' | 'S' | 'M' | 'H' | 'I') | null;
   cover?: (number | null) | Media;
   photographer?: string | null;
@@ -318,6 +327,10 @@ export interface Album {
     | {
         image: number | Media;
         caption?: string | null;
+        /**
+         * Optional. Leave blank to fall back to the original Chinese text in English mode.
+         */
+        captionEn?: string | null;
         credit?: string | null;
         source?: string | null;
         id?: string | null;
@@ -357,6 +370,32 @@ export interface Post {
     };
     [k: string]: unknown;
   };
+  /**
+   * Optional. Leave blank to fall back to the original Chinese text in English mode.
+   */
+  titleEn?: string | null;
+  /**
+   * Optional. Leave blank to fall back to the original Chinese text in English mode.
+   */
+  excerptEn?: string | null;
+  /**
+   * Optional. Leave blank to fall back to the original Chinese text in English mode.
+   */
+  bodyEn?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   relatedTrips?: (number | Trip)[] | null;
   relatedAlbums?: (number | Album)[] | null;
   updatedAt: string;
@@ -364,7 +403,7 @@ export interface Post {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 最新发布的近况显示在 Team Radio 小窗；在对话列表中添加段落并拖动排序。
+ * The latest published update is broadcast in the Team Radio widget. Add dialogue turns below and drag to reorder.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "notes".
@@ -372,17 +411,25 @@ export interface Post {
 export interface Note {
   id: number;
   /**
-   * 首页近况正文；未添加 TR 对话时，也用作车手发言。
+   * Displayed on the home page; also used as the fallback driver transmission when no dialogue turns are configured.
    */
   text: string;
+  /**
+   * Optional. Leave blank to fall back to the original Chinese text in English mode.
+   */
+  textEn?: string | null;
   teamReply?: string | null;
   /**
-   * 拖动段落调整顺序。车队白色靠左，车手红色靠右。
+   * Drag to reorder turns. Pit Wall messages render in white on the left; Driver messages render in red on the right.
    */
   radioMessages?:
     | {
         speaker: 'team' | 'driver';
         message: string;
+        /**
+         * Optional. Leave blank to fall back to the original Chinese text in English mode.
+         */
+        messageEn?: string | null;
         id?: string | null;
       }[]
     | null;
@@ -414,7 +461,7 @@ export interface Event {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * 待审核留言可在列表中一键批准；多条留言可勾选后批量编辑审核状态。只有「通过」的留言才会公开。
+ * Approve pending notes with one click from the list, or select multiple rows for bulk moderation. Only Approved entries are visible publicly.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "checkins".
@@ -443,7 +490,7 @@ export interface PaddockSignal {
   createdAt: string;
 }
 /**
- * 雷达抓取与次日入位校准的持久化队列。服务重启后继续处理到期任务。
+ * Persistent job queue for post-landing radar fetches and next-day gate-arrival calibration. Due jobs resume automatically across server restarts.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "flight-sync-jobs".
@@ -663,6 +710,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  altEn?: T;
   credit?: T;
   exposure?:
     | T
@@ -777,6 +825,8 @@ export interface AlbumsSelect<T extends boolean = true> {
   slug?: T;
   date?: T;
   description?: T;
+  titleEn?: T;
+  descriptionEn?: T;
   compound?: T;
   cover?: T;
   photographer?: T;
@@ -785,6 +835,7 @@ export interface AlbumsSelect<T extends boolean = true> {
     | {
         image?: T;
         caption?: T;
+        captionEn?: T;
         credit?: T;
         source?: T;
         id?: T;
@@ -808,6 +859,9 @@ export interface PostsSelect<T extends boolean = true> {
   category?: T;
   cover?: T;
   body?: T;
+  titleEn?: T;
+  excerptEn?: T;
+  bodyEn?: T;
   relatedTrips?: T;
   relatedAlbums?: T;
   updatedAt?: T;
@@ -820,12 +874,14 @@ export interface PostsSelect<T extends boolean = true> {
  */
 export interface NotesSelect<T extends boolean = true> {
   text?: T;
+  textEn?: T;
   teamReply?: T;
   radioMessages?:
     | T
     | {
         speaker?: T;
         message?: T;
+        messageEn?: T;
         id?: T;
       };
   compound?: T;
@@ -981,6 +1037,11 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface SiteSetting {
   id: number;
   trackMode?: ('auto' | 'clear' | 'sc' | 'vsc' | 'pit') | null;
+  /**
+   * IN PIT returns 503 for public pages. The estimate is display-only; switch back to Auto or Track Clear to reopen.
+   */
+  maintenanceExpectedExit?: string | null;
+  maintenanceStartedAt?: string | null;
   forzaFerrari?: boolean | null;
   title?: string | null;
   intro?: string | null;
@@ -998,6 +1059,8 @@ export interface SiteSetting {
  */
 export interface SiteSettingsSelect<T extends boolean = true> {
   trackMode?: T;
+  maintenanceExpectedExit?: T;
+  maintenanceStartedAt?: T;
   forzaFerrari?: T;
   title?: T;
   intro?: T;

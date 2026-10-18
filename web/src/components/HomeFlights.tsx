@@ -1,5 +1,7 @@
 'use client'
 
+import { message as i18nMessage } from '@/lib/i18n/core'
+import Localized from '@/components/Localized'
 import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from 'react'
 import ArrowIcon from './ArrowIcon'
 import AircraftLabel from './AircraftLabel'
@@ -34,36 +36,36 @@ export default function HomeFlights({ featured, recent, airports, children }: {
   }, [selected])
   const flight = featured?.flight
   const departure = flight && flightTime(flight, 'departure')
-  const airportCode = (code: string) => <span className="home-departure-code">{Array.from(code).map((letter,index) => <b key={index} style={{animationDelay:`${index * 60}ms`}}>{letter}</b>)}</span>
-  return <>
+  const airportCode = (code: string) => <Localized><span className="home-departure-code">{Array.from(code).map((letter,index) => <b key={index} style={{animationDelay:`${index * 60}ms`}}>{letter}</b>)}</span></Localized>
+  return <Localized><>
     {flight && <div className="home-departure-display">
-      <div className="home-departure-heading"><h3><span className="signal-dot" />{featured.kind === 'upcoming' ? '下一次出发' : '最近一次抵达'}</h3><span>{featured.kind === 'upcoming' ? 'DEPARTURES' : 'ARRIVALS'} / MERAK</span></div>
-      <div className="home-departure-columns" aria-hidden="true"><span>日期 / DATE</span><span>航程 / ROUTE</span><span>航班 / FLIGHT</span><span>机型 / AIRCRAFT</span><span>状态 / STATUS</span></div>
-      <button className="home-departure-row" onClick={event => open(flight, event)} aria-haspopup="dialog" aria-label={`查看 ${flight.from} 至 ${landingAirport(flight)} 航班详情`}>
-        <span className="home-departure-date"><time>{flight.date.replaceAll('-', '.')}</time><small>{departure?.clock || '时刻未记录'}</small></span>
+      <div className="home-departure-heading"><h3><span className="signal-dot" />{featured.kind === 'upcoming' ? "@i18n:ui.nextDeparture@" : "@i18n:ui.latestArrival@"}</h3><span>{featured.kind === 'upcoming' ? 'DEPARTURES' : 'ARRIVALS'} / MERAK</span></div>
+      <div className="home-departure-columns" aria-hidden="true"><span>{"@i18n:ui.date@"}</span><span>{"@i18n:ui.route@"}</span><span>{"@i18n:ui.flight@"}</span><span>{"@i18n:ui.aircraft3@"}</span><span>{"@i18n:ui.status@"}</span></div>
+      <button className="home-departure-row" onClick={event => open(flight, event)} aria-haspopup="dialog" aria-label={i18nMessage('ui.viewFlightFromValue0ToValue1', flight.from, landingAirport(flight))}>
+        <span className="home-departure-date"><time>{flight.date.replaceAll('-', '.')}</time><small>{departure?.clock || "@i18n:ui.timeNotRecorded@"}</small></span>
         <span className="home-departure-route"><strong>{airportCode(flight.from)}<ArrowIcon />{airportCode(landingAirport(flight))}</strong><small>{airportName(flight.from)} · {airportName(landingAirport(flight))}</small></span>
         <FlightNumber flight={flight} /><span className="home-departure-aircraft"><AircraftLabel aircraft={flight.aircraft}/><small>{flight.registration}</small></span>
-        <span className="home-departure-status">{flight.state === 'completed' ? '已抵达' : '计划中'}<ArrowIcon direction="up-right" /></span>
+        <span className="home-departure-status">{flight.state === 'completed' ? "@i18n:ui.arrived@" : "@i18n:flightStatus.planned@"}<ArrowIcon direction="up-right" /></span>
       </button>
-      <p className="home-departure-note">个人飞行记录 · 机场当地时间<span>点击查看航程详情</span></p>
+      <p className="home-departure-note">{"@i18n:ui.personalFlightLogAirportLocalTimes@"}<span>{"@i18n:ui.selectToViewFlightDetails@"}</span></p>
     </div>}
     {children}
-    {recent.length > 0 && <div className="home-recent-flights home-departures-board" aria-label="近期已完成航程">
-      <div className="home-recent-heading"><h3><span className="signal-dot" />最近的出发</h3><span>RECENT DEPARTURES</span></div>
-      <div className="home-board-columns" aria-hidden="true"><span>日期 / DATE</span><span>航班 / FLIGHT</span><span>航程 / ROUTE</span><span>机型 / AIRCRAFT</span><span>状态 / STATUS</span></div>
-      {recent.map((flight, index) => <button className="home-board-row" key={flight.id ?? index} onClick={event => open(flight, event)} aria-haspopup="dialog" aria-label={`查看 ${flight.date} ${flight.from} 至 ${landingAirport(flight)} 航班详情`}>
-        <span className="home-board-date"><time dateTime={flight.date}>{flight.date.replaceAll('-', '.')}</time><small>{flightTime(flight, 'departure').clock || '时刻未记录'}</small></span>
+    {recent.length > 0 && <div className="home-recent-flights home-departures-board" aria-label="@i18n:ui.recentlyCompletedFlights@">
+      <div className="home-recent-heading"><h3><span className="signal-dot" />{"@i18n:ui.recentDepartures@"}</h3><span>RECENT DEPARTURES</span></div>
+      <div className="home-board-columns" aria-hidden="true"><span>{"@i18n:ui.date@"}</span><span>{"@i18n:ui.flight@"}</span><span>{"@i18n:ui.route@"}</span><span>{"@i18n:ui.aircraft3@"}</span><span>{"@i18n:ui.status@"}</span></div>
+      {recent.map((flight, index) => <button className="home-board-row" key={flight.id ?? index} onClick={event => open(flight, event)} aria-haspopup="dialog" aria-label={i18nMessage('ui.viewValue0FlightFromValue1ToValue2', flight.date, flight.from, landingAirport(flight))}>
+        <span className="home-board-date"><time dateTime={flight.date}>{flight.date.replaceAll('-', '.')}</time><small>{flightTime(flight, 'departure').clock || "@i18n:ui.timeNotRecorded@"}</small></span>
         <span className="home-board-flight"><FlightNumber flight={flight}/></span>
         <span className="home-board-route"><strong>{airportCode(flight.from)}<ArrowIcon />{airportCode(landingAirport(flight))}</strong><small>{airportName(flight.from)} · {airportName(landingAirport(flight))}</small></span>
         <span className="home-recent-aircraft"><AircraftLabel aircraft={flight.aircraft}/></span>
-        <span className="home-board-state"><span>已抵达</span><small>LANDED <ArrowIcon direction="up-right" /></small></span>
+        <span className="home-board-state"><span>{"@i18n:ui.arrived@"}</span><small>LANDED <ArrowIcon direction="up-right" /></small></span>
       </button>)}
-      <p className="home-board-note">机场当地时间 · 个人飞行记录<span>点击航班查看详情 <ArrowIcon direction="up-right" /></span></p>
+      <p className="home-board-note">{"@i18n:ui.airportLocalTimesPersonalFlightLog@"}<span>{"@i18n:ui.selectAFlightForDetails@ "}<ArrowIcon direction="up-right" /></span></p>
     </div>}
-    <dialog ref={dialog} className="home-flight-dialog" aria-label="航程详情" onClose={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.currentTarget.close() } }}>
-      <header><span>FLIGHT DETAILS / 航程详情</span><button autoFocus onClick={() => dialog.current?.close()} aria-label="关闭航程详情">关闭 <span aria-hidden="true">×</span></button></header>
+    <dialog ref={dialog} className="home-flight-dialog" aria-label="@i18n:ui.flightDetails@" onClose={() => setSelected(null)} onClick={event => { if (event.target === event.currentTarget) { const rect = event.currentTarget.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.currentTarget.close() } }}>
+      <header><span>{"@i18n:ui.flightDetails2@"}</span><button autoFocus onClick={() => dialog.current?.close()} aria-label="@i18n:ui.closeFlightDetails@">{"@i18n:common.close@ "}<span aria-hidden="true">×</span></button></header>
       {selected && <FlightDetail flight={selected} airports={airports} airportName={airportName}/>}
-      <p className="home-dialog-credit">机型图 Credit：<a href="https://www.norebbo.com/" target="_blank" rel="noreferrer">Norebbo</a></p>
+      <p className="home-dialog-credit">{"@i18n:ui.aircraftIllustrationCredit@"}<a href="https://www.norebbo.com/" target="_blank" rel="noreferrer">Norebbo</a></p>
     </dialog>
-  </>
+  </></Localized>
 }

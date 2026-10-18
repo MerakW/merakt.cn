@@ -151,8 +151,8 @@ Pit Wall 的五红灯挑战使用浏览器高精度计时，切到后台或失�
 - `/status-preview` 可切换 404、页面错误、离线和全局错误的视觉预览；预览不会制造真实故障。
 - `/maintenance-preview` 预览独立的 IN PIT / VSC 页面。真实维护响应为 503；预览本身为 200。
 - 当前发布流程在停旧服务后备份数据、切换版本并启动新服务，因此存在停机窗口，时长取决于数据备份及启动耗时。
-- 运行包包含 `maintenance/`，部署工具会在停止服务前复制至 `/opt/merak/maintenance`。需在现有 Nginx/OpenResty 应用代理 location 中加入 `proxy_intercept_errors on;` 和 `error_page 502 503 504 =503 /__maintenance.html;`，同一 server 块加入 `web/scripts/maintenance/nginx.conf` 中的精确 location。先执行代理配置检查，再 reload。若使用 1Panel 容器，需要将宿主机 `/opt/merak/maintenance` 只读挂载到代理容器同路径；不能用浏览器路径代替文件路径。尚未配置代理时，应用停止仍会显示默认网关错误。
-- TR 保留原提示音，音频开始后逐字显示内容；提示音结束后的波形为视觉动画。PTT 回复只追加到当前窗口，不提交数据库，重播或关闭后重新打开会清空。
+- 运行包包含 `maintenance/`，部署工具会在停止服务前复制至 `/opt/merak/maintenance`。需在现有 Nginx/OpenResty 应用代理 location 中加入 `proxy_intercept_errors on;` 和 `error_page 502 504 =503 /__maintenance.html;`，同一 server 块加入 `web/scripts/maintenance/nginx.conf` 中的精确 location。先执行代理配置检查，再 reload。若使用 1Panel 容器，需要将宿主机 `/opt/merak/maintenance` 只读挂载到代理容器同路径；不能用浏览器路径代替文件路径。尚未配置代理时，应用停止仍会显示默认网关错误。
+- TR 使用 COS 上的开始与结束提示音，消息立即显示；开始提示音结束后仅播放短暂无线电噪音。PTT 回复只追加到当前窗口，不提交数据库，回复后隐藏按钮，并在结束提示音播放完 5 秒后关闭；重播或关闭后重新打开会清空。
 - 命令窗 `Enter Cockpit / Flight Deck` 进入独立导航和仪表布局；`Exit Flight Deck` 恢复正常界面。UTC 时钟是真实时间，不展示虚构飞行参数。
 
 ### 本轮上线顺序与数据库迁移
@@ -179,7 +179,7 @@ Pit Wall 的五红灯挑战使用浏览器高精度计时，切到后台或失�
 
 ```nginx
 proxy_intercept_errors on;
-error_page 502 503 504 =503 /__maintenance.html;
+error_page 502 504 =503 /__maintenance.html;
 ```
 
 4. 在同一个 `server` 块中、其他 location 外面加入：
@@ -197,3 +197,21 @@ location = /__maintenance.html {
 5. 在 1Panel 检查配置并重载 OpenResty。先用 `/maintenance-preview` 看外观；由于配置了 internal，直接访问 `/__maintenance.html` 返回 404 是正常行为。真实接管要在计划发布窗口观察应用暂时停止后的主站响应，预期状态码 503，内容为 IN PIT；不要为了预览随意停止生产服务。
 
 本轮分享图更新仍使用 `social/paddock-og.png` 对象路径，覆盖 COS 原文件并刷新该 URL 的 CDN 缓存即可。头像复用电子名片已有 `/images/card/avatar.webp`，无需新增上传。月榜/总榜仅修改查询范围，不新增迁移。
+
+## 中英文支持
+
+前台右上角可切换 `中文 / EN`，首次访问按浏览器语言选择，手动选择通过 `merak-locale` Cookie 保留一年；现有网址、查询参数和锚点继续使用。Payload 后台也支持中文和 English，可在后台语言菜单切换。
+
+界面文案使用固定代码键：中文编辑 `web/src/lib/i18n/zh.ts`，英文编辑 `web/src/lib/i18n/en.ts`。例如修改 `zh.ts` 的 `"nav.home": "围场"` 即可更新中文导航，无需改页面或英文文件。只修改值，保留键名和 `{0}`、`{1}` 等参数占位符。
+
+组件可在 `Localized` 内使用 `@i18n:nav.home@`，或通过 `useTranslator()` / `getTranslator()` 调用 `t('nav.home')`。动态文案使用 `message('flights.since', year)` 或 `t('flights.since', [year])`。中英文词典键名一致性由 TypeScript 校验，代码引用由测试核验；新增文案时同时补齐两份语言文件。`sources.ts` 只兼容既有 API 错误、数据库状态等历史原始值，不是文案编辑入口；已有兼容条目保持不变，新增代码引用不需要增加兼容条目。
+
+`Localized` 只解析显示内容，不修改表单值和状态值；用户填写的文字、博客正文与毛五配文通过 `data-i18n="off"` 保留原文。独立电子名片也使用相同代码键。维护页的文案来自同一词典：`npm run i18n:generate` 更新供 nginx 使用的静态页面，`npm run build` / `npm run build:qa` 会自动执行。
+
+博客后台增加英文标题、摘要和富文本正文；毛五相册增加英文标题、配文及逐张英文配文，媒体可填写英文图片说明。快速发布毛五页也有选填英文配文。英文界面逐字段使用已填写译文，缺少译文（含空白正文）时回退中文，不自动翻译这些创作内容。Team Radio 可独立填写英文近况和逐条英文消息。
+
+发布前按既有部署流程执行新增迁移 `20261018_020000_i18n`；它仅添加可空译文字段并涵盖版本表，无需重写旧记录。运行 `npm test` 验证翻译与回退；`node --import tsx tests/i18n.integration.ts` 会建立临时数据库验证迁移、富文本和版本保存，不读写实际内容库。
+
+后台「首页与站点设置」→「赛道状态」选择 IN PIT，填写「预计恢复时间」后保存，公开页面即返回 HTTP 503。后台、PIT WALL 与管理入口保持可用；可通过 `/manage/maintenance` 提前结束，或手动切回自动或赛道畅通。设置预计恢复时间后，到时自动解除维护（由下一次请求或页面探测触发）；留空则持续至手动关闭。新增迁移 `20261018_030000_maintenance` 保存开始时间、预计恢复时间及版本历史。
+
+红旗页位于 `/red-flag-preview`，503 页位于 `/maintenance-preview`。nginx 仅拦截 502/504，保留应用的 503 响应及预计恢复时间；应用停止时仍使用独立静态页，预计时间显示待定。

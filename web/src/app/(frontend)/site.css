@@ -1,8 +1,5 @@
-@import '@fontsource/barlow-condensed/latin-500.css';
-@import '@fontsource/barlow-condensed/latin-600.css';
-@import '@fontsource/ibm-plex-mono/latin-400.css';
 
-:root { --ink:#111b38; --canvas:#f6f8fc; --paper:#fff; --ice:#c8e8fa; --blue:#2349ed; --orange:#f66b3a; --muted:#61708b; --line:#d9e0ed; --body:'Avenir Next','PingFang SC','Microsoft YaHei',sans-serif; --display:'Barlow Condensed',sans-serif; --mono:'IBM Plex Mono',monospace; }
+:root { --ink:#111b38; --canvas:#f6f8fc; --paper:#fff; --ice:#c8e8fa; --blue:#2349ed; --orange:#f66b3a; --muted:#61708b; --line:#d9e0ed; --body:'Avenir Next','PingFang SC','Microsoft YaHei','Noto Sans CJK SC','Noto Sans SC',system-ui,sans-serif; --display:var(--font-barlow),'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif; --mono:var(--font-plex),'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',monospace; }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--canvas); color:var(--ink); font:15px/1.7 var(--body); -webkit-font-smoothing:antialiased; }
 button,input,select { font:inherit; }
@@ -18,6 +15,7 @@ h1,h2,h3,p { margin-top:0; }
 img,svg { max-width:100%; }
 .site-nav { max-width:1440px; margin:auto; display:flex; align-items:center; justify-content:space-between; gap:24px; padding:23px 48px; border-bottom:1px solid var(--line); }
 .brand { display:flex; align-items:center; gap:9px; font:600 italic 37px/.9 var(--display); letter-spacing:-.015em; }
+.brand-word { display:block; white-space:nowrap; padding-inline:.12em; margin-inline:-.12em; overflow:visible; }
 .brand-wings { color:var(--blue); letter-spacing:-.2em; margin-right:8px; font-size:43px; }
 .brand-caption { font:8px/1.5 var(--mono); letter-spacing:0; border-left:1px solid var(--line); padding-left:12px; margin-left:7px; color:var(--muted); }
 .brand img { width:31px; height:36px; object-fit:contain; }

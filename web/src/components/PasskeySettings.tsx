@@ -1,29 +1,32 @@
 'use client'
+import { message as i18nMessage } from '@/lib/i18n/core'
+import Localized, { useLocale, useTranslator } from '@/components/Localized'
 import ArrowIcon from '@/components/ArrowIcon'
 import { useEffect, useState } from 'react'
 import { passkeyError, passkeyRequest, registerPasskey } from '@/lib/passkey-client'
 
 type Key = { id: number; name: string; createdAt: string; lastUsedAt?: string }
 export default function PasskeySettings({ initialKeys }: { initialKeys: Key[] }) {
+  const locale = useLocale(), t = useTranslator()
   const [keys, setKeys] = useState(initialKeys), [busy, setBusy] = useState(false)
   const [message, setMessage] = useState(''), [supported, setSupported] = useState(false)
   useEffect(() => setSupported(window.isSecureContext && Boolean(window.PublicKeyCredential)), [])
   const refresh = async () => setKeys((await passkeyRequest('list')).keys)
-  return <section className="passkey-settings"><p>使用指纹、面容、设备 PIN 或安全密钥登录。通行密钥绑定当前站点域名；本地、家庭服务器和云端域名需分别绑定。</p>
+  return <Localized><section className="passkey-settings"><p>{"@i18n:ui.signInWithAFingerprintFaceDevicePin@"}</p>
     <form onSubmit={async event => {
       event.preventDefault(); if (busy) return
       const form = event.currentTarget, data = new FormData(form)
       setBusy(true); setMessage('')
-      try { await registerPasskey(String(data.get('password')), String(data.get('name'))); form.reset(); await refresh(); setMessage('通行密钥已绑定，下次可直接使用。') }
+      try { await registerPasskey(String(data.get('password')), String(data.get('name'))); form.reset(); await refresh(); setMessage("@i18n:ui.passkeyRegisteredYouCanUseItNextTime@") }
       catch (error) { setMessage(passkeyError(error)) } finally { setBusy(false) }
-    }}><label>密钥名称<input name="name" placeholder="例如：MacBook / iPhone" maxLength={80} required /></label><label>确认当前密码<input name="password" type="password" autoComplete="current-password" required /></label>
-      <button disabled={busy || !supported}>{busy ? '等待设备验证…' : '添加通行密钥'}</button>
-    </form>{!supported && <p>请使用支持通行密钥的浏览器，通过 HTTPS 或本机地址访问。</p>}
+    }}><label>{"@i18n:ui.passkeyName@"}<input name="name" placeholder="@i18n:ui.eGMacbookIphone@" maxLength={80} required /></label><label>{"@i18n:ui.confirmCurrentPassword@"}<input name="password" type="password" autoComplete="current-password" required /></label>
+      <button disabled={busy || !supported}>{busy ? "@i18n:ui.waitingForDeviceVerification@" : "@i18n:ui.addPasskey@"}</button>
+    </form>{!supported && <p>{"@i18n:ui.useAPasskeyCompatibleBrowserOverHttpsOr@"}</p>}
     <p role="status" aria-live="polite">{message}</p>
-    <ul>{keys.map(key => <li key={key.id}><div><strong>{key.name}</strong><small>添加于 {new Date(key.createdAt).toLocaleDateString('zh-CN')}{key.lastUsedAt && ` · 最近使用 ${new Date(key.lastUsedAt).toLocaleDateString('zh-CN')}`}</small></div><button disabled={busy} onClick={async () => {
-      if (!window.confirm(`删除「${key.name}」？此密钥将无法继续登录，密码登录仍可使用。`)) return
+    <ul>{keys.map(key => <li key={key.id}><div><strong>{key.name}</strong><small>{"@i18n:ui.added@ "}{new Date(key.createdAt).toLocaleDateString(locale)}{key.lastUsedAt && i18nMessage('ui.lastUsedValue0', new Date(key.lastUsedAt).toLocaleDateString(locale))}</small></div><button disabled={busy} onClick={async () => {
+      if (!window.confirm(t(i18nMessage('ui.deleteValue0ThisPasskeyWillNoLongerWork', key.name)))) return
       setBusy(true); setMessage('')
-      try { await passkeyRequest('remove', { id: key.id }); await refresh(); setMessage('通行密钥已删除。') }
+      try { await passkeyRequest('remove', { id: key.id }); await refresh(); setMessage("@i18n:ui.passkeyDeleted@") }
       catch (error) { setMessage(passkeyError(error)) } finally { setBusy(false) }
-    }}>删除</button></li>)}</ul>{!keys.length && <p>尚未绑定通行密钥。密码登录始终可用。</p>}<a href="/manage">返回管理首页 <ArrowIcon direction="up-right" /></a></section>
+    }}>{"@i18n:common.delete@"}</button></li>)}</ul>{!keys.length && <p>{"@i18n:ui.noPasskeysRegisteredPasswordSignInRemainsAvailable@"}</p>}<a href="/manage">{"@i18n:ui.backToManagement@ "}<ArrowIcon direction="up-right" /></a></section></Localized>
 }

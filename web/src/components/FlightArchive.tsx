@@ -1,4 +1,6 @@
 'use client'
+import { message as i18nMessage } from '@/lib/i18n/core'
+import Localized from '@/components/Localized'
 import ArrowIcon from '@/components/ArrowIcon'
 import AircraftLabel from './AircraftLabel'
 import FlightDetail from './FlightDetail'
@@ -17,7 +19,7 @@ import ArchiveDisclosure from './ArchiveDisclosure'
 import AircraftPortrait from './AircraftPortrait'
 
 export type FlightArchiveHandle = { open: (flight: DisplayFlight) => void; filterRoute: (route: string) => void }
-const labels = { completed: '已完成', planned: '计划中', cancelled: '已取消', unconfirmed: '待确认' }
+const labels = { completed: "@i18n:flightStatus.completed@", planned: "@i18n:flightStatus.planned@", cancelled: "@i18n:flightStatus.cancelled@", unconfirmed: "@i18n:flightStatus.unconfirmed@" }
 const dateLabel = (date: string) => date.replaceAll('-', '.')
 const batchSize = 12
 
@@ -71,36 +73,36 @@ export default function FlightArchive({ flights, airports, airportName, souvenir
   }, [view, scope, year, airport, route, limit])
   const selectAirport = (code: string) => { setScope('history'); setAirport(airport === code ? 'all' : code); setYear('all'); setRoute(null); setCollectionFilter(null); resetPage() }
 
-  return <>
+  return <Localized><>
     <FlightCollection flights={flights} selected={collectionFilter} onSelect={filter=>{setCollectionFilter(filter);setScope('history');setYear('all');setAirport('all');setRoute(null);resetPage();collection.current?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'})}}>
     {souvenirs.airports.length > 0 && <section className="airport-stampbook" aria-labelledby="stamp-heading">
-      <div className="stampbook-heading"><div><p className="kicker">AIRPORTS</p><h2 id="stamp-heading">去过的机场</h2></div><p>{souvenirs.airports.length} 座机场 <span>点击机场筛选航程</span></p></div>
-      <div className="airport-stamps">{(allStamps ? souvenirs.airports : souvenirs.airports.slice(0, 10)).map(({ code, count, firstDate }, index) => <button key={code} className={`airport-stamp stamp-${index % 3}`} aria-pressed={airport === code} aria-label={`筛选 ${airportName(code)} ${code} 的航程`} onClick={() => selectAirport(code)}><span className="stamp-ink"><span className="stamp-city">{airportName(code)}</span><strong>{code}</strong><span className="stamp-date">{dateLabel(firstDate)}</span><small>首次到访</small></span><span className="stamp-count">{count} 次起降</span></button>)}</div>
-      {souvenirs.airports.length > 10 && <button className="stamp-more" aria-expanded={allStamps} onClick={() => setAllStamps(value => !value)}>{allStamps ? '收起印章' : `还有 ${souvenirs.airports.length - 10} 座机场`} <span aria-hidden="true">{allStamps ? '−' : '+'}</span></button>}
+      <div className="stampbook-heading"><div><p className="kicker">AIRPORTS</p><h2 id="stamp-heading">{"@i18n:ui.airportsVisited@"}</h2></div><p>{souvenirs.airports.length} {" @i18n:ui.airports@ "}<span>{"@i18n:ui.selectAnAirportToFilterFlights@"}</span></p></div>
+      <div className="airport-stamps">{(allStamps ? souvenirs.airports : souvenirs.airports.slice(0, 10)).map(({ code, count, firstDate }, index) => <button key={code} className={`airport-stamp stamp-${index % 3}`} aria-pressed={airport === code} aria-label={i18nMessage('ui.filterFlightsForValue0Value1', airportName(code), code)} onClick={() => selectAirport(code)}><span className="stamp-ink"><span className="stamp-city">{airportName(code)}</span><strong>{code}</strong><span className="stamp-date">{dateLabel(firstDate)}</span><small>{"@i18n:ui.firstVisit@"}</small></span><span className="stamp-count">{count} {" @i18n:ui.departuresArrivals@"}</span></button>)}</div>
+      {souvenirs.airports.length > 10 && <button className="stamp-more" aria-expanded={allStamps} onClick={() => setAllStamps(value => !value)}>{allStamps ? "@i18n:ui.showFewerStamps@" : i18nMessage('ui.value0MoreAirports', souvenirs.airports.length - 10)} <span aria-hidden="true">{allStamps ? '−' : '+'}</span></button>}
     </section>}
 
     </FlightCollection>
     <section ref={collection} className={`archive-section archive-${view}`} aria-labelledby="archive-heading">
-      <div className="archive-heading"><div><p className="kicker">FLIGHT ARCHIVE</p><h2 id="archive-heading">航程记录</h2></div><div className="archive-controls"><ArchiveTabs className="archive-view" label="记录显示方式" value={view} options={[{value:'tags',label:'登机存根'},{value:'list',label:'列表'}]} onChange={setView} /><label className="year-filter"><span>年份</span><select aria-label="年份" value={year} onChange={e => { setYear(e.target.value); resetPage() }}><option value="all">全部年份</option>{years.map(y => <option key={y}>{y}</option>)}</select></label></div></div>
-      <ArchiveTabs className="archive-scope" label="行程分类" value={scope} options={(['all','planned','history'] as const).map(value=>({value,label:<>{({all:'全部',planned:'待出行',history:'过往历史'})[value]}<small>{flights.filter(f=>value==='all'||(value==='planned'?f.state==='planned':f.state!=='planned')).length}</small></>}))} onChange={value=>{setScope(value);resetPage()}} />
-      <div className="archive-filter-summary"><p role="status">{collectionFilter ? `${collectionFilter.label} · ` : ''}{airport !== 'all' ? `${airportName(airport)} · ` : ''}{route ? `${route} · 已完成 · ` : ''}{year !== 'all' ? `${year} · ` : ''}{entries.length} 条记录 <span>按出发日期倒序</span></p>{(airport !== 'all' || route || year !== 'all' || collectionFilter) && <button onClick={resetFilters}>清除筛选 ×</button>}</div>
+      <div className="archive-heading"><div><p className="kicker">FLIGHT ARCHIVE</p><h2 id="archive-heading">{"@i18n:ui.flightArchive@"}</h2></div><div className="archive-controls"><ArchiveTabs className="archive-view" label="@i18n:ui.archiveDisplay@" value={view} options={[{value:'tags',label:"@i18n:ui.ticketStubs@"},{value:'list',label:"@i18n:ui.list@"}]} onChange={setView} /><label className="year-filter"><span>{"@i18n:ui.year@"}</span><select aria-label="@i18n:ui.year@" value={year} onChange={e => { setYear(e.target.value); resetPage() }}><option value="all">{"@i18n:ui.allYears@"}</option>{years.map(y => <option key={y}>{y}</option>)}</select></label></div></div>
+      <ArchiveTabs className="archive-scope" label="@i18n:ui.flightCategory@" value={scope} options={(['all','planned','history'] as const).map(value=>({value,label:<>{({all:"@i18n:common.all@",planned:"@i18n:ui.upcoming@",history:"@i18n:ui.pastFlights@"})[value]}<small>{flights.filter(f=>value==='all'||(value==='planned'?f.state==='planned':f.state!=='planned')).length}</small></>}))} onChange={value=>{setScope(value);resetPage()}} />
+      <div className="archive-filter-summary"><p role="status">{collectionFilter ? `${collectionFilter.label} · ` : ''}{airport !== 'all' ? `${airportName(airport)} · ` : ''}{route ? i18nMessage('ui.value0Completed', route) : ''}{year !== 'all' ? `${year} · ` : ''}{entries.length} {" @i18n:ui.records2@ "}<span>{"@i18n:ui.latestDeparturesFirst@"}</span></p>{(airport !== 'all' || route || year !== 'all' || collectionFilter) && <button onClick={resetFilters}>{"@i18n:ui.clearFilters@"}</button>}</div>
       <ol key={`${view}-${scope}-${year}-${airport}-${route}`} className="baggage-tags">{visible.map(({ flight: f, index }, position) => {
         const isOpen = expanded === index
         const delayMinutes = arrivalDelayMinutes(f)
         const delayed = delayMinutes >= 10
         return <li id={`archive-flight-${index}`} key={index} style={{animationDelay:`${Math.min(position % batchSize * 28, 180)}ms`}} className={`baggage-entry${isOpen ? ' is-open' : ''}`}>
-          <button className={`baggage-tag tag-${index % 3}${isOpen ? '' : ' ticket-face'}`} aria-expanded={isOpen} aria-controls={`archive-detail-${index}`} aria-label={`${f.date} ${airportName(f.from)}至${airportName(landingAirport(f))} ${isOpen ? '收起' : '展开'}航程`} onClick={() => setExpanded(isOpen ? null : index)}>
-            <span className="tag-top">{f.dateHidden ? <span className="private-date">{dateLabel(f.date)}</span> : <time dateTime={f.date}>{dateLabel(f.date)}</time>}<span className={`state-label ${f.state}${delayed ? ' arrival-delayed' : ''}`}>{labels[f.state]}{f.divertedTo && <em className="diversion-label">备降</em>}</span></span>
+          <button className={`baggage-tag tag-${index % 3}${isOpen ? '' : ' ticket-face'}`} aria-expanded={isOpen} aria-controls={`archive-detail-${index}`} aria-label={i18nMessage('ui.value0Value1ToValue2Value3Flight', f.date, airportName(f.from), airportName(landingAirport(f)), isOpen ? "@i18n:ui.collapse@" : "@i18n:ui.expand@")} onClick={() => setExpanded(isOpen ? null : index)}>
+            <span className="tag-top">{f.dateHidden ? <span className="private-date">{dateLabel(f.date)}</span> : <time dateTime={f.date}>{dateLabel(f.date)}</time>}<span className={`state-label ${f.state}${delayed ? ' arrival-delayed' : ''}`}>{labels[f.state]}{f.divertedTo && <em className="diversion-label">{"@i18n:ui.diverted@"}</em>}</span></span>
             <span className="tag-route"><span><strong>{f.from}</strong><small>{airportName(f.from)}</small></span><i aria-hidden="true"><ArrowIcon /></i><span><strong>{landingAirport(f)}</strong><small>{airportName(landingAirport(f))}</small></span></span>
             <AircraftPortrait flight={f} />
-            <span className="tag-bottom"><span><FlightNumber flight={f} />{!isOpen && <small><AircraftLabel aircraft={f.aircraft} /></small>}</span><span className="tag-open" aria-hidden="true">{isOpen ? '收起' : '详情'}</span></span>
+            <span className="tag-bottom"><span><FlightNumber flight={f} />{!isOpen && <small><AircraftLabel aircraft={f.aircraft} /></small>}</span><span className="tag-open" aria-hidden="true">{isOpen ? "@i18n:ui.collapse@" : "@i18n:ui.details@"}</span></span>
             <span className="tag-perforation" aria-hidden="true" />
           </button>
           <ArchiveDisclosure open={isOpen}><FlightDetail flight={f} airports={airports} airportName={airportName} id={`archive-detail-${index}`} animate={isOpen} /></ArchiveDisclosure>
         </li>
       })}</ol>
-      {entries.length === 0 && <p className="empty-list">没有符合条件的航程。试试其他年份或机场。</p>}
+      {entries.length === 0 && <p className="empty-list">{"@i18n:ui.noMatchingFlightsTryADifferentYearOr@"}</p>}
       <AutoLoadMore visible={visible.length} total={entries.length} onLoad={() => setLimit(value => Math.min(value + batchSize, entries.length))} />
     </section>
-  </>
+  </></Localized>
 }

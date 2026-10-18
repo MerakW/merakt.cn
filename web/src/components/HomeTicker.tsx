@@ -1,5 +1,6 @@
 'use client'
 
+import Localized from '@/components/Localized'
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 export default function HomeTicker({ items }: { items: string[] }) {
@@ -30,6 +31,6 @@ export default function HomeTicker({ items }: { items: string[] }) {
     return () => observer.disconnect()
   }, [])
 
-  const special = status === 'SAFETY CAR' ? ['SAFETY CAR','NO OVERTAKING','保持距离 / 禁止超车'] : status === 'FORZA FERRARI' ? ['FORZA FERRARI','P1 / VITTORIA','SEMPRE FERRARI'] : status === 'IN PIT' ? ['IN PIT','BOX BOX','PIT LANE / 51'] : status === 'VSC ENDING' ? ['VSC ENDING','GREEN FLAG NEXT','保持 DELTA'] : null
-  return <div ref={viewport} className="cover-ticker" aria-label="杭州出发，航空、F1 与 Furry 的生活记录"><div className="cover-ticker-track" aria-hidden="true">{Array.from({ length: copies }, (_, copy) => <div ref={copy === 0 ? group : undefined} className="cover-ticker-group" key={copy}>{(special || [status, 'HGH / PADDOCK', ...items]).map(text => <span key={text}>{text}</span>)}</div>)}</div></div>
+  const special = status === 'SAFETY CAR' ? ['SAFETY CAR','NO OVERTAKING',"@i18n:ui.keepYourDistanceNoOvertaking@"] : status === 'FORZA FERRARI' ? ['FORZA FERRARI','P1 / VITTORIA','SEMPRE FERRARI'] : status === 'IN PIT' ? ['IN PIT','BOX BOX','PIT LANE / 51'] : status === 'VSC ENDING' ? ['VSC ENDING','GREEN FLAG NEXT',"@i18n:ui.maintainDelta@"] : null
+  return <Localized><div ref={viewport} className="cover-ticker" aria-label="@i18n:ui.fromHangzhouAviationF1AndFurry@"><div className="cover-ticker-track" aria-hidden="true">{Array.from({ length: copies }, (_, copy) => <div ref={copy === 0 ? group : undefined} className="cover-ticker-group" key={copy}>{(special || [status, 'HGH / PADDOCK', ...items]).map(text => <span key={text}>{text}</span>)}</div>)}</div></div></Localized>
 }

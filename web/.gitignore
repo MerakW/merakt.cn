@@ -8,3 +8,5 @@ test-results/
 playwright-report/
 
 .next-qa/
+
+.next-i18n-qa/

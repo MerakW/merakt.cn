@@ -1,0 +1,48 @@
+import assert from 'node:assert/strict'
+import { randomUUID } from 'node:crypto'
+import { mkdtemp } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+const directory = process.env.I18N_QA_DIRECTORY || await mkdtemp(join(tmpdir(),'merak-i18n-'))
+Object.assign(process.env,{NODE_ENV:'production',MERAK_AUTO_MIGRATE:'1',PAYLOAD_SECRET:'i18n-isolated-qa-'+randomUUID(),DATABASE_URL:'file:'+join(directory,'test.db'),MEDIA_DIR:join(directory,'media'),FLIGHT_SYNC_ENABLED:'0'})
+const { getPayload } = await import('payload')
+const { default:config } = await import('../src/payload.config')
+const { translatedPost } = await import('../src/lib/i18n/content')
+const { publicAlbum } = await import('../src/lib/gallery')
+const payload = await getPayload({config})
+const {default:sharp} = await import('sharp')
+const image = await sharp({create:{width:4,height:4,channels:3,background:'#4080cc'}}).png().toBuffer()
+const body = (text:string) => ({root:{children:[{type:'paragraph',version:1,children:[{type:'text',version:1,text}]}],direction:null,format:'' as const,indent:0,type:'root',version:1}})
+try {
+  const post = await payload.create({collection:'posts',data:{title:'关于',titleEn:'A translated story',slug:'i18n-translated',date:new Date().toISOString(),excerpt:'原始摘要',excerptEn:'English excerpt',body:body('原文正文'),bodyEn:body('Manually translated body'),_status:'published'}})
+  await payload.create({collection:'posts',data:{title:'保留中文标题',slug:'i18n-fallback',date:new Date().toISOString(),body:body('这篇文章还没有译文。'),_status:'published'}})
+  assert.equal(translatedPost(await payload.findByID({collection:'posts',id:post.id,overrideAccess:false}),'en').title,'A translated story')
+  const versions = await payload.findVersions({collection:'posts',where:{parent:{equals:post.id}}})
+  assert.equal(versions.docs[0].version.titleEn,'A translated story')
+  const media = await payload.create({collection:'media',data:{alt:'原始图片说明',altEn:'English image description',visibility:'public'},file:{data:image,name:'test.png',mimetype:'image/png',size:image.length}})
+  const album = await payload.create({collection:'albums',data:{title:'相册',titleEn:'Translated album',slug:'i18n-album',description:'原始配文',descriptionEn:'Manually translated caption',date:'2026-10-18',photos:[{image:media.id,caption:'逐张原文',captionEn:'Per-photo English caption'}],_status:'published'}})
+  const published = await payload.findByID({collection:'albums',id:album.id,depth:1,overrideAccess:false})
+  assert.equal(publicAlbum(published,'en')?.title,'Translated album')
+  assert.equal(publicAlbum(published,'en')?.photos[0].caption,'Per-photo English caption')
+  assert.equal(publicAlbum(published,'en')?.photos[0].alt,'English image description')
+  assert.equal(publicAlbum(published,'zh-CN')?.description,'原始配文')
+  const note = await payload.create({collection:'notes',data:{text:'原始近况',textEn:'English status',date:new Date().toISOString(),radioMessages:[{speaker:'driver',message:'原始消息',messageEn:'English radio message'}],_status:'published'}})
+  assert.equal(note.radioMessages?.[0].messageEn,'English radio message')
+  const eta = new Date(Date.now() + 3600_000).toISOString()
+  const pit = await payload.updateGlobal({slug:'site-settings',data:{trackMode:'pit',maintenanceExpectedExit:eta}})
+  assert.equal(pit.maintenanceExpectedExit,eta)
+  assert.ok(pit.maintenanceStartedAt)
+  const start = pit.maintenanceStartedAt
+  assert.equal((await payload.updateGlobal({slug:'site-settings',data:{maintenanceExpectedExit:eta}})).maintenanceStartedAt,start)
+  const settingsVersions = await payload.findGlobalVersions({slug:'site-settings'})
+  assert.equal(settingsVersions.docs[0].version.maintenanceExpectedExit,eta)
+  assert.equal((await payload.updateGlobal({slug:'site-settings',data:{trackMode:'auto'}})).maintenanceStartedAt,null)
+  const expires = new Date(Date.now()+1000).toISOString()
+  await payload.updateGlobal({slug:'site-settings',data:{trackMode:'pit',maintenanceExpectedExit:expires}})
+  await new Promise(resolve=>setTimeout(resolve,1100))
+  const reopened = await payload.findGlobal({slug:'site-settings',overrideAccess:false})
+  assert.equal(reopened.trackMode,'auto')
+  assert.equal(reopened.maintenanceExpectedExit,null)
+  assert.equal((await payload.findGlobal({slug:'site-settings'})).trackMode,'auto')
+  console.log('PASS: production migration, English rich text and version history, album/photo translations and Chinese originals; fixture: '+directory)
+} finally { await payload.destroy() }

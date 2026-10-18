@@ -84,7 +84,7 @@ body:has(.home-page[data-over-cover=true]) .site-nav {
 body:has(.home-page[data-over-cover=true][data-scrolled=false]) .site-nav {
   background:transparent; border-bottom-color:transparent;
 }
-.site-nav .brand { font-size:30px; }
+.site-nav .brand { font-size:30px; padding-right:.25em; margin-right:-.25em; overflow:visible; flex-shrink:0; }
 .site-nav .brand-wings { font-size:32px; }
 .site-nav .brand-caption { display:none; }
 .site-nav nav { gap:clamp(16px,2.5vw,36px); margin-inline:auto; }

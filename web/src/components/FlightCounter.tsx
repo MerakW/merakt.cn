@@ -1,5 +1,7 @@
 'use client'
 
+import { message as i18nMessage } from '@/lib/i18n/core'
+import Localized, { useTranslator } from '@/components/Localized'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 function SplitDigit({ digit, position, run }: { digit: string; position: number; run: number }) {
@@ -28,19 +30,20 @@ function SplitDigit({ digit, position, run }: { digit: string; position: number;
     timer = setTimeout(flip, position * 70)
     return () => { stopped = true; clearTimeout(timer); preference.removeEventListener('change', stop) }
   }, [digit, position, run])
-  return <span className="flap-digit" data-digit={frame?.next ?? digit} data-flipping={Boolean(frame)}>
+  return <Localized><span className="flap-digit" data-digit={frame?.next ?? digit} data-flipping={Boolean(frame)}>
     <span className="flap-half flap-upper">{frame?.next ?? digit}</span>
     <span className="flap-half flap-lower">{frame?.previous ?? digit}</span>
     {frame && <span key={`${run}-${frame.step}`} className="flap-moving" style={{ '--flip-duration': `${frame.duration}ms` } as CSSProperties}>
       <span className="flap-half flap-upper flap-falling-top">{frame.previous}</span>
       <span className="flap-half flap-lower flap-falling-bottom">{frame.next}</span>
     </span>}
-  </span>
+  </span></Localized>
 }
 
 function Flaps({ value, label, unit, digits, run }: { value: number; label: string; unit: string; digits: number; run: number }) {
+  const t = useTranslator()
   const text = String(value).padStart(digits, '0')
-  return <div className="counter-reading"><span className="counter-label">{label}</span><div className="counter-value" role="img" aria-label={`${label} ${value} ${unit}`}><span className="flap-line" aria-hidden="true">{[...text].map((digit, index) => <SplitDigit key={index} digit={digit} position={index} run={run} />)}</span><small aria-hidden="true">{unit}</small></div></div>
+  return <Localized><div className="counter-reading"><span className="counter-label">{label}</span><div className="counter-value" role="img" aria-label={`${t(label)} ${value} ${t(unit)}`}><span className="flap-line" aria-hidden="true">{[...text].map((digit, index) => <SplitDigit key={index} digit={digit} position={index} run={run} />)}</span><small aria-hidden="true">{unit}</small></div></div></Localized>
 }
 
 export default function FlightCounter({ km, flights, airports, airlines, distanceCount }: { km: number; flights: number; airports: number; airlines: number; distanceCount: number }) {
@@ -53,10 +56,10 @@ export default function FlightCounter({ km, flights, airports, airlines, distanc
     if (board.current) observer.observe(board.current)
     return () => observer.disconnect()
   }, [])
-  return <section ref={board} data-revealed={run > 0} className="flight-counter" aria-labelledby="counter-heading"><div className="counter-top"><h2 id="counter-heading">飞行累计</h2><span>MERAK / FLIGHT COUNTER</span><div className="counter-led" aria-label="数据已载入"><i aria-hidden="true" /><ReadyMatrix /><small>记录已载入</small></div></div><div className="counter-readings"><Flaps value={Math.round(km)} label="累计航程 · 估算" unit="KM" digits={6} run={run} /><Flaps value={flights} label="已完成飞行" unit="段" digits={3} run={run} /><Flaps value={airports} label="到访机场" unit="座" digits={2} run={run} /><Flaps value={airlines} label="搭乘航司" unit="家" digits={2} run={run} /></div><p>机场间大圆距离<span>{distanceCount === flights ? `${distanceCount} 段记录已计入` : `${distanceCount} / ${flights} 段有坐标可计算`}</span></p></section>
+  return <Localized><section ref={board} data-revealed={run > 0} className="flight-counter" aria-labelledby="counter-heading"><div className="counter-top"><h2 id="counter-heading">{"@i18n:ui.flightTotals@"}</h2><span>MERAK / FLIGHT COUNTER</span><div className="counter-led" aria-label="@i18n:ui.dataLoaded@"><i aria-hidden="true" /><ReadyMatrix /><small>{"@i18n:ui.recordsLoaded@"}</small></div></div><div className="counter-readings"><Flaps value={Math.round(km)} label="@i18n:ui.totalDistanceEstimated@" unit="KM" digits={6} run={run} /><Flaps value={flights} label="@i18n:ui.completedFlights2@" unit="段" digits={3} run={run} /><Flaps value={airports} label="@i18n:ui.airportsVisited2@" unit="座" digits={2} run={run} /><Flaps value={airlines} label="@i18n:ui.airlinesFlown2@" unit="家" digits={2} run={run} /></div><p>{"@i18n:ui.greatCircleDistanceBetweenAirports@"}<span>{distanceCount === flights ? i18nMessage('ui.value0FlightsIncluded', distanceCount) : i18nMessage('ui.value0Value1FlightsHaveCoordinates', distanceCount, flights)}</span></p></section></Localized>
 }
 
 function ReadyMatrix() {
  const glyphs = ['11110100011000111110101001001010001','11111100001000011110100001000011111','01110100011000111111100011000110001','11110100011000110001100011000111110','10001100010101000100001000010000100']
- return <svg className="ready-matrix" viewBox="0 0 60 14" width="90" height="21" aria-hidden="true">{glyphs.flatMap((glyph,g) => [...glyph].flatMap((on,i) => on === '1' ? [<circle key={`${g}-${i}`} cx={g*12+(i%5)*2+1} cy={Math.floor(i/5)*2+1} r=".65" fill="currentColor" />] : []))}</svg>
+ return <Localized><svg className="ready-matrix" viewBox="0 0 60 14" width="90" height="21" aria-hidden="true">{glyphs.flatMap((glyph,g) => [...glyph].flatMap((on,i) => on === '1' ? [<circle key={`${g}-${i}`} cx={g*12+(i%5)*2+1} cy={Math.floor(i/5)*2+1} r=".65" fill="currentColor" />] : []))}</svg></Localized>
 }

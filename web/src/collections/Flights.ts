@@ -8,10 +8,10 @@ import { importFlights } from '@/lib/flights/import-endpoint'
 import { backfillFlights } from '@/lib/flights/backfill-endpoint'
 
 export const visibilityFields: Field[] = [
-  { name: 'visibility', label: '公开范围', type: 'select', defaultValue: 'private', required: true, options: [
-    { label: '仅自己可见', value: 'private' }, { label: '公开', value: 'public' }, { label: '指定时间后公开', value: 'scheduled' },
+  { name: 'visibility', label: "ui.visibility", type: 'select', defaultValue: 'private', required: true, options: [
+    { label: "ui.private", value: 'private' }, { label: "ui.public", value: 'public' }, { label: "ui.publishAtScheduledTime", value: 'scheduled' },
   ], admin: { position: 'sidebar' } },
-  { name: 'publishAt', label: '公开时间', type: 'date', admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' }, condition: (_, data) => data?.visibility === 'scheduled' } },
+  { name: 'publishAt', label: "ui.publishTime", type: 'date', admin: { position: 'sidebar', date: { pickerAppearance: 'dayAndTime' }, condition: (_, data) => data?.visibility === 'scheduled' } },
 ]
 
 const normalizeFlight: CollectionBeforeValidateHook = ({ data, originalDoc }) => {
@@ -47,8 +47,8 @@ const normalizeFlight: CollectionBeforeValidateHook = ({ data, originalDoc }) =>
 }
 
 export const Flights: CollectionConfig = {
-  slug: 'flights', labels: { singular: '航段', plural: '飞行记录' },
-  admin: { group: '飞行', useAsTitle: 'flightNumber', defaultColumns: ['date', 'from', 'to', 'flightNumber', 'state', 'privateDetails', 'visibility'] },
+  slug: 'flights', labels: { singular: "ui.flightSegment", plural: "flights.title" },
+  admin: { group: "nav.flights", useAsTitle: 'flightNumber', defaultColumns: ['date', 'from', 'to', 'flightNumber', 'state', 'privateDetails', 'visibility'] },
   access: { ...editingAccess, read: visiblePublished },
   endpoints: [{ path: '/import', method: 'post', handler: importFlights }, { path: '/backfill', method: 'post', handler: backfillFlights }],
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 20 },
@@ -65,52 +65,52 @@ export const Flights: CollectionConfig = {
     return doc
   }] },
   fields: [
-    { name: 'importReview', type: 'ui', label: '导入核对', admin: { components: {
+    { name: 'importReview', type: 'ui', label: "ui.importReview", admin: { components: {
       Field: './components/admin/FlightImportReview#FlightImportReview',
       Cell: './components/admin/FlightImportReview#FlightImportReviewCell',
     } } },
     { type: 'row', fields: [
-      { name: 'date', label: '航程日期', type: 'text', required: true, admin: { description: '出发机场当地日期，例如 2026-09-29。' } },
-      { name: 'flightNumber', label: '航班号', type: 'text' },
-      { name: 'airline', label: '航空公司', type: 'text' },
+      { name: 'date', label: "ui.flightDate", type: 'text', required: true, admin: { description: "ui.localDateAtDepartureAirportEG2026" } },
+      { name: 'flightNumber', label: "ui.flightNumber", type: 'text' },
+      { name: 'airline', label: "ui.airline", type: 'text' },
     ] },
     { type: 'row', fields: [
-      { name: 'from', label: '出发机场（IATA）', type: 'text', required: true },
-      { name: 'to', label: '到达机场（IATA）', type: 'text', required: true },
-      { name: 'divertedTo', label: '备降机场（可选）', type: 'text' },
+      { name: 'from', label: "ui.departureAirportIata", type: 'text', required: true },
+      { name: 'to', label: "ui.arrivalAirportIata", type: 'text', required: true },
+      { name: 'divertedTo', label: "ui.diversionAirportOptional", type: 'text' },
     ] },
-    { name: 'state', label: '记录状态', type: 'select', required: true, defaultValue: 'unconfirmed', options: [
-      { label: '计划中', value: 'planned' }, { label: '已完成', value: 'completed' }, { label: '已取消', value: 'cancelled' }, { label: '待确认', value: 'unconfirmed' },
-    ], admin: { description: '这里是你的记录状态，不代表航空公司的实时运行状态。' } },
+    { name: 'state', label: "ui.recordStatus", type: 'select', required: true, defaultValue: 'unconfirmed', options: [
+      { label: "flightStatus.planned", value: 'planned' }, { label: "flightStatus.completed", value: 'completed' }, { label: "flightStatus.cancelled", value: 'cancelled' }, { label: "flightStatus.unconfirmed", value: 'unconfirmed' },
+    ], admin: { description: "ui.yourRecordStatusNotTheAirlinesLiveOperational" } },
     { type: 'row', fields: [
-      { name: 'departureLocal', label: '计划出位', type: 'text', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
-      { name: 'arrivalLocal', label: '计划入位', type: 'text', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
+      { name: 'departureLocal', label: "ui.scheduledGateDeparture", type: 'text', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
+      { name: 'arrivalLocal', label: "ui.scheduledGateArrival", type: 'text', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
     ] },
-    { type: 'collapsible', label: '实际运行时间 · 出位 → 起飞 → 接地 → 入位', admin: { initCollapsed: false }, fields: [
+    { type: 'collapsible', label: "ui.actualTimesGateDepartureTakeoffLandingGateArrival", admin: { initCollapsed: false }, fields: [
       { type: 'row', fields: [
-        { name: 'actualDepartureUTC', label: '实际出位', type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
-        { name: 'takeoffUTC', label: '实际起飞（跑道离地）', type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
+        { name: 'actualDepartureUTC', label: "ui.actualGateDeparture", type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
+        { name: 'takeoffUTC', label: "ui.actualTakeoffAirborne", type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
       ] },
       { type: 'row', fields: [
-        { name: 'touchdownUTC', label: '实际接地（跑道落地）', type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
-        { name: 'actualArrivalUTC', label: '实际入位', type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
+        { name: 'touchdownUTC', label: "ui.actualLandingTouchdown", type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
+        { name: 'actualArrivalUTC', label: "ui.actualGateArrival", type: 'date', admin: { components: { Field: './components/admin/FlightTimeField#FlightTimeField' } } },
       ] },
     ] },
     ...['departureUTC', 'arrivalUTC'].map(name => ({ name, type: 'date' as const, admin: { readOnly: true, hidden: true } })),
     ...['departureTimeZone', 'arrivalTimeZone'].map(name => ({ name, type: 'text' as const, admin: { readOnly: true, hidden: true } })),
     { type: 'row', fields: [
-      { name: 'aircraft', label: '机型', type: 'text' }, { name: 'aircraftCode', label: '机型代码（ICAO）', type: 'text', admin: { description: '例如 C919、B738。' } }, { name: 'registration', label: '注册号', type: 'text' },
+      { name: 'aircraft', label: "ui.aircraft2", type: 'text' }, { name: 'aircraftCode', label: "ui.aircraftCodeIcao", type: 'text', admin: { description: "ui.eGC919B738" } }, { name: 'registration', label: "ui.registration", type: 'text' },
     ] },
-    { name: 'trip', label: '所属旅行', type: 'relationship', relationTo: 'trips' },
-    { name: 'photos', label: '航程照片', type: 'relationship', relationTo: 'media', hasMany: true },
-    { name: 'note', label: '公开备注', type: 'textarea' },
-    { name: 'hideSchedule', label: '隐藏此段未来行程的月日', type: 'checkbox', defaultValue: false,
-      admin: { position: 'sidebar', description: '计划中的航段以 2026.**.** 显示日期，保留年份和当地起降时刻；完整日期、时间戳和备注不对访客公开。改为已完成后恢复日期；后台始终保留原始数据。' } },
+    { name: 'trip', label: "ui.trip", type: 'relationship', relationTo: 'trips' },
+    { name: 'photos', label: "ui.flightPhotos", type: 'relationship', relationTo: 'media', hasMany: true },
+    { name: 'note', label: "ui.publicNotes", type: 'textarea' },
+    { name: 'hideSchedule', label: "ui.hideMonthAndDayOfThisUpcomingFlight", type: 'checkbox', defaultValue: false,
+      admin: { position: 'sidebar', description: "ui.scheduledFlightsShowDatesAs2026RetainingThe" } },
     ...visibilityFields,
     { name: 'importKey', type: 'text', unique: true, index: true, access: { read: adminField }, admin: { hidden: true } },
     { name: 'sourceId', type: 'text', access: { read: adminField }, admin: { hidden: true } },
-    { type: 'collapsible', label: 'Flighty 原始导入信息', admin: { initCollapsed: true }, fields: [
-      { name: 'privateDetails', label: '导入核对', type: 'json', access: { read: adminField }, admin: { components: { Cell: './components/admin/FlightImportReview#FlightImportReviewCell' }, description: '原始记录、订票编号、座位等仅你可见。通常无需修改；补齐历史时间请进入 Flighty 导入页面。' } },
+    { type: 'collapsible', label: "ui.originalFlightyImportData", admin: { initCollapsed: true }, fields: [
+      { name: 'privateDetails', label: "ui.importReview", type: 'json', access: { read: adminField }, admin: { components: { Cell: './components/admin/FlightImportReview#FlightImportReviewCell' }, description: "ui.sourceRecordsBookingReferencesAndSeatsArePrivate" } },
     ] },
   ],
 }

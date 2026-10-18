@@ -1,5 +1,7 @@
 'use client'
 
+import { message as i18nMessage } from '@/lib/i18n/core'
+import Localized from '@/components/Localized'
 import { useMemo, useState, useId, useEffect, useRef } from 'react'
 import { geoMercator, geoNaturalEarth1, geoPath, geoInterpolate } from 'd3-geo'
 import type { FeatureCollection, Geometry, LineString } from 'geojson'
@@ -95,10 +97,10 @@ export default function RouteMap({ flights, airports, overview = false }: { flig
   }, [geometry.target, overview])
   const zoom = overview ? camera[2] / 800 : 1
   const count = geometry.paths.filter(p => p.active).length
-  if (!count && !overview) return <div className="route-map">机场位置尚未整理。</div>
-  return <div className="route-map-panel">{overview && <div className="map-toolbar"><div className="map-airport-tabs" role="group" aria-label="从机场看航线">{['HGH', 'PVG', 'PKX', '*'].map(code => <button type="button" key={code} aria-pressed={selected === code} onClick={() => setFocus(code)}>{code === '*' ? '全部' : code}</button>)}</div><span>{count} 条航线 · 往返合并</span></div>}<div className={`route-map ${overview ? 'overview-map' : ''}`}>
-    {overview && !count && <p className="map-hint" style={{ padding: 20 }}>这座机场暂时没有可显示的航线，可以选择其他机场。</p>}
-    <svg viewBox={camera.join(' ')} role="img" aria-label={overview ? '个人航线示意图' : `${flights[0].from} 至 ${flights[0].divertedTo || flights[0].to} 的起终点示意图`}>
+  if (!count && !overview) return <Localized><div className="route-map">{"@i18n:ui.airportLocationsAreNotAvailableYet@"}</div></Localized>
+  return <Localized><div className="route-map-panel">{overview && <div className="map-toolbar"><div className="map-airport-tabs" role="group" aria-label="@i18n:ui.exploreRoutesByAirport@">{['HGH', 'PVG', 'PKX', '*'].map(code => <button type="button" key={code} aria-pressed={selected === code} onClick={() => setFocus(code)}>{code === '*' ? "@i18n:common.all@" : code}</button>)}</div><span>{count} {" @i18n:ui.routesReturnRoutesCombined@"}</span></div>}<div className={`route-map ${overview ? 'overview-map' : ''}`}>
+    {overview && !count && <p className="map-hint" style={{ padding: 20 }}>{"@i18n:ui.noRoutesToShowForThisAirportTry@"}</p>}
+    <svg viewBox={camera.join(' ')} role="img" aria-label={overview ? "@i18n:ui.personalRouteMap@" : i18nMessage('ui.routeFromValue0ToValue1', flights[0].from, flights[0].divertedTo || flights[0].to)}>
       <defs><pattern id={gridId} width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="currentColor" strokeWidth=".5" opacity=".15" /></pattern></defs>
       <rect x="-800" y="-390" width="2400" height="1170" fill={`url(#${gridId})`} />
       {geometry.landPath && <path d={geometry.landPath} fill="var(--map-land, #dae5ea)" stroke="var(--map-coast, #b6c9d3)" strokeWidth=".5" />}
@@ -106,5 +108,5 @@ export default function RouteMap({ flights, airports, overview = false }: { flig
       {geometry.points.map(({ airport, point, active, labelVisible }, i) => <g className="map-airport-point" key={airport.iata} transform={`translate(${point[0]},${point[1]})`} style={{ opacity: active ? 1 : 0 }}><title>{`${airport.iata} · ${airport.name}`}</title><circle className="map-airport-pulse" r={(overview ? 6 : 10) * zoom} /><circle r={(overview ? 2.5 : 5) * zoom} className="map-airport" /><text x={overview ? 6 * zoom : i === 0 ? -10 : 10} y={overview ? -6 * zoom : -14} textAnchor={!overview && i === 0 ? 'end' : 'start'} style={{ fontSize: `${12 * zoom}px`, strokeWidth: overview ? `${2.5 * zoom}px` : undefined, opacity: labelVisible ? 1 : 0 }}>{airport.iata}</text></g>)}
     </svg>
     <span className="map-caption">{overview ? selected === '*' ? 'ALL ROUTES' : `${selected} / ROUTES` : 'ROUTE STUDY'}</span>
-  </div>{overview && <p className="map-hint">点选机场查看航线。</p>}</div>
+  </div>{overview && <p className="map-hint">{"@i18n:ui.selectAnAirportToViewRoutes@"}</p>}</div></Localized>
 }

@@ -15,3 +15,15 @@
 @media(max-width:650px){.terminal-v3{min-height:0}.terminal-v3 .terminal-signal{top:auto}.terminal-v3 .signal-orbit{width:104px;height:104px}.terminal-v3 .signal-avatar{width:56px;height:56px}.terminal-v3 .signal-orbit i:nth-child(2){inset:8px}.terminal-v3 .signal-orbit i:nth-child(3){inset:16px}.terminal-v3 .terminal-form{padding-top:24px}.terminal-v3 .terminal-form h1{margin-top:14px}.passkey-settings li{gap:12px}}
 @media(prefers-reduced-motion:reduce){.terminal-v3,.terminal-v3:before,.terminal-v3 .terminal-grid,.terminal-v3 .signal-orbit i,.terminal-v3 .avatar-sweep{animation:none}.terminal-v3 .avatar-sweep{display:none}.terminal-v3 .terminal-form button,.terminal-v3 .terminal-form input{transition:none}}
 .terminal-v3.terminal-paused:before,.terminal-v3.terminal-paused .terminal-grid,.terminal-v3.terminal-paused .terminal-scan,.terminal-v3.terminal-paused .signal-orbit i,.terminal-v3.terminal-paused .avatar-sweep,.terminal-v3.terminal-paused .terminal-cursor{animation-play-state:paused}
+
+.terminal-login.terminal-v3{border-radius:3px;background:#0a1017;color:#c5dccf;font-family:var(--mono);border:1px solid #456450;box-shadow:none;display:block;min-height:0}
+.terminal-v3 .terminal-grid,.terminal-v3 .terminal-scan,.terminal-v3:before,.terminal-v3 .signal-orbit{display:none}
+.terminal-v3 .terminal-signal{position:static;width:auto;padding:24px 28px 0;border:0;background:none}
+.terminal-v3 .terminal-signal p{color:#85d9a0;font:12px var(--mono)}
+.terminal-v3 .terminal-signal ol{font:12px/1.9 var(--mono);color:#8eae99;list-style:none;padding:0}
+.terminal-v3 .terminal-form{max-width:none;padding:16px 28px 28px;border:0}
+.terminal-v3 .terminal-form h2{font:18px var(--mono);color:#d6e9db}
+.terminal-v3 .terminal-form input{border-radius:0;background:#0a1017;border-color:#456450;color:#d6e9db;font-family:var(--mono)}
+.terminal-v3 .terminal-form button{border-radius:0;background:#193126;border:1px solid #537c62;color:#c5dccf}
+.terminal-v3 .terminal-top,.terminal-v3 .terminal-bottom{color:#83b59b;border-color:#334339;font:11px var(--mono);padding:16px 28px}
+.terminal-v3 .terminal-prompt{color:#8de0a6}

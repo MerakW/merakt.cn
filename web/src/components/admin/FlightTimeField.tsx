@@ -1,7 +1,9 @@
 'use client'
 
+import { message as i18nMessage, translate } from '@/lib/i18n/core'
+import Localized from '@/components/admin/AdminLocalized'
 import { useEffect, useState } from 'react'
-import { useField, useFormFields } from '@payloadcms/ui'
+import { useField, useFormFields, useTranslation } from '@payloadcms/ui'
 import { Temporal } from '@js-temporal/polyfill'
 import type { DateFieldClientProps, TextFieldClientProps } from 'payload'
 import { airportMap } from '@/lib/flights/airports'
@@ -9,6 +11,8 @@ import { formatTimeInput, localToUTC } from '@/lib/flights/time'
 import './admin-tools.css'
 
 export function FlightTimeField({ path, field, readOnly }: DateFieldClientProps | TextFieldClientProps) {
+  const { i18n } = useTranslation()
+  const label = typeof field.label === 'string' ? field.label : (field.label as Record<string,string> | undefined)?.[i18n.language] || path
   const planned = path === 'departureLocal' || path === 'arrivalLocal'
   const arrival = path === 'arrivalLocal' || path === 'touchdownUTC' || path === 'actualArrivalUTC'
   const code = useFormFields(([fields]) => String(arrival ? fields.divertedTo?.value || fields.to?.value || '' : fields.from?.value || '').trim().toUpperCase())
@@ -17,7 +21,7 @@ export function FlightTimeField({ path, field, readOnly }: DateFieldClientProps 
   const { value, setValue, showError, errorMessage, disabled } = useField<string | null>({ path, validate: value => {
     if (!value) return true
     try { if (planned) localToUTC(value, zone!); else Temporal.Instant.from(value); return true }
-    catch { return '请填写有效日期和 24 小时时间；夏令时歧义需要核对。' }
+    catch { return translate('ui.enterAValidDateAnd24HourTime', i18n.language === 'en' ? 'en' : 'zh-CN') }
   } })
   let local = ''
   if (value && zone) {
@@ -38,16 +42,16 @@ export function FlightTimeField({ path, field, readOnly }: DateFieldClientProps 
     try { const utc = localToUTC(entered, zone!); next = planned ? entered : utc } catch { /* Keep invalid values visible so validation prevents saving. */ }
     if (next !== value) setValue(next)
   }
-  return <div className="field-type flight-time-field">
-    <label className="field-label" htmlFor={`${id}-time`}>{typeof field.label === 'string' ? field.label : path}</label>
+  return <Localized><div className="field-type flight-time-field">
+    <label className="field-label" htmlFor={`${id}-time`}>{label}</label>
     <div className="flight-time-inputs">
-      <input aria-label={`${typeof field.label === 'string' ? field.label : path}日期`} type="date" value={date} disabled={locked}
+      <input aria-label={i18nMessage('ui.value0Date', label)} type="date" value={date} disabled={locked}
         onChange={event => { setDate(event.currentTarget.value); if (time) save(event.currentTarget.value, time) }} />
       <input id={`${id}-time`} type="text" inputMode="numeric" placeholder="HH:mm" maxLength={5} value={time} disabled={locked} aria-invalid={showError} aria-describedby={`${id}-help`}
         onChange={event => setTime(formatTimeInput(event.currentTarget.value))} onBlur={() => save(date, time)} />
-      <button type="button" className="flight-time-clear" disabled={locked || (!value && !time)} onClick={() => { setValue(null); setTime('') }}>清空</button>
+      <button type="button" className="flight-time-clear" disabled={locked || (!value && !time)} onClick={() => { setValue(null); setTime('') }}>{"@i18n:ui.clear@"}</button>
     </div>
-    <p id={`${id}-help`} className="field-description">{zone ? `${code} · ${zone} · 24 小时制，输入 1711 即为 17:11。${!value ? '尚未记录。' : ''}` : '先填写有效机场代码，再录入当地时间。'}</p>
+    <p id={`${id}-help`} className="field-description">{zone ? i18nMessage('ui.value0Value124HourTime1711Becomes17', code, zone, !value ? "@i18n:ui.notRecordedYet@" : '') : "@i18n:ui.enterAValidAirportCodeBeforeEnteringLocal@"}</p>
     {showError && <p className="admin-tool-error" role="alert">{errorMessage}</p>}
-  </div>
+  </div></Localized>
 }

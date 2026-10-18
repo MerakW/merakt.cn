@@ -1,26 +1,61 @@
 'use client'
+import Localized, { useTranslator } from '@/components/Localized'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { copyFrequency, setFlightDeck, setTheme, setTelemetry as toggleTelemetry } from '@/lib/cockpit'
 export default function TowerControl({latestFlight}:{latestFlight?:{id:number|string;number:string}}) {
+ const t = useTranslator()
+ const [history,setHistory]=useState<string[]>(['MERAK CONTROL SHELL / HGH','@i18n:terminal.ready@'])
+ const [pit,setPit]=useState<{elapsed:number;duration:number;closing?:boolean}|null>(null)
+ const transcript=useRef<HTMLPreElement>(null)
  const dialog=useRef<HTMLDialogElement>(null),input=useRef<HTMLInputElement>(null),opener=useRef<HTMLElement|null>(null)
  const [open,setOpen]=useState(false),[query,setQuery]=useState(''),[picked,setPicked]=useState(0),[toast,setToast]=useState(''),[fps,setFps]=useState(0),[telemetry,setTelemetry]=useState(false)
  const router=useRouter(),path=usePathname(),toastTimer=useRef<ReturnType<typeof setTimeout>|null>(null),pitTimer=useRef<ReturnType<typeof setTimeout>|null>(null),restorePit=useRef<(()=>void)|null>(null)
- const close=()=>{dialog.current?.close();setOpen(false);opener.current?.focus({preventScroll:true})}
+ const closing=useRef<ReturnType<typeof setTimeout>|null>(null)
+ const close=()=>{
+  const el=dialog.current
+  if(!el?.open){setOpen(false);return}
+  if(closing.current)return
+  const finish=()=>{el.close();delete el.dataset.closing;setOpen(false);closing.current=null;opener.current?.focus({preventScroll:true})}
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){finish();return}
+  el.dataset.closing='true';closing.current=setTimeout(finish,180)
+ }
  const show=()=>{opener.current=document.activeElement as HTMLElement;setQuery('');setPicked(0);setOpen(true)}
- function pitStop(){restorePit.current?.();const old=sessionStorage.getItem('merak-track-preview');sessionStorage.setItem('merak-track-preview',JSON.stringify({mode:'pit'}));window.dispatchEvent(new Event('merak-track-preview'));window.dispatchEvent(new CustomEvent('merak-toast',{detail:'BOX BOX / PIT LANE 51'}));const restore=()=>{if(pitTimer.current)clearTimeout(pitTimer.current);if(old)sessionStorage.setItem('merak-track-preview',old);else sessionStorage.removeItem('merak-track-preview');window.dispatchEvent(new Event('merak-track-preview'));restorePit.current=null};restorePit.current=restore;pitTimer.current=setTimeout(restore,8000)}
+ function pitStop(){
+  restorePit.current?.()
+  if(pitTimer.current)clearTimeout(pitTimer.current)
+  const old=sessionStorage.getItem('merak-track-preview'),duration=1.8+Math.random()*2.7
+  sessionStorage.setItem('merak-track-preview',JSON.stringify({mode:'pit'}));window.dispatchEvent(new Event('merak-track-preview'))
+  setPit({elapsed:0,duration})
+  const restore=()=>{if(pitTimer.current)clearTimeout(pitTimer.current);if(old)sessionStorage.setItem('merak-track-preview',old);else sessionStorage.removeItem('merak-track-preview');window.dispatchEvent(new Event('merak-track-preview'));restorePit.current=null;setPit(value=>value?{...value,closing:true}:null);pitTimer.current=setTimeout(()=>setPit(null),260)}
+  restorePit.current=restore;pitTimer.current=setTimeout(restore,(duration+5)*1000)
+ }
+ useEffect(()=>{
+  if(!pit)return
+  const started=performance.now();let raf=0
+  const tick=(now:number)=>{setPit(value=>value?{...value,elapsed:(now-started)/1000}:null);raf=requestAnimationFrame(tick)}
+  raf=requestAnimationFrame(tick);return()=>cancelAnimationFrame(raf)
+ },[pit?.duration])
  const commands=[
-  {label:'Issue Boarding Pass',hint:'领取登机牌 / 围场通行证',run:()=>router.push('/visitors')},
-  {label:`View Latest Flight${latestFlight?' · '+latestFlight.number:''}`,hint:'最近一次飞行',run:()=>router.push(latestFlight?`/flights?flight=${latestFlight.id}`:'/flights')},
-  {label:'Switch to Dark Mode',hint:'深色模式',run:()=>setTheme('dark')},
-  {label:'Switch to Light Mode',hint:'浅色模式',run:()=>setTheme('light')},
-  {label:'Enter Cockpit / Flight Deck',hint:'驾驶舱 · 独立导航与仪表布局',run:()=>setFlightDeck(true)},
-  {label:'Exit Cockpit / Normal Theme',hint:'退出驾驶舱，恢复之前的深浅模式',run:()=>setFlightDeck(false)},
-  {label:'Toggle Telemetry',hint:'工程视图 / T',run:()=>toggleTelemetry(!telemetry)},
-  {label:'Trigger Box Box / Pit Stop',hint:'进站 8 秒',run:pitStop},
-  {label:'Lights Out',hint:'五红灯反应挑战',run:()=>router.push('/pit-wall#lights-title')},
-  {label:'Ping Merak',hint:'复制 QQ 联系方式',run:()=>void copyFrequency()},
- ].filter(c=>`${c.label} ${c.hint}`.toLowerCase().includes(query.toLowerCase()))
+  {id:'boarding-pass',label:'Issue Boarding Pass',hint:"@i18n:ui.getABoardingPassPaddockPass@",run:()=>router.push('/visitors')},
+  {id:'flight.latest',label:`View Latest Flight${latestFlight?' · '+latestFlight.number:''}`,hint:"@i18n:ui.latestFlight@",run:()=>router.push(latestFlight?`/flights?flight=${latestFlight.id}`:'/flights')},
+  {id:'theme.dark',label:'Switch to Dark Mode',hint:"@i18n:ui.darkMode@",run:()=>setTheme('dark')},
+  {id:'theme.light',label:'Switch to Light Mode',hint:"@i18n:ui.lightMode@",run:()=>setTheme('light')},
+  {id:'cockpit.enter',label:'Enter Cockpit / Flight Deck',hint:"@i18n:ui.cockpitDedicatedNavigationAndInstruments@",run:()=>setFlightDeck(true)},
+  {id:'cockpit.exit',label:'Exit Cockpit / Normal Theme',hint:"@i18n:ui.leaveCockpitAndRestoreYourPreviousTheme@",run:()=>setFlightDeck(false)},
+  {id:'telemetry',label:'Toggle Telemetry',hint:"@i18n:ui.engineerViewT@",run:()=>toggleTelemetry(!telemetry)},
+  {id:'box',label:'Trigger Box Box / Pit Stop',hint:"@i18n:ui.pitStopFor8Seconds@",run:pitStop},
+  {id:'lights-out',label:'Lights Out',hint:"@i18n:ui.fiveLightReactionChallenge@",run:()=>router.push('/pit-wall#lights-title')},
+  {id:'contact',label:'Ping Merak',hint:"@i18n:ui.copyQqContact@",run:()=>void copyFrequency()},
+ ].filter(c=>`${c.id} ${c.label} ${c.hint} ${t(c.hint)}`.toLowerCase().includes(query.toLowerCase()))
+ function execute(command: typeof commands[number]){
+  setHistory(lines=>[...lines.slice(-9),`merak@hgh:~$ ${command.id}`,`[OK] ${command.label}`]);setQuery('');setPicked(0);command.run()
+  if(command.id==='box')close()
+ }
+ useEffect(()=>{if(transcript.current)transcript.current.scrollTop=transcript.current.scrollHeight},[history])
+ useEffect(()=>{
+  if(open)document.getElementById(`tower-option-${picked}`)?.scrollIntoView({block:'nearest',behavior:'instant'})
+ },[picked,query,open])
  useEffect(()=>{if(open){dialog.current?.showModal();input.current?.focus()}},[open])
  useEffect(()=>{close()},[path])
  useEffect(()=>{
@@ -28,7 +63,7 @@ export default function TowerControl({latestFlight}:{latestFlight?:{id:number|st
   const mode=()=>setTelemetry(document.documentElement.dataset.telemetry==='true')
   const notify=(e:Event)=>{setToast(String((e as CustomEvent).detail));if(toastTimer.current)clearTimeout(toastTimer.current);toastTimer.current=setTimeout(()=>setToast(''),3500)}
   mode();window.addEventListener('merak-open-tower',show);window.addEventListener('keydown',key);window.addEventListener('merak-telemetry',mode);window.addEventListener('merak-toast',notify)
-  return()=>{window.removeEventListener('merak-open-tower',show);window.removeEventListener('keydown',key);window.removeEventListener('merak-telemetry',mode);window.removeEventListener('merak-toast',notify);if(toastTimer.current)clearTimeout(toastTimer.current);restorePit.current?.()}
+  return()=>{window.removeEventListener('merak-open-tower',show);window.removeEventListener('keydown',key);window.removeEventListener('merak-telemetry',mode);window.removeEventListener('merak-toast',notify);if(toastTimer.current)clearTimeout(toastTimer.current);restorePit.current?.();if(pitTimer.current)clearTimeout(pitTimer.current);if(closing.current)clearTimeout(closing.current)}
  },[])
  useEffect(()=>{
   if(!telemetry)return
@@ -48,5 +83,5 @@ export default function TowerControl({latestFlight}:{latestFlight?:{id:number|st
   const move=(e:PointerEvent)=>{const card=(e.target as HTMLElement).closest<HTMLElement>('.instrument-card,.telemetry-grid article,.home-gallery-card');if(!card)return;const rect=card.getBoundingClientRect();card.style.setProperty('--spot-x',`${e.clientX-rect.left}px`);card.style.setProperty('--spot-y',`${e.clientY-rect.top}px`)}
   document.addEventListener('pointermove',move,{passive:true});return()=>document.removeEventListener('pointermove',move)
  },[])
- return <><button className="tower-launch" onClick={show}>TOWER CONTROL <kbd>⌘ / Ctrl K</kbd></button>{toast&&<div className="cockpit-toast" role="status">{toast}</div>}{telemetry&&<div className="fps-monitor">TELEMETRY <b title="浏览器 requestAnimationFrame 回调频率，不是 GPU 实际帧率">{fps||"—"} Hz / rAF</b><button onClick={()=>toggleTelemetry(false)}>EXIT / T</button></div>}<dialog ref={dialog} className="tower-dialog" onCancel={close} onClose={()=>setOpen(false)} onClick={e=>{if(e.target===e.currentTarget)close()}}><div className="tower-panel"><header><span>TOWER CONTROL / HGH</span><button onClick={close} aria-label="关闭指令窗">ESC</button></header><input ref={input} role="combobox" aria-label="搜索塔台指令" aria-controls="tower-results" aria-expanded="true" aria-activedescendant={commands[picked]?`tower-option-${picked}`:undefined} value={query} placeholder="输入指令…" onChange={e=>{setQuery(e.target.value);setPicked(0)}} onKeyDown={e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();setPicked(n=>(n+(e.key==='ArrowDown'?1:-1)+commands.length)%Math.max(1,commands.length))}if(e.key==='Enter'&&commands[picked]){e.preventDefault();commands[picked].run();close()}}}/><div id="tower-results" role="listbox" aria-label="可用指令">{commands.map((command,i)=><button role="option" aria-selected={picked===i} id={`tower-option-${i}`} key={command.label} onPointerMove={()=>setPicked(i)} onClick={()=>{command.run();close()}}><b>{command.label}</b><span>{command.hint}</span></button>)}{!commands.length&&<p>未找到指令。</p>}</div><footer>↑ ↓ 选择 · Enter 执行 · Esc 关闭</footer></div></dialog></>
+ return <Localized><><button className="tower-launch" onClick={show}>TOWER CONTROL <kbd>⌘ / Ctrl K</kbd></button>{pit&&<aside className="pit-stop-timing" data-closing={pit.closing} data-working={pit.elapsed>=1.5&&pit.elapsed<1.5+pit.duration} aria-label="Pit stop timing"><header><b>51</b><img src="/team-logos/ferrari-hq.svg" alt="Ferrari" width="22" height="26"/><strong>MERAK</strong><button onClick={()=>restorePit.current?.()} aria-label="@i18n:pit.closeTimer@">×</button></header><div className="pit-readout" key={pit.elapsed<1.5?'entry':pit.elapsed<1.5+pit.duration?'stop':'exit'}><span>{pit.elapsed<1.5?'IN PIT':pit.elapsed<1.5+pit.duration?'STOP TIME':'PIT EXIT'}</span><b>{(pit.elapsed<1.5?pit.elapsed:Math.min(pit.duration,pit.elapsed-1.5)).toFixed(1)}</b></div><small>IN PIT <time>{pit.elapsed.toFixed(1)} s</time></small></aside>}{toast&&<div className="cockpit-toast" role="status">{toast}</div>}{telemetry&&<div className="fps-monitor">TELEMETRY <b title="@i18n:ui.browserRequestanimationframeRateNotActualGpuFrameRate@">{fps||"—"} Hz / rAF</b><button onClick={()=>toggleTelemetry(false)}>EXIT / T</button></div>}<dialog ref={dialog} className="tower-dialog" onCancel={e=>{e.preventDefault();close()}} onClose={()=>{setOpen(false);if(closing.current)clearTimeout(closing.current);closing.current=null}} onClick={e=>{if(e.target===e.currentTarget)close()}}><div className="tower-panel"><header><span>TOWER CONTROL / HGH</span><button onClick={close} aria-label="@i18n:ui.closeCommandPalette@">ESC</button></header><pre ref={transcript} className="tower-history" role="log" aria-label={t('terminal.output')}>{history.map((line,index)=><span className="tower-log-line" key={`${index}-${line}`}>{t(line)}</span>)}</pre><div className="tower-command-line"><label htmlFor="tower-command">merak@hgh:~$</label><input id="tower-command" spellCheck={false} autoComplete="off" ref={input} role="combobox" aria-label="@i18n:ui.searchTowerCommands@" aria-controls="tower-results" aria-expanded="true" aria-activedescendant={commands[picked]?`tower-option-${picked}`:undefined} value={query} placeholder="@i18n:ui.typeACommand@" onChange={e=>{setQuery(e.target.value);setPicked(0)}} onKeyDown={e=>{if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();setPicked(n=>(n+(e.key==='ArrowDown'?1:-1)+commands.length)%Math.max(1,commands.length))}if(e.key==='Enter'&&commands[picked]){e.preventDefault();execute(commands[picked])}else if(e.key==='Enter'&&query==='clear'){setHistory([]);setQuery('')}else if(e.key==='Enter'&&!commands.length){setHistory(lines=>[...lines.slice(-9),`merak@hgh:~$ ${query}`,'@i18n:terminal.notFound@']);setQuery('')}}}/></div><div id="tower-results" role="listbox" aria-label="@i18n:ui.availableCommands@">{commands.map((command,i)=><button role="option" aria-selected={picked===i} id={`tower-option-${i}`} key={command.id} onPointerMove={()=>setPicked(i)} onClick={()=>{execute(command)}}><b><code>{command.id}</code> {command.label}</b><span>{command.hint}</span></button>)}{!commands.length&&<p>{"@i18n:ui.noCommandsFound@"}</p>}</div><footer>{"@i18n:ui.selectEnterRunEscClose@"}</footer></div></dialog></></Localized>
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import Localized from '@/components/Localized'
 import { useEffect, useRef, useState } from 'react'
 
 export default function AutoLoadMore({ visible, total, onLoad }: { visible: number; total: number; onLoad: () => void }) {
@@ -16,8 +17,8 @@ export default function AutoLoadMore({ visible, total, onLoad }: { visible: numb
     observer.observe(sentinel.current)
     return () => observer.disconnect()
   }, [visible, total, onLoad])
-  return <div ref={sentinel} className="auto-load-more">
-    <span role="status">{Math.min(visible, total)} / {total} 条{visible >= total && total > 0 ? ' · 已显示全部记录' : ''}</span>
-    {visible < total && !automatic && <button onClick={onLoad}>继续加载</button>}
-  </div>
+  return <Localized><div ref={sentinel} className="auto-load-more">
+    <span role="status">{Math.min(visible, total)} / {total} {" @i18n:ui.records@"}{visible >= total && total > 0 ? "@i18n:ui.allRecordsShown@" : ''}</span>
+    {visible < total && !automatic && <button onClick={onLoad}>{"@i18n:ui.loadMore@"}</button>}
+  </div></Localized>
 }

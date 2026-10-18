@@ -19,6 +19,7 @@ if (!address) {
 const port = '3003'
 const env = {
   ...process.env,
+  PORT: port,
   DATABASE_URL: `file:${database}`,
   MEDIA_DIR: resolve(root,'.data/media'),
   SERVER_URL: `http://${address}:${port}`,
@@ -44,6 +45,7 @@ async function run(args) {
   })
 }
 try {
+  await run(['--import','tsx','scripts/generate-i18n.ts'])
   console.log('正在构建本地数据预览…')
   await run(['node_modules/next/dist/bin/next','build','--webpack'])
   await run(['scripts/check-build.mjs'])

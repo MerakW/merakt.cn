@@ -146,3 +146,8 @@ html:is([data-track=sc],[data-track=vsc],[data-track=pit],[data-track=race],[dat
 @media(prefers-reduced-motion:reduce){.nav-marquee-track{animation:none}.nav-marquee{overflow-x:auto}}
 
 .credential-logo-frame{height:78px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}.credential-team .credential-logo-frame img{margin:0;max-width:100%;object-fit:contain}
+
+/* Explicit CJK fallbacks and readable caption sizes also apply on Windows. */
+.tyre-compound small,.compound-legend>p,.telemetry-grid article>small{font-size:12px;line-height:1.75}
+.compound-legend summary,.pass-mode button,.telemetry-grid article>p:not(.telemetry-label){font-size:12px;line-height:1.75}
+.heartbeat-axis,.pit-heading-meta,.radio-message footer,.pit-links,.paddock-pass>footer small{font-size:12px;line-height:1.7}

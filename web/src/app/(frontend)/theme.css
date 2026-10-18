@@ -133,3 +133,8 @@ html[data-theme-transition=radial]::view-transition-old(root){z-index:0}
 html[data-theme-transition=radial]::view-transition-new(root){z-index:1}
 
 @media(prefers-reduced-motion:no-preference){html.theme-fading *,html.theme-fading *::before,html.theme-fading *::after{transition:background-color .35s ease,color .35s ease,border-color .35s ease,box-shadow .35s ease!important}}
+
+.language-control{font:600 12px/1.2 var(--font-mono,monospace);color:inherit;background:transparent;border:1px solid currentColor;border-radius:4px;min-width:36px;min-height:36px;padding:6px;cursor:pointer;flex-shrink:0}
+.language-control:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.language-control:disabled{opacity:.5;cursor:wait}
+html[lang="en"] .main-tabs a{white-space:nowrap}

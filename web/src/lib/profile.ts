@@ -1,7 +1,7 @@
 export const profile = {
-    title: 'Merak | 人物档案', eyebrow: 'PERSONNEL FILE / MK-05', heading: 'Merak，\n也叫米拉克。', lead: '住在杭州，喜欢航空、F1 和 Furry。平时会折腾智能家居，也经常给自己挖点新坑。',
-    tags: ['杭州', 'Furry', 'Tifosi', '飞友'], origin: '为什么叫 Merak？', originText: 'Merak 是北斗七星里的天璇。「米拉克」就是它的音译，叫哪个都行。',
-    interestsHeading: '平时喜欢什么', interests: [['Furry', '我 是 龙 性 恋。'], ['航空', '试问谁又能拒绝一堆会飞的铁鸟呢。'], ['科技', '喜欢折腾各种新技术，让生活更方便。'], ['F1', '成为 Tifosi，这辈子真是有了。']],
-    basics: [['呼号/CALLSIGN', 'Merak（米拉克）'], ['坐标/LOCATION', '中国·杭州'], ['时区/TIMEZONE', 'Asia/Shanghai']], findHeading: '来找我', findLead: '日常和碎碎念主要发在下面这些地方。',
-    socials: [['𝕏', '@real_merakw', '生活日常 / 吐槽', 'https://x.com/real_merakw'], ['GH', '@MerakW', '我真的不会写代码', 'https://github.com/MerakW'], ['QQ', '1540180211', '即时联络', 'https://qm.qq.com/cgi-bin/qm/qr?k=1540180211'], ['DY', '@merak_w', '生活、航空与 furry', 'https://v.douyin.com/9FjfikdKPog']],
+    title: 'Merak | 人物档案', eyebrow: 'PERSONNEL FILE / MK-05', heading: "@i18n:ui.merakAlsoKnownAs@", lead: "@i18n:profile.lead@",
+    tags: ["@i18n:ui.hangzhou2@", 'Furry', 'Tifosi', "@i18n:ui.avgeek@"], origin: "@i18n:profile.originHeading@", originText: "@i18n:profile.originText@",
+    interestsHeading: "@i18n:ui.whatImInto@", interests: [['Furry', "@i18n:ui.dragonsVeryMuchMyType@"], ["@i18n:ui.aviation@", "@i18n:ui.whoCouldResistASkyFullOfMetal@"], ["@i18n:ui.technology@", "@i18n:ui.iLikeTinkeringWithNewTechnologyToMake@"], ['F1', "@i18n:ui.lifeAsATifosiIsQuiteSomething@"]],
+    basics: [["@i18n:ui.callsign@", "@i18n:ui.merak2@"], ["@i18n:ui.location@", "@i18n:ui.hangzhouChina@"], ["@i18n:ui.timezone@", 'Asia/Shanghai']], findHeading: "@i18n:ui.findMe@", findLead: "@i18n:ui.youllFindMyEverydayUpdatesAndRamblingsHere@",
+    socials: [['𝕏', '@real_merakw', "@i18n:ui.everydayLifeRamblings@", 'https://x.com/real_merakw'], ['GH', '@MerakW', "@i18n:ui.iReallyCantCode@", 'https://github.com/MerakW'], ['QQ', '1540180211', "@i18n:ui.getInTouch@", 'https://qm.qq.com/cgi-bin/qm/qr?k=1540180211'], ['DY', '@merak_w', "@i18n:ui.lifeAviationAndFurry@", 'https://v.douyin.com/9FjfikdKPog']],
   } as const

@@ -1,3 +1,5 @@
+import * as maintenance from './20261018_030000_maintenance';
+import * as migration_20261018_020000_i18n from './20261018_020000_i18n';
 import * as migration_20261002_173728_initial_schema from './20261002_173728_initial_schema';
 import * as migration_20261004_160409_passkeys from './20261004_160409_passkeys';
 import * as migration_20261012_120000_flight_runway_times from './20261012_120000_flight_runway_times';
@@ -66,4 +68,6 @@ export const migrations = [
     down: migration_20261017_155746_photo_equipment.down,
     name: '20261017_155746_photo_equipment'
   },
+  { up: migration_20261018_020000_i18n.up, down: migration_20261018_020000_i18n.down, name: '20261018_020000_i18n' },
+  { up: maintenance.up, down: maintenance.down, name: '20261018_030000_maintenance' },
 ];

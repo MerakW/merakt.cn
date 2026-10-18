@@ -30,6 +30,7 @@ import { RefreshableAvatar as RefreshableAvatar_b788d07268fdc7d3648de3bb74ae4979
 import { FlightImportLink as FlightImportLink_a8145c5603aa93e6f449c34708a0bb36 } from '../../../components/admin/FlightImportLink'
 import { RefreshAvatarButton as RefreshAvatarButton_b788d07268fdc7d3648de3bb74ae4979 } from '../../../components/admin/RefreshableAvatar'
 import { PasskeyLoginLink as PasskeyLoginLink_a8145c5603aa93e6f449c34708a0bb36 } from '../../../components/admin/FlightImportLink'
+import { default as default_4e1c87f62a5231328e8625143ad1b7e1 } from '../../../components/admin/AdminLocaleSync'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -66,5 +67,6 @@ export const importMap = {
   "./components/admin/FlightImportLink#FlightImportLink": FlightImportLink_a8145c5603aa93e6f449c34708a0bb36,
   "./components/admin/RefreshableAvatar#RefreshAvatarButton": RefreshAvatarButton_b788d07268fdc7d3648de3bb74ae4979,
   "./components/admin/FlightImportLink#PasskeyLoginLink": PasskeyLoginLink_a8145c5603aa93e6f449c34708a0bb36,
+  "./components/admin/AdminLocaleSync#default": default_4e1c87f62a5231328e8625143ad1b7e1,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

@@ -1,3 +1,4 @@
+import { manualTranslation, type Locale } from './i18n/core'
 import { imageURL, legacyImageURL } from './assets'
 import type { Album, Media } from '@/payload-types'
 
@@ -23,12 +24,12 @@ export function publicPhoto(value: number | Media | null | undefined, caption?: 
   }
 }
 
-export function publicAlbum(album: Album): GalleryAlbum | null {
+export function publicAlbum(album: Album, locale: Locale = 'zh-CN'): GalleryAlbum | null {
   if (album._status !== 'published') return null
   const photos = (album.photos || []).flatMap(photo => {
-    const image = publicPhoto(photo.image, photo.caption, photo.credit || album.photographer, photo.source)
-    return image ? [image] : []
+    const image = publicPhoto(photo.image, manualTranslation(photo.caption, photo.captionEn, locale), photo.credit || album.photographer, photo.source)
+    return image ? [{ ...image, alt: typeof photo.image === 'object' && photo.image ? manualTranslation(image.alt, photo.image.altEn, locale) : image.alt }] : []
   })
-  if (!photos.length) { const cover = publicPhoto(album.cover, album.description, album.photographer); if (cover) photos.push(cover) }
-  return photos.length ? { id: album.id, slug: album.slug, title: album.title, date: album.date?.slice(0, 10) || '', description: album.description || '', compound: album.compound, photos } : null
+  if (!photos.length) { const cover = publicPhoto(album.cover, manualTranslation(album.description, album.descriptionEn, locale), album.photographer); if (cover) photos.push({ ...cover, alt: typeof album.cover === 'object' && album.cover ? manualTranslation(cover.alt, album.cover.altEn, locale) : cover.alt }) }
+  return photos.length ? { id: album.id, slug: album.slug, title: manualTranslation(album.title, album.titleEn, locale), date: album.date?.slice(0, 10) || '', description: manualTranslation(album.description, album.descriptionEn, locale) || '', compound: album.compound, photos } : null
 }

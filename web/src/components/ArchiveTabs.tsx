@@ -1,10 +1,12 @@
 'use client'
+import Localized, { useLocale } from './Localized'
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
 
 /** One moving indicator, shared by both archive switchers. */
 export default function ArchiveTabs<T extends string>({ value, options, onChange, className, label }: {
   value: T; options: {value:T; label:ReactNode}[]; onChange:(value:T)=>void; className:string; label:string
 }) {
+  const locale = useLocale()
   const root=useRef<HTMLDivElement>(null)
   useLayoutEffect(()=>{
     const group=root.current
@@ -18,6 +20,6 @@ export default function ArchiveTabs<T extends string>({ value, options, onChange
     update()
     const observer=new ResizeObserver(update);observer.observe(group)
     return ()=>observer.disconnect()
-  },[value])
-  return <div ref={root} className={`${className} animated-tabs`} role="group" aria-label={label}><span className="tab-indicator" aria-hidden="true" />{options.map(option=><button key={option.value} aria-pressed={value===option.value} onClick={()=>onChange(option.value)}>{option.label}</button>)}</div>
+  },[value,locale])
+  return <Localized><div ref={root} className={`${className} animated-tabs`} role="group" aria-label={label}><span className="tab-indicator" aria-hidden="true" />{options.map(option=><button key={option.value} aria-pressed={value===option.value} onClick={()=>onChange(option.value)}>{option.label}</button>)}</div></Localized>
 }

@@ -35,6 +35,8 @@ export async function POST(request: Request) {
     form = await new Response(new Uint8Array(Buffer.concat(chunks)), { headers: { 'Content-Type': contentType } }).formData()
   } catch { return json({ error: '无法读取上传内容，请重新选择图片。' }, 400) }
   const file = form.get('image')
+  const captionEn = String(form.get('captionEn') || '').trim()
+  if (captionEn.length > 10_000) return json({ error: '英文配文不能超过 10,000 字。' }, 400)
   const caption = String(form.get('caption') || '').trim()
   const date = String(form.get('date') || '')
   if (!(file instanceof File) || !file.size || file.size > MAX_BYTES) return json({ error: '请选择一张 30 MB 以内的图片。' }, 400)
@@ -43,7 +45,7 @@ export async function POST(request: Request) {
     return json({ error: '记录日期无效。' }, 400)
   }
   const original = Buffer.from(await file.arrayBuffer())
-  const id = createHash('sha256').update(original).update('\0' + caption + '\0' + date).digest('hex').slice(0, 32)
+  const id = createHash('sha256').update(original).update('\0' + caption + '\0' + date + (captionEn ? '\0' + captionEn : '')).digest('hex').slice(0, 32)
   const slug = 'photo-' + id
   const existing = await payload.find({ collection: 'albums', user, overrideAccess: false, depth: 0, limit: 1, where: { slug: { equals: slug } } })
   if (existing.docs[0]) return json({ url: `/fursuitfriday?album=${slug}`, duplicate: true })
@@ -71,10 +73,10 @@ export async function POST(request: Request) {
   try {
     const media = await payload.create({ collection: 'media', user, overrideAccess: false, req,
       file: { data: image, name: `upload-${id}.webp`, mimetype: 'image/webp', size: image.length },
-      data: { alt: title, credit, visibility: 'public', legacyPath } })
+      data: { alt: title, altEn: captionEn.split('\n')[0].slice(0,100) || undefined, credit, visibility: 'public', legacyPath } })
     await payload.create({ collection: 'albums', user, overrideAccess: false, req,
-      data: { title, slug, date, description: caption, photographer: credit, cover: media.id,
-        photos: [{ image: media.id, caption, credit }], _status: 'published' } })
+      data: { title, slug, date, description: caption, titleEn: captionEn.split('\n')[0].slice(0,100) || undefined, descriptionEn: captionEn || undefined, photographer: credit, cover: media.id,
+        photos: [{ image: media.id, caption, captionEn: captionEn || undefined, credit }], _status: 'published' } })
     await payload.db.commitTransaction(transactionID)
     return json({ url: `/fursuitfriday?album=${slug}`, bytes: image.length })
   } catch {

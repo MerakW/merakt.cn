@@ -24,7 +24,7 @@ export const signalEndpoints: Endpoint[] = [
     const china=new Date(Date.now()+8*3600000), monthStart=Date.UTC(china.getUTCFullYear(),china.getUTCMonth(),1)-8*3600000
     const best=async(since:number)=>{
       const rows=await req.payload.find({collection:'paddock-signals',where:{and:[{kind:{equals:'reaction'}},{createdAt:{greater_than_equal:new Date(since).toISOString()}}]},sort:'value',limit:1,depth:0,overrideAccess:true})
-      const row=rows.docs[0]; return row ? {ms:row.value,name:row.approved&&row.name?row.name:`GUEST ${String(row.id).padStart(4,'0')}`} : null
+      const row=rows.docs[0]; return row ? {ms:row.value,name:row.name?row.name:`GUEST ${String(row.id).padStart(4,'0')}`} : null
     }
     const [month,allTime]=await Promise.all([best(monthStart),best(0)]);return json({month,allTime})
   }},
@@ -47,11 +47,11 @@ export const signalEndpoints: Endpoint[] = [
         const [body,signature]=data.token.split('.'), expected=sign(body)
         if(!signature||signature.length!==expected.length||!timingSafeEqual(Buffer.from(signature),Buffer.from(expected)))throw new SignalError('发车凭证无效。')
         const token=JSON.parse(Buffer.from(body,'base64url').toString()), elapsed=Date.now()-token.started
-        if(!Number.isInteger(data.ms)||data.ms<100||data.ms>10000||elapsed<5000+token.delay+data.ms-100||elapsed>300000)throw new SignalError('成绩无法登记，请重新发车。')
+        if(!Number.isInteger(data.ms)||data.ms<0||data.ms>10000||elapsed<5000+token.delay+data.ms-100||elapsed>300000)throw new SignalError('成绩无法登记，请重新发车。')
         const name=typeof data.name==='string'?data.name.trim().slice(0,24):''
         const used=await req.payload.count({collection:'paddock-signals',where:{ticket:{equals:token.ticket}},overrideAccess:true})
         if(used.totalDocs)throw new SignalError('这次成绩已登记。')
-        await req.payload.create({collection:'paddock-signals',data:{kind:'reaction',value:data.ms,name,ticket:token.ticket},overrideAccess:true})
+        await req.payload.create({collection:'paddock-signals',data:{kind:'reaction',value:data.ms,name,approved:true,ticket:token.ticket},overrideAccess:true})
       } else throw new SignalError('信号无效。')
       return json({accepted:true},201)
     } catch(error) { return json({error:error instanceof SignalError ? error.message : '暂时无法发送，请稍后重试。'},400) }

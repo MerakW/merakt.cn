@@ -1,9 +1,11 @@
+import { bilingualLabels } from './lib/i18n/admin'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { mkdirSync } from 'node:fs'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor, BlocksFeature } from '@payloadcms/richtext-lexical'
 import { buildConfig } from 'payload'
+import { en } from '@payloadcms/translations/languages/en'
 import { zh } from '@payloadcms/translations/languages/zh'
 import sharp from 'sharp'
 import { Users, Trips, Albums, Posts, Notes, Events, SiteSettings } from './collections/Content'
@@ -27,12 +29,12 @@ export default buildConfig({
   cookiePrefix: process.env.LOCAL_PREVIEW === '1' ? 'merak-preview' : process.env.SERVER_URL === 'http://127.0.0.1:3002' ? 'merak-qa' : 'payload',
   serverURL: process.env.SERVER_URL || 'http://127.0.0.1:3000',
   csrf: process.env.LOCAL_PREVIEW === '1' ? ['http://127.0.0.1:3003', 'http://localhost:3003'] : [],
-  admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
-  i18n: { supportedLanguages: { zh }, fallbackLanguage: 'zh' },
-  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, Passkeys, PasskeyChallenges],
+  admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { providers: ['./components/admin/AdminLocaleSync'], beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
+  i18n: { supportedLanguages: { zh, en }, fallbackLanguage: 'zh' },
+  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, Passkeys, PasskeyChallenges].map(bilingualLabels),
   endpoints: flightSyncEndpoints,
   onInit: startFlightSyncWorker,
-  globals: [SiteSettings],
+  globals: [bilingualLabels(SiteSettings)],
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [
     { slug: 'trip', labels: { singular: '航程', plural: '航程' }, fields: [{ name: 'trip', label: '选择旅行', type: 'relationship', relationTo: 'trips', required: true }] },
     { slug: 'album', labels: { singular: '相册', plural: '相册' }, fields: [{ name: 'album', label: '选择相册', type: 'relationship', relationTo: 'albums', required: true }] },
