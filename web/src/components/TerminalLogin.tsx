@@ -1,11 +1,25 @@
 'use client'
 import Localized from '@/components/Localized'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { imageURL } from '@/lib/assets'
 import { loginWithPasskey, passkeyError } from '@/lib/passkey-client'
 export default function TerminalLogin() {
   const router = useRouter()
+  const terminal = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const node = terminal.current
+    if (!node || !node.closest('#pit-login') || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    node.dataset.entrance = 'ready'
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        node.dataset.inView = String(entry.isIntersecting)
+        if (entry.isIntersecting) node.dataset.entrance = 'shown'
+      }
+    }, { threshold: .08 })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
   const [localPort, setLocalPort] = useState('')
   useEffect(() => { if (['localhost','127.0.0.1'].includes(location.hostname)) setLocalPort(location.port) }, [])
   const [error, setError] = useState(''), [busy, setBusy] = useState(false)
@@ -16,7 +30,7 @@ export default function TerminalLogin() {
     update(); document.addEventListener('visibilitychange', update)
     return () => document.removeEventListener('visibilitychange', update)
   }, [])
-  return <Localized><div className={`terminal-login terminal-v2 terminal-v3${busy ? " terminal-verifying" : ""}${away ? " terminal-paused" : ""}`}><div className="terminal-top"><span>MERAK / CONTROL TERMINAL</span><span>AUTH REQUIRED</span></div><div className="terminal-grid" aria-hidden="true" /><div className="terminal-scan" aria-hidden="true" /><aside className="terminal-signal" aria-label="@i18n:ui.connectionStatus@"><div className="signal-orbit" aria-hidden="true"><i /><i /><i /><span className="signal-avatar"><img src={imageURL("/images/card/avatar.webp")} alt="" width={132} height={132} /><b className="avatar-sweep" /></span></div><p>{busy ? 'VERIFYING IDENTITY' : error ? 'ACCESS DENIED' : 'AWAITING IDENTITY'}</p><ol><li>{"@i18n:ui.consoleReady@"}</li><li>{busy ? "@i18n:ui.verifyingCredentials@" : "@i18n:ui.waitingForAdministratorVerification@"}</li><li>{"@i18n:ui.managementToolsLoadAfterVerification@"}</li></ol></aside><div className="terminal-form"><p className="terminal-prompt">&gt; establish connection<span className="terminal-cursor">_</span></p><h2>{"@i18n:ui.administratorSignIn@"}</h2><p>{localPort === '3002' ? "@i18n:ui.localIsolatedTestSiteSignInWithTest@" : "@i18n:ui.useAPasskeyOrEnterYourAdministratorCredentials@"}</p>{localPort === '3000' && <a className="test-login-link" href="http://127.0.0.1:3002/manage/login">{"@i18n:ui.testAccountOpenTheIsolatedTestSite3002@"}</a>}<button className="passkey-login" type="button" disabled={busy || !passkeySupported} onClick={async () => {
+  return <Localized><div ref={terminal} className={`terminal-login terminal-v2 terminal-v3${busy ? " terminal-verifying" : ""}${away ? " terminal-paused" : ""}`}><div className="terminal-top"><span>MERAK / CONTROL TERMINAL</span><span>AUTH REQUIRED</span></div><div className="terminal-grid" aria-hidden="true" /><div className="terminal-scan" aria-hidden="true" /><aside className="terminal-signal" aria-label="@i18n:ui.connectionStatus@"><div className="signal-orbit" aria-hidden="true"><i /><i /><i /><span className="signal-avatar"><img src={imageURL("/images/card/avatar.webp")} alt="" width={132} height={132} /><b className="avatar-sweep" /></span></div><p>{busy ? 'VERIFYING IDENTITY' : error ? 'ACCESS DENIED' : 'AWAITING IDENTITY'}</p><ol><li>{"@i18n:ui.consoleReady@"}</li><li>{busy ? "@i18n:ui.verifyingCredentials@" : "@i18n:ui.waitingForAdministratorVerification@"}</li><li>{"@i18n:ui.managementToolsLoadAfterVerification@"}</li></ol></aside><div className="terminal-form"><p className="terminal-prompt">&gt; establish connection<span className="terminal-cursor">_</span></p><h2>{"@i18n:ui.administratorSignIn@"}</h2><p>{localPort === '3002' ? "@i18n:ui.localIsolatedTestSiteSignInWithTest@" : "@i18n:ui.useAPasskeyOrEnterYourAdministratorCredentials@"}</p>{localPort === '3000' && <a className="test-login-link" href="http://127.0.0.1:3002/manage/login">{"@i18n:ui.testAccountOpenTheIsolatedTestSite3002@"}</a>}<button className="passkey-login" type="button" disabled={busy || !passkeySupported} onClick={async () => {
     if (busy) return; setBusy(true); setError('')
     try { await loginWithPasskey(); router.refresh() }
     catch (error) { setError(passkeyError(error)) } finally { setBusy(false) }
