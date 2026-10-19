@@ -46,6 +46,10 @@ export const english: Record<MessageKey, string> = {
   "ui.signalUnavailableChooseYourDepartureAirport": "Signal unavailable. Select your departure airport manually.",
   "ui.savedYouA": "Saved you a", // [Fragment: Prefix] Followed by a space and `ui.windowSeat`
   "ui.windowSeat": "window seat.", // [Fragment: Suffix] Preceded by `ui.savedYouA`
+  "ui.radarNearbyHangzhou": "Already near Hangzhou",
+  "ui.radarLocalWelcome": "You are close by. Welcome to Hangzhou.",
+  "ui.radarSuggestedAirport": "Suggested departure airport: {0}. You can change it manually.",
+  "ui.radarAlternativeAirports": "Metro airports: {0}.",
   "ui.distanceToHangzhouApprox": "· Approx. distance to Hangzhou:",
   "ui.youAreInTheHangzhouTerminalArea": "You are within the Hangzhou terminal area (TMA).",
   "ui.a350900MeetingInApproxValue0HValue1": "A350-900 · Rendezvous in approx. {0}h {1}m",
@@ -57,7 +61,7 @@ export const english: Record<MessageKey, string> = {
   "ui.calculateRoute": "Calculate route",
   "ui.yourLocationInformationIsNeverStored": "Your location data is processed on the fly and never stored.",
   "ui.routeEstimate": "Route estimation",
-  "ui.cityLocationIsProvidedByIpwhoisAndCan": "Coarse IP geolocation is provided by IPWHOIS and can be overridden manually. Distance is calculated via great-circle routing; block time assumes a 900 km/h cruise plus a 1-hour terminal buffer, not actual airline schedules.",
+  "ui.cityLocationIsProvidedByIpwhoisAndCan": "Coarse IP geolocation from IPWHOIS may reflect your network exit. Metro areas use a default hub as a suggested origin; you can choose another airport. Within 50 km of the Hangzhou reference point, only a nearby message is shown. Other great-circle distances are rounded to 10 km. Time assumes 900 km/h plus a 1-hour buffer, rounded to 5 minutes, not an actual flight schedule.",
 
   // ============================================================================
   // 4. Lounge, Souvenir Pass & Guestbook

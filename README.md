@@ -140,6 +140,15 @@ Pit Wall 的五红灯挑战使用浏览器高精度计时，切到后台或失�
 
 首页航路简报直接从浏览器调用 `https://ipwho.is/` 获取城市级 IP 定位，不申请 GPS 权限，定位仅在当前页面内存中用于计算，不写入数据库或浏览器存储；坐标通过 POST 正文传递，避免进入 URL 访问日志。失败后可手动输入机场三字码。第三方定位服务仍会接收访问者 IP，因此页面承诺仅指本站不保存定位信息。第三方免费接口有额度和可用性限制，见 [IPWHOIS 文档](https://ipwhois.io/documentation)。距离按大圆航线估算，A350-900 时间按 900 km/h 加 1 小时起降余量估算，不代表真实航班。若配置 CSP，请允许 `connect-src https://ipwho.is https://cos.merakt.cn`。
 
+航路简报的自动机场选择规则：
+
+- 自动候选使用 [OurAirports 公开数据](https://ourairports.com/data/) 中有定期航班的陆地机场，与站内机场库取交集；NAY、QPG 等无定期航班条目不会自动选中。原机场库继续支持历史航段。
+- 多机场城市使用显式默认值：北京 PEK（备选 PKX）、台北 TPE（TSA）、新加坡 SIN（XSP）、上海 PVG（SHA）、东京 HND（NRT）等。完整规则在 `web/src/lib/radar.ts`。默认值是本站参考出发地的展示约定；界面列出备选机场，手动输入始终优先。
+- 城市名称存在时须与都会区相符，并限制默认机场距定位点不超过 120 公里、与最近候选处于同一国家或地区，避免把邻近城市直接吸附到远处枢纽。未配置的城市使用最近的定期航班机场。
+- 以固定杭州参考点计算距离；原始距离小于 50 公里只显示“已在杭州附近”，隐藏公里数和预计飞行时间。其他距离取整至 10 公里，时间取整至 5 分钟，匹配 IP 定位的近似精度。
+- 公共状态快照位于 `web/src/data/radar-airports.json`，记录来源、获取日期和校验值。在 `web` 下运行 `python3 scripts/update-radar-airports.py` 更新，也支持传入已下载的官方 CSV 文件。运行时不访问机场数据服务；升级前应核对机场状态与都会区默认值。
+
+
 顶栏保留普通深浅模式和独立遥测按钮，两者互不影响。`Cmd/Ctrl + K` 打开塔台指令窗，`T` 开关遥测视图（输入框内不触发）。遥测标注包含边框的显示尺寸，单位为 CSS 像素；rAF Hz 是前台动画回调频率，不是 GPU 实际渲染帧率，受浏览器、显示器刷新率和省电策略影响，隐藏标签页时暂停采样。TR 的 PLAY RADIO 和开窗提示音使用原始 `audio/team-radio.wav`，Web Audio 分析真实音频驱动频谱；若跨域分析失败则回退到原始音频播放。红色车手文字、白色车队文字和访客回电按顺序逐字呈现，全部完成后显示大回复按钮；重播位于底部。
 
 分享卡片通过 `cd web && node scripts/generate-social-card.mjs` 生成 1200 × 630 PNG。生成文件位于 `web/public/social/paddock-og.png`，上传副本位于 `web/.data/cos-upload-paddock/social/paddock-og.png`。将其上传至 COS 的 `social/paddock-og.png`（`Content-Type: image/png`），正式站 OpenGraph / Twitter 元数据引用此 COS 地址。PNG 不提交 Git，部署前须独立上传；微信和 QQ 是否显示卡片由各平台抓取策略决定。

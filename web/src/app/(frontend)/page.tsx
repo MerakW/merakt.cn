@@ -11,6 +11,7 @@ import HomeFlights from '@/components/HomeFlights'
 import SpeedTunnel from '@/components/SpeedTunnel'
 import HomeMotion from '@/components/HomeMotion'
 import HomeGallery from '@/components/HomeGallery'
+import LoadingImage from '@/components/LoadingImage'
 import HomeTicker from '@/components/HomeTicker'
 import FlightCounter from '@/components/FlightCounter'
 import RouteMap from '@/components/RouteMap'
@@ -54,7 +55,7 @@ export default async function Home() {
       <div className="cover-coordinate"><span>MERAK / DIGITAL PADDOCK</span><span>HANGZHOU · 30° N / 120° E</span></div>
       <div className="cover-copy"><p className="cover-greeting">{"@i18n:home.greeting@"}</p><p className="cover-intro">{intro}</p><div className="cover-links"><a href="/merak">{"@i18n:home.meet@ "}<span aria-hidden="true"><ArrowIcon direction="up-right" /></span></a><a href="/flights">{"@i18n:home.flights@"}</a></div></div>
       <figure className="cover-photo">
-        <a href={hero && !settings.heroImage && heroAlbum ? `/fursuitfriday?album=${heroAlbum.slug}` : '/fursuitfriday'} aria-label="@i18n:ui.viewFursuitFridayPhotos@"><img src={hero?.display || imageURL('/identity/merak-avatar.webp')} width={hero?.width || 600} height={hero?.height || 600} alt={hero?.alt || "@i18n:ui.meraksBlueAndWhiteFoxCharacter@"} fetchPriority="high" /></a>
+        <a href={hero && !settings.heroImage && heroAlbum ? `/fursuitfriday?album=${heroAlbum.slug}` : '/fursuitfriday'} aria-label="@i18n:ui.viewFursuitFridayPhotos@"><LoadingImage src={hero?.display || imageURL('/identity/merak-avatar.webp')} width={hero?.width || 600} height={hero?.height || 600} alt={hero?.alt || "@i18n:ui.meraksBlueAndWhiteFoxCharacter@"} fetchPriority="high" /></a>
         <figcaption><span>{"@i18n:ui.anotherSideOfMeFursuitFriday@"}</span>{hero?.credit && <span>{"@i18n:ui.photoBy@ "}{hero.credit}</span>}</figcaption>
       </figure>
       <h1 className="cover-wordmark" aria-label="MERAK.">{Array.from('MERAK.').map((letter,index)=><span aria-hidden="true" key={index} style={{animationDelay:`${index * 65}ms`}}>{letter}</span>)}</h1>

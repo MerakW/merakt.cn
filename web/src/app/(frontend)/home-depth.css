@@ -310,7 +310,7 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
 .home-gallery-visual img { display:block; width:100%; height:100%; object-fit:cover; transition:transform .7s cubic-bezier(.22,1,.36,1); user-select:none; }
 .home-gallery-card:hover img { transform:scale(1.025); }
 .home-gallery-visual::after { content:''; position:absolute; inset:0 0 auto; height:min(38%,160px); background:linear-gradient(180deg,#05080f70 0%,#05080f30 55%,transparent 100%); pointer-events:none; }
-.home-gallery-visual>span { position:absolute; z-index:1; top:12px; left:16px; color:#fff; font:600 64px/1 var(--display); pointer-events:none; }
+.home-gallery-number { position:absolute; z-index:1; top:12px; left:16px; color:#fff; font:600 64px/1 var(--display); pointer-events:none; }
 .home-gallery-caption { display:flex; justify-content:space-between; gap:16px; margin-top:15px; }
 .home-gallery-caption p { min-width:0; margin:0; font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .home-gallery-caption time { flex:none; padding-top:3px; color:var(--muted); font:11px var(--mono); }
@@ -331,7 +331,7 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
   .home-gallery-controls { width:100%; }
   .home-gallery-controls>a { margin-left:auto; }
   .home-gallery-rail { gap:16px; }
-  .home-gallery-visual>span { font-size:48px; }
+  .home-gallery-number { font-size:48px; }
   .home-gallery-caption p { font-size:12px; }
   .home-gallery-all { width:180px; }
 }
@@ -523,3 +523,5 @@ html[data-theme=dark] .home-pass-plane { filter:invert(1); }
  .home-board-row .home-recent-aircraft{grid-column:1/3;grid-row:2;justify-self:start;align-self:center;max-width:160px}
  .home-board-row .home-board-route small{text-align:right}
 }
+
+.radar-origin-hint { max-width:58ch; font-size:11px; line-height:1.7; color:var(--muted); }

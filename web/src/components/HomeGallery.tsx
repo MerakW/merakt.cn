@@ -1,6 +1,7 @@
 'use client'
 import Localized from '@/components/Localized'
 import ArrowIcon from '@/components/ArrowIcon'
+import LoadingImage from '@/components/LoadingImage'
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import type { GalleryAlbum } from '@/lib/gallery'
 
@@ -47,7 +48,7 @@ export default function HomeGallery({ albums, total }: { albums: GalleryAlbum[];
       {albums.map((album, index) => {
         const photo = album.photos[0]
         return <a className="home-gallery-card" key={album.id} href={`/fursuitfriday?album=${album.slug}`} draggable={false} style={{ '--photo-ratio': photo.width / photo.height } as CSSProperties}>
-          <div className="home-gallery-visual"><img data-i18n="off" src={photo.display} srcSet={photo.srcSet} sizes="(max-width:650px) 80vw, 60vw" width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" draggable={false}/><span aria-hidden="true">{String(index + 1).padStart(2,'0')}</span></div>
+          <div className="home-gallery-visual"><LoadingImage data-i18n="off" src={photo.display} srcSet={photo.srcSet} sizes="(max-width:650px) 80vw, 60vw" width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" draggable={false}/><span className="home-gallery-number" aria-hidden="true">{String(index + 1).padStart(2,'0')}</span></div>
           <div className="home-gallery-caption"><p data-i18n="off" title={album.title}>{album.title}</p><time dateTime={album.date}>{album.date.slice(5).replace('-', '.')}</time></div>
           {photo.credit && <span className="home-gallery-credit">{"@i18n:ui.photoBy@ "}{photo.credit}</span>}
         </a>

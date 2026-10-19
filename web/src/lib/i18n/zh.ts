@@ -43,6 +43,10 @@ export const chinese = {
   "ui.signalUnavailableChooseYourDepartureAirport": "信号暂未定位，请手动选择你的出发机场。",
   "ui.savedYouA": "特意为你留了一个", // [拼接前半句] 后接 ui.windowSeat
   "ui.windowSeat": "靠窗座位。", // [拼接后半句] 前接 ui.savedYouA
+  "ui.radarNearbyHangzhou": "已在杭州附近",
+  "ui.radarLocalWelcome": "已经很近了，欢迎来杭州相聚。",
+  "ui.radarSuggestedAirport": "参考出发机场 {0}，可手动更改。",
+  "ui.radarAlternativeAirports": "同城机场：{0}。",
   "ui.distanceToHangzhouApprox": "· 距杭州约",
   "ui.youAreInTheHangzhouTerminalArea": "你已进入杭州终端区。",
   "ui.a350900MeetingInApproxValue0HValue1": "A350-900 · 预计 {0}h {1}m 后汇合",
@@ -54,7 +58,7 @@ export const chinese = {
   "ui.calculateRoute": "计算航路",
   "ui.yourLocationInformationIsNeverStored": "我们不会存储你的任何位置信息，请放心。",
   "ui.routeEstimate": "航路估算说明",
-  "ui.cityLocationIsProvidedByIpwhoisAndCan": "IP 城市定位由 IPWHOIS 提供，支持手动更改。航程按大圆距离估算，飞行时间按 900 km/h 巡航速度加 1 小时起降裕度计算，不代表实际航班时刻。",
+  "ui.cityLocationIsProvidedByIpwhoisAndCan": "IP 城市定位由 IPWHOIS 提供，可能受网络出口影响。自动推荐参考机场，多机场城市使用默认枢纽，可手动更改。杭州参考点周边 50 公里内仅显示附近提示；其他距离取整至 10 公里，飞行时间按 900 km/h 加 1 小时裕度估算并取整至 5 分钟，不代表实际航班时刻。",
 
   // ============================================================================
   // 4. 候机室、通行证签发与留言墙 (Lounge, Souvenir Pass & Guestbook)
