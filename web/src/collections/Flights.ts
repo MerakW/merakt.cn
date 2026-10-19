@@ -1,3 +1,4 @@
+import { savedValueOptions, flightSavedFields } from '@/lib/saved-values'
 import { publicFlight } from '@/lib/flights/public'
 import type { FlightRecord } from '@/lib/flights/types'
 import { APIError, type CollectionBeforeValidateHook, type CollectionConfig, type Field } from 'payload'
@@ -50,7 +51,7 @@ export const Flights: CollectionConfig = {
   slug: 'flights', labels: { singular: "ui.flightSegment", plural: "flights.title" },
   admin: { group: "nav.flights", useAsTitle: 'flightNumber', defaultColumns: ['date', 'from', 'to', 'flightNumber', 'state', 'privateDetails', 'visibility'] },
   access: { ...editingAccess, read: visiblePublished },
-  endpoints: [{ path: '/import', method: 'post', handler: importFlights }, { path: '/backfill', method: 'post', handler: backfillFlights }],
+  endpoints: [{ path: '/saved-values', method: 'get', handler: savedValueOptions('flights', flightSavedFields) }, { path: '/import', method: 'post', handler: importFlights }, { path: '/backfill', method: 'post', handler: backfillFlights }],
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 20 },
   hooks: { beforeValidate: [normalizeFlight], afterRead: [async ({doc,req,context}) => {
     if (req.user || context.internalFlightDates) return doc
@@ -71,13 +72,13 @@ export const Flights: CollectionConfig = {
     } } },
     { type: 'row', fields: [
       { name: 'date', label: "ui.flightDate", type: 'text', required: true, admin: { description: "ui.localDateAtDepartureAirportEG2026" } },
-      { name: 'flightNumber', label: "ui.flightNumber", type: 'text' },
-      { name: 'airline', label: "ui.airline", type: 'text' },
+      { name: 'flightNumber', label: "ui.flightNumber", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
+      { name: 'airline', label: "ui.airline", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
     ] },
     { type: 'row', fields: [
-      { name: 'from', label: "ui.departureAirportIata", type: 'text', required: true },
-      { name: 'to', label: "ui.arrivalAirportIata", type: 'text', required: true },
-      { name: 'divertedTo', label: "ui.diversionAirportOptional", type: 'text' },
+      { name: 'from', label: "ui.departureAirportIata", type: 'text', required: true, admin: { components: { Field: './components/admin/SavedValueField' } } },
+      { name: 'to', label: "ui.arrivalAirportIata", type: 'text', required: true, admin: { components: { Field: './components/admin/SavedValueField' } } },
+      { name: 'divertedTo', label: "ui.diversionAirportOptional", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
     ] },
     { name: 'state', label: "ui.recordStatus", type: 'select', required: true, defaultValue: 'unconfirmed', options: [
       { label: "flightStatus.planned", value: 'planned' }, { label: "flightStatus.completed", value: 'completed' }, { label: "flightStatus.cancelled", value: 'cancelled' }, { label: "flightStatus.unconfirmed", value: 'unconfirmed' },
@@ -99,7 +100,7 @@ export const Flights: CollectionConfig = {
     ...['departureUTC', 'arrivalUTC'].map(name => ({ name, type: 'date' as const, admin: { readOnly: true, hidden: true } })),
     ...['departureTimeZone', 'arrivalTimeZone'].map(name => ({ name, type: 'text' as const, admin: { readOnly: true, hidden: true } })),
     { type: 'row', fields: [
-      { name: 'aircraft', label: "ui.aircraft2", type: 'text' }, { name: 'aircraftCode', label: "ui.aircraftCodeIcao", type: 'text', admin: { description: "ui.eGC919B738" } }, { name: 'registration', label: "ui.registration", type: 'text' },
+      { name: 'aircraft', label: "ui.aircraft2", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } }, { name: 'aircraftCode', label: "ui.aircraftCodeIcao", type: 'text', admin: { description: "ui.eGC919B738", components: { Field: './components/admin/SavedValueField' } } }, { name: 'registration', label: "ui.registration", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
     ] },
     { name: 'trip', label: "ui.trip", type: 'relationship', relationTo: 'trips' },
     { name: 'photos', label: "ui.flightPhotos", type: 'relationship', relationTo: 'media', hasMany: true },

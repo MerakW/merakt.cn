@@ -90,6 +90,18 @@ ERS 显示 V8 堆内存余量；OT 显示本地资源模式或已确认的 CDN �
 
 生产升级需执行 `20261016_160000_paddock` 数据迁移。先备份数据库，再运行 `npm run payload -- migrate`；配置 `MERAK_AUTO_MIGRATE=1` 的环境会在启动时执行迁移。自动旗语使用 2026 赛历，后续年份需更新 `web/src/lib/paddock.ts`。
 
+### Pit Wall 资源加速状态
+
+`CDN_EDGE_CACHE_ACTIVE` 是部署确认标记，不会自动开通 CDN 或修改缓存规则。正式站素材地址由 `web/src/lib/assets.ts` 指向 `https://cos.merakt.cn`；本地预览的 `NEXT_PUBLIC_LOCAL_MEDIA=1` 会优先显示 `LOCAL`。
+
+1. 确认素材域名已在 CDN 控制台启用，回源到承载公开素材的 COS 桶，CNAME、HTTPS 证书与文件路径正确。仅缓存公开素材；后台、登录、私有媒体和业务 API 不应纳入公共缓存。
+2. 配置静态文件缓存，并在覆盖同名对象后刷新对应 URL。字体和通行证导出依赖跨域读取，按下文保留 `Access-Control-Allow-Origin: https://merakt.cn`。若启用了 Referer 防盗链，检测请求也须携带允许的正式站来源；无 Referer 的 403 不能单独证明正式页面加载失败。
+3. 正式构建设置 `NEXT_PUBLIC_LOCAL_MEDIA=0`，运行设置 `LOCAL_PREVIEW=0`。用正式站来源检查素材成功返回与缓存命中、跨域响应后，在运行环境中设置 `CDN_EDGE_CACHE_ACTIVE=true` 并重启应用，Pit Wall 将显示 `ENABLED`。
+
+使用仓库的单命令部署脚本时，运行环境来自服务器 `/opt/merak/runtime.env`。将 `CDN_EDGE_CACHE_ACTIVE=true` 加入该文件；修改后需在服务器执行 `docker compose -p merak-deploy -f /opt/merak/deploy-compose.json up -d --force-recreate web`，让容器重新读取环境文件。仅 `restart` 现有容器不会加载修改后的 `env_file`。此步骤不需要重新构建前端；若修改的是 `NEXT_PUBLIC_LOCAL_MEDIA`，则必须重新构建。
+
+可用 `curl -I -H 'Referer: https://merakt.cn/' -H 'Origin: https://merakt.cn' https://cos.merakt.cn/airlines/CCA.svg` 检查。状态牌报告部署配置，实际命中情况以 CDN 控制台及响应头为准。参考[腾讯云节点缓存配置](https://cloud.tencent.com/document/product/228/6291)和[响应头配置](https://cloud.tencent.com/document/product/228/41737)。
+
 ## 围场素材上传 COS
 
 正式构建中，通行证的完整车队标识、TR 小盾徽、音效和 F1 字体统一从 `https://cos.merakt.cn` 读取；通行证 PNG 在浏览器中生成。`npm run preview:lan` 继续使用本地 `web/public/` 文件；正式构建和运行应将 `NEXT_PUBLIC_LOCAL_MEDIA` 留空或设为 `0`。
@@ -136,7 +148,7 @@ audio/team-radio.wav
 
 Pit Wall 的五红灯挑战使用浏览器高精度计时，切到后台或失焦会取消当前发车。访客主动登记成绩后进入月榜和总榜（月榜按北京时间每月 1 日开始）；昵称在后台「围场互动」勾选公开后显示，此前使用访客编号。服务端校验一次性签名凭证、等待时间和成绩范围；这是休闲榜单，不是防作弊竞技排名。PTT 预设回电仅在当前窗口显示，不写入后台。部署时需执行新增迁移 `20261017_152556_paddock_interactions` 和 `20261017_155746_photo_equipment`，或使用既有自动迁移流程。
 
-照片角落以毛玻璃参数牌展示后台填写的拍摄信息。在「媒体库 → 拍摄参数」选择拍摄介质：数码显示已填写的相机、镜头、焦段、快门、光圈和 ISO；明确选择胶片后，仅显示相机、镜头和胶片型号。未填写的项目隐藏，不推断拍摄设备。已取消滤镜切换、直方图和 Boop。公共互动接口有进程内限流；部署代理应覆盖 `X-Real-IP`，不能直接信任客户端传入的同名头。
+毛五页面在照片旁与大图下方展示后台填写的拍摄信息，照片本身保持无遮挡；近期照片采用滚动展示，往期按年份归档。署名仅解析明确记录的摄影、毛替、后期等角色，同一人的自拍或摄影/后期会合并显示；未记录的署名不推断。在「媒体库 → 拍摄参数」选择拍摄介质：数码显示已填写的相机、镜头、焦段、快门、光圈和 ISO；明确选择胶片后，仅显示相机、镜头和胶片型号。未填写的项目隐藏，不推断拍摄设备。后台相机、镜头、胶卷、摄影署名，以及航班机型、ICAO 机型代码、航司、注册号、航班号和起降/备降机场都支持选用已保存值。新值随记录保存后可复用；候选只向登录编辑者开放，不读取私有导入明细，无需数据库迁移。已取消滤镜切换、直方图和 Boop。公共互动接口有进程内限流；部署代理应覆盖 `X-Real-IP`，不能直接信任客户端传入的同名头。
 
 首页航路简报直接从浏览器调用 `https://ipwho.is/` 获取城市级 IP 定位，不申请 GPS 权限，定位仅在当前页面内存中用于计算，不写入数据库或浏览器存储；坐标通过 POST 正文传递，避免进入 URL 访问日志。失败后可手动输入机场三字码。第三方定位服务仍会接收访问者 IP，因此页面承诺仅指本站不保存定位信息。第三方免费接口有额度和可用性限制，见 [IPWHOIS 文档](https://ipwhois.io/documentation)。距离按大圆航线估算，A350-900 时间按 900 km/h 加 1 小时起降余量估算，不代表真实航班。若配置 CSP，请允许 `connect-src https://ipwho.is https://cos.merakt.cn`。
 

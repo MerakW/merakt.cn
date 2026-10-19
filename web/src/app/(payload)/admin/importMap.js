@@ -1,3 +1,4 @@
+import { default as default_43afa593f13a91343d32b0f9f13a2e6c } from '../../../components/admin/SavedValueField'
 import { FlightImportReview as FlightImportReview_8223d63bcb097d658212492048e4c910 } from '../../../components/admin/FlightImportReview'
 import { FlightImportReviewCell as FlightImportReviewCell_8223d63bcb097d658212492048e4c910 } from '../../../components/admin/FlightImportReview'
 import { FlightTimeField as FlightTimeField_00cf829c14a9dc2f40fde533f60eb994 } from '../../../components/admin/FlightTimeField'
@@ -35,6 +36,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "./components/admin/SavedValueField#default": default_43afa593f13a91343d32b0f9f13a2e6c,
   "./components/admin/FlightImportReview#FlightImportReview": FlightImportReview_8223d63bcb097d658212492048e4c910,
   "./components/admin/FlightImportReview#FlightImportReviewCell": FlightImportReviewCell_8223d63bcb097d658212492048e4c910,
   "./components/admin/FlightTimeField#FlightTimeField": FlightTimeField_00cf829c14a9dc2f40fde533f60eb994,

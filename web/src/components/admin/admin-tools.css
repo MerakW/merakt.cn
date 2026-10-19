@@ -14,3 +14,8 @@
 .checkin-approve:hover { background: var(--theme-elevation-100); }
 .checkin-approve:disabled { opacity: .6; cursor: wait; }
 .admin-tool-error { color: var(--theme-error-500); }
+.saved-equipment-field{margin-bottom:24px}
+.saved-equipment-field .field-type{margin-bottom:8px}
+.saved-equipment-history{width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--theme-elevation-150);border-radius:4px;background:var(--theme-input-bg);color:var(--theme-text);font:inherit}
+.saved-equipment-history:focus-visible{outline:2px solid var(--theme-text);outline-offset:2px}
+.saved-equipment-history:disabled{opacity:.6}

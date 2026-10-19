@@ -1,3 +1,4 @@
+import { savedValueOptions, albumSavedFields } from '@/lib/saved-values'
 import type { CollectionConfig, Field, GlobalConfig } from 'payload'
 import { adminOnly, editingAccess, publishedOnly, visiblePublished } from '@/lib/access'
 import { maintenanceExpired } from '@/lib/maintenance-time'
@@ -33,6 +34,7 @@ export const Trips: CollectionConfig = {
 export const Albums: CollectionConfig = {
   slug: 'albums', labels: { singular: "ui.albums", plural: "ui.fursuitFridayAlbums" }, admin: { group: "ui.content", useAsTitle: 'title' },
   access: { ...editingAccess, read: publishedOnly }, versions,
+  endpoints: [{ path: '/saved-values', method: 'get', handler: savedValueOptions('albums', albumSavedFields) }],
   fields: [
     { name: 'title', label: "ui.albumTitle", type: 'text', required: true }, { ...slugField, defaultValue: () => `photo-${Date.now().toString(36)}` },
     { name: 'date', label: "ui.date2", type: 'text' },
@@ -40,7 +42,7 @@ export const Albums: CollectionConfig = {
     englishField('title', 'Title'), englishField('description', 'Caption', 'textarea'),
     compoundField,
     { name: 'cover', label: "ui.cover", type: 'upload', relationTo: 'media' },
-    { name: 'photographer', label: "ui.photoCredit", type: 'text' },
+    { name: 'photographer', label: "ui.photoCredit", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
     { name: 'photos', label: "ui.photosAndVideos", type: 'array', fields: [
       { name: 'image', type: 'upload', relationTo: 'media', required: true, label: "ui.uploadPhotoOrVideo" },
       { name: 'caption', type: 'textarea', label: "ui.caption" }, englishField('caption', 'Caption', 'textarea'),
