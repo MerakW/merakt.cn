@@ -1,3 +1,5 @@
+import { exposureFromExif } from '@/lib/photo-exif'
+import type { Media } from '@/payload-types'
 import { createHash } from 'node:crypto'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -50,12 +52,14 @@ export async function POST(request: Request) {
   const existing = await payload.find({ collection: 'albums', user, overrideAccess: false, depth: 0, limit: 1, where: { slug: { equals: slug } } })
   if (existing.docs[0]) return json({ url: `/fursuitfriday?album=${slug}`, duplicate: true })
   let image: Buffer
+  let exposure: Media['exposure']
   try {
     const input = sharp(original, { limitInputPixels: 40_000_000, failOn: 'error' })
     const metadata = await input.metadata()
     if (!['jpeg', 'png', 'webp', 'avif', 'heif'].includes(metadata.format || '') || (metadata.pages || 1) > 1) {
       return json({ error: '请选择静态 JPG、PNG、WebP 或 AVIF 图片。' }, 415)
     }
+    exposure = exposureFromExif(metadata.exif)
     // sharp strips metadata by default. rotate() applies EXIF orientation first.
     image = await input.rotate().resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer()
   } catch { return json({ error: '图片无法处理，或超过 4,000 万像素。请换一张图片。' }, 400) }
@@ -73,7 +77,7 @@ export async function POST(request: Request) {
   try {
     const media = await payload.create({ collection: 'media', user, overrideAccess: false, req,
       file: { data: image, name: `upload-${id}.webp`, mimetype: 'image/webp', size: image.length },
-      data: { alt: title, altEn: captionEn.split('\n')[0].slice(0,100) || undefined, credit, visibility: 'public', legacyPath } })
+      data: { exposure, alt: title, altEn: captionEn.split('\n')[0].slice(0,100) || undefined, credit, visibility: 'public', legacyPath } })
     await payload.create({ collection: 'albums', user, overrideAccess: false, req,
       data: { title, slug, date, description: caption, titleEn: captionEn.split('\n')[0].slice(0,100) || undefined, descriptionEn: captionEn || undefined, photographer: credit, cover: media.id,
         photos: [{ image: media.id, caption, captionEn: captionEn || undefined, credit }], _status: 'published' } })

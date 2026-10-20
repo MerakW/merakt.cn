@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import type { PayloadRequest } from 'payload'
+import { exifFixture } from './photo-exif-fixture'
 
 const directory = await mkdtemp(join(tmpdir(), 'merak-equipment-'))
 Object.assign(process.env, { NODE_ENV: 'production', MERAK_AUTO_MIGRATE: '1', PAYLOAD_SECRET: randomUUID(), DATABASE_URL: 'file:' + join(directory, 'test.db'), MEDIA_DIR: join(directory, 'media'), FLIGHT_SYNC_ENABLED: '0' })
@@ -44,5 +45,21 @@ try {
   }
   assert.equal((await flightOptions({url:'http://localhost/api/flights/saved-values?field=privateDetails',payload,user} as PayloadRequest)).status,400)
   assert.ok(flight.id)
+  const exifImage = await exifFixture()
+  const exifFile = {data:exifImage,name:randomUUID()+'.jpg',mimetype:'image/jpeg',size:exifImage.length}
+  const detected = await payload.create({collection:'media',data:{alt:'synthetic EXIF fixture',visibility:'private',exposure:{lens:'Manual lens'}},file:exifFile})
+  assert.deepEqual(detected.exposure,{medium:'digital',camera:'Canon EOS R5',lens:'Manual lens',focalLength:'85 mm',shutter:'1/250',aperture:'2.8',iso:400,filmStock:null})
+  const edited = await payload.update({collection:'media',id:detected.id,data:{exposure:{camera:'Manual camera',iso:800}}})
+  assert.equal(edited.exposure?.camera,'Manual camera')
+  assert.equal(edited.exposure?.iso,800)
+  const replaced = await payload.update({collection:'media',id:detected.id,data:{alt:'replacement'},file:{...exifFile,name:randomUUID()+'.jpg'}})
+  assert.equal(replaced.exposure?.camera,'Manual camera')
+  assert.equal(replaced.exposure?.iso,800)
+  assert.equal(replaced.exposure?.lens,'Manual lens')
+  const film = await payload.create({collection:'media',data:{alt:'synthetic film scan',visibility:'private',exposure:{medium:'film',camera:'Film camera',filmStock:'Test Film'}},file:{...exifFile,name:randomUUID()+'.jpg'}})
+  assert.equal(film.exposure?.camera,'Film camera')
+  assert.equal(film.exposure?.filmStock,'Test Film')
+  assert.ok(film.exposure?.iso == null)
+  console.log('PASS: EXIF automatically fills uploads; manual values, replacement uploads and film settings stay intact.')
   console.log('PASS: saved camera/lens history, deduplication, new models, reuse, authenticated access and no-store responses.')
 } finally { await payload.destroy() }

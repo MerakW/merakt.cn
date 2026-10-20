@@ -67,6 +67,7 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
         <label htmlFor="photo-caption-en">{"@i18n:gallery.englishCaption@"}<textarea id="photo-caption-en" lang="en" value={captionEn} onChange={event => { setCaptionEn(event.target.value); setResult(null) }} placeholder="@i18n:gallery.translationFallback@" maxLength={10_000} disabled={busy} /></label>
         <label htmlFor="photo-date">{"@i18n:ui.date2@"}<input id="photo-date" type="date" value={date} onChange={event => { setDate(event.target.value); setResult(null) }} required disabled={busy} /></label>
         <p className="photo-publish-hint">{"@i18n:ui.orInTheCaptionIsAutomaticallyUsedAs@"}</p>
+        <p className="photo-publish-hint">{"@i18n:gallery.exifUploadHint@"}</p>
         <button className="solid-button" type="submit" disabled={busy || !configured || !file || !caption.trim() || Boolean(result)}>{busy ? "@i18n:ui.uploadingAndPublishing@" : "@i18n:ui.uploadAndPublish@"}</button>
       </div>
     </form>

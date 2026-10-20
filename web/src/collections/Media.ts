@@ -1,3 +1,4 @@
+import { captureUploadExif, fillUploadExposure } from '@/lib/photo-exif'
 import { legacyImageURL } from '@/lib/assets'
 import { resolve } from 'node:path'
 import type { CollectionConfig } from 'payload'
@@ -9,6 +10,7 @@ export const Media: CollectionConfig = {
   admin: { group: "ui.content", useAsTitle: 'alt' },
   endpoints: [{ path: '/saved-values', method: 'get', handler: savedValueOptions('media', mediaSavedFields) }],
   access: { ...editingAccess, read: ({ req }) => req.user ? true : { visibility: { equals: 'public' } } },
+  hooks: { beforeOperation: [captureUploadExif], beforeValidate: [fillUploadExposure] },
   upload: {
     staticDir: resolve(/* turbopackIgnore: true */ process.env.MEDIA_DIR || './.data/media'),
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'video/mp4', 'video/webm'],
@@ -23,7 +25,7 @@ export const Media: CollectionConfig = {
     { name: 'alt', label: "ui.imageDescription", type: 'text', required: true },
     { name: 'altEn', label: 'admin.translation.imageDescription', type: 'text' },
     { name: 'credit', label: "ui.photoCredit", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
-    { name: 'exposure', label: "ui.cameraSettings", type: 'group', fields: [
+    { name: 'exposure', label: "ui.cameraSettings", type: 'group', admin: { description: 'admin.equipment.exifHelp' }, fields: [
       { name: 'medium', label: "ui.medium", type: 'select', defaultValue: 'digital', options: [{label:"ui.digital",value:'digital'},{label:"ui.film",value:'film'}] },
       { name: 'camera', label: "ui.camera", type: 'text', maxLength: 80, admin: { autoComplete: 'off', description: 'admin.equipment.savedOptionsHelp', components: { Field: './components/admin/SavedValueField' } } },
       { name: 'lens', label: "ui.lens", type: 'text', maxLength: 100, admin: { autoComplete: 'off', description: 'admin.equipment.savedOptionsHelp', components: { Field: './components/admin/SavedValueField' } } },

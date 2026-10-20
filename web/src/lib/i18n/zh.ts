@@ -15,6 +15,7 @@ export const chinese = {
   "language.english": "EN",
   "language.switchToEnglish": "切换到英文",
   "language.switchToChinese": "切换到中文",
+  "admin.equipment.exifHelp": "上传保存时自动从 EXIF 补充相机、镜头、焦距、快门、光圈和 ISO；已有填写优先保留，胶片记录不自动填入扫描设备参数。",
   "admin.equipment.chooseSaved": "选用已保存的{0}…",
   "admin.equipment.savedOptionsHelp": "可选用已保存的内容，也可直接输入新值；保存记录后可在后续记录中复用。",
   "admin.translation.title": "英文标题",
@@ -451,6 +452,7 @@ export const chinese = {
   "gallery.originalImage": "原图",
   "gallery.tallyOne": "从 {0} 算起，一共攒了 {1} 期。",
   "gallery.yearCountOne": "{0} 期",
+  "gallery.exifUploadHint": "上传后会自动读取照片中可用的 EXIF 拍摄参数，保存后可在媒体库修改。",
   "gallery.lede": "多数时候是我在里面，有时也会换朋友穿、由我来按下快门。",
   "gallery.tally": "从 {0} 算起，一共攒了 {1} 期。", // {0} 首条日期 {1} 期数
   "gallery.reelLabel": "最近几期",

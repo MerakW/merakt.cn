@@ -18,6 +18,7 @@ export const english: Record<MessageKey, string> = {
   "language.english": "EN",
   "language.switchToEnglish": "Switch to English",
   "language.switchToChinese": "Switch to Chinese",
+  "admin.equipment.exifHelp": "When saving an upload, EXIF fills empty camera, lens, focal length, shutter, aperture and ISO fields. Existing values take priority; film records keep their own settings.",
   "admin.equipment.chooseSaved": "Use a saved {0}…",
   "admin.equipment.savedOptionsHelp": "Choose a saved value or type a new one. Save the record to reuse it on later records.",
   "admin.translation.title": "Title · English translation",
@@ -454,6 +455,7 @@ export const english: Record<MessageKey, string> = {
   "gallery.originalImage": "Full size",
   "gallery.tallyOne": "{1} set since {0}.",
   "gallery.yearCountOne": "{0} set",
+  "gallery.exifUploadHint": "Available EXIF camera settings are read on upload. You can edit them in the media library after saving.",
   "gallery.lede": "Usually it's me inside; sometimes a friend steps in while I take the photos.",
   "gallery.tally": "{1} sets since {0}.", // {0} first date {1} sets
   "gallery.reelLabel": "The latest few",
