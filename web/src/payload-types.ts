@@ -79,6 +79,7 @@ export interface Config {
     'paddock-signals': PaddockSignal;
     'flight-sync-jobs': FlightSyncJob;
     'flight-worker-replays': FlightWorkerReplay;
+    'flight-provider-queries': FlightProviderQuery;
     passkeys: Passkey;
     'passkey-challenges': PasskeyChallenge;
     'payload-kv': PayloadKv;
@@ -100,6 +101,7 @@ export interface Config {
     'paddock-signals': PaddockSignalsSelect<false> | PaddockSignalsSelect<true>;
     'flight-sync-jobs': FlightSyncJobsSelect<false> | FlightSyncJobsSelect<true>;
     'flight-worker-replays': FlightWorkerReplaysSelect<false> | FlightWorkerReplaysSelect<true>;
+    'flight-provider-queries': FlightProviderQueriesSelect<false> | FlightProviderQueriesSelect<true>;
     passkeys: PasskeysSelect<false> | PasskeysSelect<true>;
     'passkey-challenges': PasskeyChallengesSelect<false> | PasskeyChallengesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -181,9 +183,18 @@ export interface Media {
   alt: string;
   altEn?: string | null;
   credit?: string | null;
+  /**
+   * When saving an upload, EXIF fills empty camera, lens, focal length, shutter, aperture and ISO fields. Existing values take priority; film records keep their own settings.
+   */
   exposure?: {
     medium?: ('digital' | 'film') | null;
+    /**
+     * Choose a saved value or type a new one. Save the record to reuse it on later records.
+     */
     camera?: string | null;
+    /**
+     * Choose a saved value or type a new one. Save the record to reuse it on later records.
+     */
     lens?: string | null;
     focalLength?: string | null;
     filmStock?: string | null;
@@ -537,6 +548,35 @@ export interface FlightWorkerReplay {
   id: number;
   nonce: string;
   expiresAt: string;
+}
+/**
+ * Confirmed query reservations. Interrupted queries are never automatically charged again.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flight-provider-queries".
+ */
+export interface FlightProviderQuery {
+  id: number;
+  key: string;
+  flightNumber: string;
+  date: string;
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'unknown';
+  costFen: number;
+  requestedBy: number;
+  flights?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  errorCode?: string | null;
+  startedAt?: string | null;
+  leaseToken?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -966,6 +1006,24 @@ export interface FlightWorkerReplaysSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "flight-provider-queries_select".
+ */
+export interface FlightProviderQueriesSelect<T extends boolean = true> {
+  key?: T;
+  flightNumber?: T;
+  date?: T;
+  status?: T;
+  costFen?: T;
+  requestedBy?: T;
+  flights?: T;
+  errorCode?: T;
+  startedAt?: T;
+  leaseToken?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "passkeys_select".
  */
 export interface PasskeysSelect<T extends boolean = true> {
@@ -1038,7 +1096,7 @@ export interface SiteSetting {
   id: number;
   trackMode?: ('auto' | 'clear' | 'sc' | 'vsc' | 'pit') | null;
   /**
-   * IN PIT returns 503 for public pages. The estimate is display-only; switch back to Auto or Track Clear to reopen.
+   * IN PIT enables the maintenance page. A recovery time ends maintenance automatically; leave it blank to end manually.
    */
   maintenanceExpectedExit?: string | null;
   maintenanceStartedAt?: string | null;

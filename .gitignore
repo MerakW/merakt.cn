@@ -3,6 +3,7 @@ dist/
 .astro/
 .next/
 .next-qa/
+.next-*/
 .next-validation/
 .DS_Store
 *.tsbuildinfo

@@ -236,3 +236,17 @@ location = /__maintenance.html {
 后台「首页与站点设置」→「赛道状态」选择 IN PIT，填写「预计恢复时间」后保存，公开页面即返回 HTTP 503。后台、PIT WALL 与管理入口保持可用；可通过 `/manage/maintenance` 提前结束，或手动切回自动或赛道畅通。设置预计恢复时间后，到时自动解除维护（由下一次请求或页面探测触发）；留空则持续至手动关闭。新增迁移 `20261018_030000_maintenance` 保存开始时间、预计恢复时间及版本历史。
 
 红旗页位于 `/red-flag-preview`，503 页位于 `/maintenance-preview`。nginx 仅拦截 502/504，保留应用的 503 响应及预计恢复时间；应用停止时仍使用独立静态页，预计时间显示待定。
+
+### 飞常准手动补齐（可选付费）
+
+航班后台填写航班号与**出发机场当地日期**后，点击「查询并补齐」。页面先显示航班、日期与预计费用，勾选核对后才会创建任务；查询完成后选择航段，补入空白字段，再检查并保存。已有时间和机号不会被覆盖，入位时间缺失时保持空白，不用预计时间代替实际时间。已有查询结果免费复用；需要最新数据时点击「重新查询」，重新核对费用。自动航班同步和 Flighty 校准不会自动调用此付费接口。
+
+启用需要更新云端程序及家庭端运行包，保留既有数据库、工作端签名密钥与同步配置：
+
+1. 云端按现有发布流程执行新增迁移 `20261020_120000_paid_flight_queries`。运行环境设置 `FLIGHT_SYNC_ENABLED=1`、`FLIGHT_SYNC_MODE=remote`、`VARIFLIGHT_ENABLED=1`；每日/月度查询上限分别为 `VARIFLIGHT_DAILY_QUERY_LIMIT=4` 和 `VARIFLIGHT_MONTHLY_QUERY_LIMIT=20`（可改为 0 停止新增付费任务）。上限按北京时间计算。
+2. 家庭端用 `npm run package:flight-home` 生成的新版运行包更新程序。将 Key 保存在家庭部署目录 `secrets/variflight-key`，权限 600；在家庭端 `.env` 设置 `VARIFLIGHT_API_KEY_FILE=/run/secrets/variflight-key`，不把 Key 放进云端、网页或 Git。家庭端也独立校验上述每日/月度上限，需按预期设置一致。
+3. 既有家庭部署首次升级时创建 `data` 目录并保留其内容，新版 compose 将其挂载到 `/var/lib/flight-logger`；默认 `VARIFLIGHT_CACHE_DB=/var/lib/flight-logger/variflight.sqlite`。该文件保存付费请求占位、原始响应和待上传结果，必须持久化并纳入本机备份；后续更新程序不要删除或覆盖 `data`、`keys`、`secrets` 和 `.env`。完成配置后重建并启动家庭端容器。
+
+一次确认只调用 `searchFlightsByNumber`，不额外查询舒适度等工具。界面按样例脚本标示约 50 积分 / ¥0.50，实际以账户套餐账单为准。确认后 15 分钟内未被家庭端领取则失效，不发起请求；领取后出现超时、服务重启或结果不明时不会自动重新付费。家庭端先保存原始响应再上传，云端暂时离线只重传已保存结果。请求结果未知时仍预留额度，重新查询前先检查供应商账单。
+
+验证命令：`npm test`、`python3 -m unittest discover -s tests -p test_variflight_fetch.py`、`node --import tsx tests/flight-provider-query.integration.ts` 和 `npm run test:flight-worker`；测试使用临时数据库及模拟响应，不消耗供应商额度。

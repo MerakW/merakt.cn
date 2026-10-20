@@ -2,3 +2,4 @@ keys/
 secrets/
 .env
 *.tar.gz
+data

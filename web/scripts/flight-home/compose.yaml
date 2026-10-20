@@ -11,6 +11,7 @@ services:
     volumes:
       - ./keys/worker-private.pem:/run/keys/worker-private.pem:ro
       - ./secrets:/run/secrets:ro
+      - ./data:/var/lib/flight-logger
     healthcheck:
       test: ["CMD", "node", "worker.mjs", "--check"]
       interval: 60s

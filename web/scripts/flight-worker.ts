@@ -2,6 +2,7 @@ import { createPrivateKey } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import { lookupFlight, pushCalibration, FlightSyncError, type SyncRequest } from '../src/lib/flights/sync-provider'
 import { signedHeaders, workerPath } from '../src/lib/flights/worker-protocol'
+import { processProviderQuery } from './flight-provider-worker'
 
 const server = new URL(process.env.FLIGHT_CLOUD_URL || 'https://merakt.cn')
 if (server.protocol !== 'https:' || server.username || server.password || server.search || server.hash || !['', '/'].includes(server.pathname)) throw new Error('FLIGHT_CLOUD_URL 必须是 HTTPS 网站根地址。')
@@ -10,6 +11,7 @@ if (privateKey.asymmetricKeyType !== 'ed25519') throw new Error('请选择 Ed255
 if (process.env.BARK_KEY_FILE) process.env.BARK_KEY = (await readFile(process.env.BARK_KEY_FILE, 'utf8')).trim()
 process.env.FR24_TRANSPORT ||= 'curl_cffi'
 if (process.env.FLIGHTAWARE_API_KEY_FILE) process.env.FLIGHTAWARE_API_KEY = (await readFile(process.env.FLIGHTAWARE_API_KEY_FILE, 'utf8')).trim()
+if (process.env.VARIFLIGHT_API_KEY_FILE) process.env.VARIFLIGHT_API_KEY = (await readFile(process.env.VARIFLIGHT_API_KEY_FILE, 'utf8')).trim()
 process.env.FR24_PYTHON ||= '/opt/venv/bin/python'
 const provider = process.env.FLIGHT_DATA_PROVIDER || 'fr24'
 if (!['fr24', 'flightaware'].includes(provider)) throw new Error('FLIGHT_DATA_PROVIDER 配置无效。')
@@ -17,12 +19,14 @@ if (provider === 'flightaware' && !process.env.FLIGHTAWARE_API_KEY) throw new Er
 
 async function rpc(input: unknown) {
   const body = JSON.stringify(input)
-  const response = await fetch(new URL(workerPath, server), { method: 'POST', headers: signedHeaders(body, privateKey), body, signal: AbortSignal.timeout(20000), redirect: 'error' })
+  const response = await fetch(new URL(workerPath, server), { method: 'POST', headers: { ...signedHeaders(body, privateKey), ...((input as { action?: string })?.action === 'provider-query-result' ? { 'x-flight-paid-result': '1' } : {}) }, body, signal: AbortSignal.timeout(20000), redirect: 'error' })
   if (!response.ok) throw new Error(`云端 HTTP ${response.status}`)
   return response.json()
 }
 
 async function once() {
+  try { if (await processProviderQuery(rpc)) return true }
+  catch { console.error('付费查询结果暂未确认；已保留记录，不会自动重新付费。') }
   const { job } = await rpc({ action: 'claim' })
   if (!job) return false
   let result: Record<string, unknown>

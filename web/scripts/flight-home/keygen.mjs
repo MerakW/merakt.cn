@@ -3,6 +3,7 @@ import { mkdirSync, existsSync, writeFileSync } from 'node:fs'
 
 mkdirSync('keys', { recursive: true, mode: 0o700 })
 mkdirSync('secrets', { recursive: true, mode: 0o700 })
+mkdirSync('data', { recursive: true, mode: 0o700 })
 if (existsSync('keys/worker-private.pem') || existsSync('keys/worker-public.pem')) throw new Error('密钥已存在，保留现有文件。')
 const { privateKey, publicKey } = generateKeyPairSync('ed25519')
 writeFileSync('keys/worker-private.pem', privateKey.export({ type: 'pkcs8', format: 'pem' }), { flag: 'wx', mode: 0o600 })

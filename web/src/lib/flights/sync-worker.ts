@@ -7,6 +7,7 @@ import { acquire, release, processSyncJob } from './sync-service'
 import { signingMessage } from './worker-protocol'
 import { FlightSyncError, normalizeSyncRequest, type FlightFacts, type SyncRequest } from './sync-provider'
 import { validateActualTimes } from './time'
+import { claimProviderQuery, acceptProviderQuery } from './provider-queries'
 
 const json = (data: unknown, status = 200) => Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } })
 const invalid = () => new FlightSyncError('invalid-result', '家庭端结果不符合航段数据规范。', false)
@@ -101,7 +102,7 @@ export async function workerEndpoint(req: PayloadRequest): Promise<Response> {
     while (true) {
       const { value, done } = await reader.read(); if (done) break
       bytes += value.byteLength
-      if (bytes > 8192) { await reader.cancel(); return json({ error: '请求超过 8 KB。' }, 413) }
+      if (bytes > (req.headers.get('x-flight-paid-result') === '1' ? 65536 : 8192)) { await reader.cancel(); return json({ error: '请求超过大小限制。' }, 413) }
       chunks.push(value)
     }
     const raw = Buffer.concat(chunks).toString('utf8')
@@ -114,6 +115,8 @@ export async function workerEndpoint(req: PayloadRequest): Promise<Response> {
     let body: Record<string, unknown>
     try { body = JSON.parse(raw); if (!body || typeof body !== 'object' || Array.isArray(body)) throw invalid() } catch { return json({ error: 'JSON 无效。' }, 400) }
     if (body.action === 'check') return json({ mode: 'remote', status: 'ready' })
+    if (body.action === 'provider-query-claim') return json({ job: await claimProviderQuery(req.payload, now) })
+    if (body.action === 'provider-query-result') return json(await acceptProviderQuery(req.payload, body, now))
     if (body.action === 'claim') return json({ job: await claimWorkerJob(req.payload, now) })
     if (body.action === 'result') return json(await acceptWorkerResult(req.payload, body, now))
     return json({ error: '未知操作。' }, 400)

@@ -7,6 +7,7 @@ import { airportMap } from '@/lib/flights/airports'
 import { localToUTC, validDate, validateActualTimes } from '@/lib/flights/time'
 import { importFlights } from '@/lib/flights/import-endpoint'
 import { backfillFlights } from '@/lib/flights/backfill-endpoint'
+import { providerQueryEndpoint } from '@/lib/flights/provider-query-endpoint'
 
 export const visibilityFields: Field[] = [
   { name: 'visibility', label: "ui.visibility", type: 'select', defaultValue: 'private', required: true, options: [
@@ -51,7 +52,7 @@ export const Flights: CollectionConfig = {
   slug: 'flights', labels: { singular: "ui.flightSegment", plural: "flights.title" },
   admin: { group: "nav.flights", useAsTitle: 'flightNumber', defaultColumns: ['date', 'from', 'to', 'flightNumber', 'state', 'privateDetails', 'visibility'] },
   access: { ...editingAccess, read: visiblePublished },
-  endpoints: [{ path: '/saved-values', method: 'get', handler: savedValueOptions('flights', flightSavedFields) }, { path: '/import', method: 'post', handler: importFlights }, { path: '/backfill', method: 'post', handler: backfillFlights }],
+  endpoints: [{ path: '/saved-values', method: 'get', handler: savedValueOptions('flights', flightSavedFields) }, { path: '/import', method: 'post', handler: importFlights }, { path: '/backfill', method: 'post', handler: backfillFlights }, { path: '/provider-query', method: 'post', handler: providerQueryEndpoint }],
   versions: { drafts: { autosave: { interval: 2000 } }, maxPerDoc: 20 },
   hooks: { beforeValidate: [normalizeFlight], afterRead: [async ({doc,req,context}) => {
     if (req.user || context.internalFlightDates) return doc
@@ -75,6 +76,7 @@ export const Flights: CollectionConfig = {
       { name: 'flightNumber', label: "ui.flightNumber", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
       { name: 'airline', label: "ui.airline", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
     ] },
+    { name: 'providerLookup', type: 'ui', admin: { components: { Field: './components/admin/FlightProviderLookup#FlightProviderLookup' } } },
     { type: 'row', fields: [
       { name: 'from', label: "ui.departureAirportIata", type: 'text', required: true, admin: { components: { Field: './components/admin/SavedValueField' } } },
       { name: 'to', label: "ui.arrivalAirportIata", type: 'text', required: true, admin: { components: { Field: './components/admin/SavedValueField' } } },

@@ -17,6 +17,7 @@ import { Passkeys, PasskeyChallenges } from './collections/Passkeys'
 import { migrations } from './migrations'
 import { FlightWorkerReplays } from './collections/FlightWorkerReplays'
 import { FlightSyncJobs } from './collections/FlightSyncJobs'
+import { FlightProviderQueries } from './collections/FlightProviderQueries'
 import { flightSyncEndpoints } from './lib/flights/sync-endpoints'
 import { startFlightSyncWorker } from './lib/flights/sync-service'
 
@@ -31,7 +32,7 @@ export default buildConfig({
   csrf: process.env.LOCAL_PREVIEW === '1' ? ['http://127.0.0.1:3003', 'http://localhost:3003'] : [],
   admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { providers: ['./components/admin/AdminLocaleSync'], beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
   i18n: { supportedLanguages: { zh, en }, fallbackLanguage: 'zh' },
-  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, Passkeys, PasskeyChallenges].map(bilingualLabels),
+  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, FlightProviderQueries, Passkeys, PasskeyChallenges].map(bilingualLabels),
   endpoints: flightSyncEndpoints,
   onInit: startFlightSyncWorker,
   globals: [bilingualLabels(SiteSettings)],

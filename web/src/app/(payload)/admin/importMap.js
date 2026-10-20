@@ -1,6 +1,7 @@
 import { default as default_43afa593f13a91343d32b0f9f13a2e6c } from '../../../components/admin/SavedValueField'
 import { FlightImportReview as FlightImportReview_8223d63bcb097d658212492048e4c910 } from '../../../components/admin/FlightImportReview'
 import { FlightImportReviewCell as FlightImportReviewCell_8223d63bcb097d658212492048e4c910 } from '../../../components/admin/FlightImportReview'
+import { FlightProviderLookup as FlightProviderLookup_22a26921f7038526755d8e33b70a1980 } from '../../../components/admin/FlightProviderLookup'
 import { FlightTimeField as FlightTimeField_00cf829c14a9dc2f40fde533f60eb994 } from '../../../components/admin/FlightTimeField'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -39,6 +40,7 @@ export const importMap = {
   "./components/admin/SavedValueField#default": default_43afa593f13a91343d32b0f9f13a2e6c,
   "./components/admin/FlightImportReview#FlightImportReview": FlightImportReview_8223d63bcb097d658212492048e4c910,
   "./components/admin/FlightImportReview#FlightImportReviewCell": FlightImportReviewCell_8223d63bcb097d658212492048e4c910,
+  "./components/admin/FlightProviderLookup#FlightProviderLookup": FlightProviderLookup_22a26921f7038526755d8e33b70a1980,
   "./components/admin/FlightTimeField#FlightTimeField": FlightTimeField_00cf829c14a9dc2f40fde533f60eb994,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,

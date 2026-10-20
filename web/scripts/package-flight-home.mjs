@@ -12,6 +12,7 @@ await build({ entryPoints: ['scripts/flight-worker.ts'], outfile: directory + '/
 for (const name of ['Dockerfile', '.dockerignore', 'compose.yaml', 'compose.host-network.yaml', '.env.example', 'keygen.mjs']) await copyFile('scripts/flight-home/' + name, directory + '/' + name)
 await copyFile('scripts/flight-sync-requirements.txt', directory + '/requirements.txt')
 await copyFile('src/lib/flights/fr24_fetch.py', directory + '/fr24_fetch.py')
+await copyFile('src/lib/flights/variflight_fetch.py', directory + '/variflight_fetch.py')
 const archive = resolve('.data/flight-logger-home.tar.gz')
 execFileSync('tar', ['-czf', archive, '-C', directory, '.'])
 console.log('家庭端部署包：' + archive)
