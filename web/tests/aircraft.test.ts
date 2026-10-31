@@ -1,6 +1,23 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { aircraftModel } from '../src/lib/flights/aircraft'
+import { aircraftLightLayout } from '../src/lib/flights/aircraft-lights'
+
+test('lights follow the displayed image even when the flight uses a different variant', () => {
+  for (const [aircraft, airline, exactAircraft] of [
+    ['Airbus A320neo', 'CES', 'Airbus A320'],
+    ['Boeing 737-89P', 'CSH', 'Boeing 737-800'],
+    ['Boeing 787-9', 'ANA', 'Boeing 787-8'],
+  ]) {
+    const model = aircraftModel({ aircraft, airline })!
+    const exact = aircraftModel({ aircraft: exactAircraft, airline })!
+    assert.equal(model.family, true)
+    assert.equal(model.file, exact.file)
+    assert.ok(aircraftLightLayout(model))
+    assert.deepEqual(aircraftLightLayout(model), aircraftLightLayout(exact))
+  }
+  assert.equal(aircraftLightLayout({ file: '/aircraft/unconfigured.webp?v=2' }), undefined)
+})
 
 test('prefers available airline liveries within the aircraft family', () => {
   assert.match(aircraftModel({aircraft:'Airbus A321neo',airline:'CES'})!.file, /A320_china_eastern/)

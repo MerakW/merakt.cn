@@ -169,8 +169,7 @@ const layouts: Record<string, AircraftLightLayout> = {
   },
 }
 
-export function aircraftLightLayout(model: AircraftModel): AircraftLightLayout | undefined {
-  if (model.family) return undefined
+export function aircraftLightLayout(model: Pick<AircraftModel, 'file'>): AircraftLightLayout | undefined {
   const asset = model.file.split('/').at(-1)?.split('.webp')[0]
   return asset ? layouts[asset] : undefined
 }

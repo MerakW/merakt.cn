@@ -1,14 +1,14 @@
-import { exposureFromExif } from '@/lib/photo-exif'
+import { preparePublishedPhoto } from '@/lib/photo-upload'
+import { PHOTO_UPLOAD_MAX_BYTES } from '@/lib/photo-upload-limits'
 import type { Media } from '@/payload-types'
 import { createHash } from 'node:crypto'
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import sharp from 'sharp'
 import { cosConfigured, uploadPhotoToCOS } from '@/lib/cos-upload'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-const MAX_BYTES = 30 * 1024 * 1024
+const MAX_BYTES = PHOTO_UPLOAD_MAX_BYTES
 const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { 'Cache-Control': 'no-store' } })
 
 export async function POST(request: Request) {
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       const { value, done } = await reader.read()
       if (done) break
       size += value.byteLength
-      if (size > MAX_BYTES + 64 * 1024) { await reader.cancel(); return json({ error: '图片不能超过 30 MB。' }, 413) }
+      if (size > MAX_BYTES + 64 * 1024) { await reader.cancel(); return json({ error: '图片不能超过 100 MB。' }, 413) }
       chunks.push(value)
     }
     form = await new Response(new Uint8Array(Buffer.concat(chunks)), { headers: { 'Content-Type': contentType } }).formData()
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   if (captionEn.length > 10_000) return json({ error: '英文配文不能超过 10,000 字。' }, 400)
   const caption = String(form.get('caption') || '').trim()
   const date = String(form.get('date') || '')
-  if (!(file instanceof File) || !file.size || file.size > MAX_BYTES) return json({ error: '请选择一张 30 MB 以内的图片。' }, 400)
+  if (!(file instanceof File) || !file.size || file.size > MAX_BYTES) return json({ error: '请选择一张 100 MB 以内的图片。' }, 400)
   if (!caption || caption.length > 10_000) return json({ error: '请填写 1–10,000 字的文案。' }, 400)
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !Number.isFinite(Date.parse(date)) || new Date(date).toISOString().slice(0, 10) !== date) {
     return json({ error: '记录日期无效。' }, 400)
@@ -54,15 +54,11 @@ export async function POST(request: Request) {
   let image: Buffer
   let exposure: Media['exposure']
   try {
-    const input = sharp(original, { limitInputPixels: 40_000_000, failOn: 'error' })
-    const metadata = await input.metadata()
-    if (!['jpeg', 'png', 'webp', 'avif', 'heif'].includes(metadata.format || '') || (metadata.pages || 1) > 1) {
-      return json({ error: '请选择静态 JPG、PNG、WebP 或 AVIF 图片。' }, 415)
-    }
-    exposure = exposureFromExif(metadata.exif)
-    // sharp strips metadata by default. rotate() applies EXIF orientation first.
-    image = await input.rotate().resize({ width: 2048, height: 2048, fit: 'inside', withoutEnlargement: true }).webp({ quality: 82 }).toBuffer()
-  } catch { return json({ error: '图片无法处理，或超过 4,000 万像素。请换一张图片。' }, 400) }
+    const prepared = await preparePublishedPhoto(original)
+    if (!prepared) return json({ error: '请选择静态 JPG、PNG、WebP 或 AVIF 图片。' }, 415)
+    image = prepared.image
+    exposure = prepared.exposure
+  } catch { return json({ error: '图片无法处理，或超过 1.2 亿像素。请换一张图片。' }, 400) }
   const key = `fursuitfriday/upload-${id}.webp`
   try { await uploadPhotoToCOS(key, image) }
   catch (error) { return json({ error: error instanceof Error ? error.message : '图片上传失败，未发布相册。' }, 502) }

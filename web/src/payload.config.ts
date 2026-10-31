@@ -8,6 +8,7 @@ import { buildConfig } from 'payload'
 import { en } from '@payloadcms/translations/languages/en'
 import { zh } from '@payloadcms/translations/languages/zh'
 import sharp from 'sharp'
+import { PHOTO_UPLOAD_MAX_BYTES } from './lib/photo-upload-limits'
 import { Users, Trips, Albums, Posts, Notes, Events, SiteSettings } from './collections/Content'
 import { PaddockSignals } from './collections/PaddockSignals'
 import { Flights } from './collections/Flights'
@@ -42,6 +43,6 @@ export default buildConfig({
   ] })] }),
   db: sqliteAdapter({ prodMigrations: process.env.MERAK_AUTO_MIGRATE === '1' ? migrations : undefined, client: { url: process.env.DATABASE_URL || 'file:./.data/merak.db' }, transactionOptions: { behavior: 'immediate' }, wal: true, busyTimeout: 5000, migrationDir: resolve(baseDir, 'migrations') }),
   sharp,
-  upload: { limits: { fileSize: 30 * 1024 * 1024 } },
+  upload: { limits: { fileSize: PHOTO_UPLOAD_MAX_BYTES } },
   typescript: { outputFile: resolve(baseDir, 'payload-types.ts') },
 })

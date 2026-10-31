@@ -1,5 +1,6 @@
 import exifReader from 'exif-reader'
 import sharp from 'sharp'
+import { PHOTO_UPLOAD_MAX_PIXELS } from './photo-upload-limits'
 import type { CollectionBeforeOperationHook, CollectionBeforeValidateHook } from 'payload'
 import type { Media } from '@/payload-types'
 
@@ -34,7 +35,7 @@ export const captureUploadExif: CollectionBeforeOperationHook = async ({ operati
   delete req.context.mediaUploadExif
   if (!req.file?.mimetype.startsWith('image/')) return
   try {
-    const metadata = await sharp(req.file.tempFilePath || req.file.data, { limitInputPixels: 40_000_000 }).metadata()
+    const metadata = await sharp(req.file.tempFilePath || req.file.data, { limitInputPixels: PHOTO_UPLOAD_MAX_PIXELS }).metadata()
     req.context.mediaUploadExif = exposureFromExif(metadata.exif)
   } catch { /* Payload handles invalid image uploads; EXIF is optional. */ }
 }

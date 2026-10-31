@@ -1,6 +1,7 @@
 'use client'
 import Localized from '@/components/Localized'
 import ArrowIcon from '@/components/ArrowIcon'
+import { PHOTO_UPLOAD_MAX_BYTES } from '@/lib/photo-upload-limits'
 
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 
@@ -34,7 +35,7 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
     if (files.length !== 1) { setError("@i18n:ui.selectOneImageAtATime@"); return }
     const next = files[0]
     if (!/\.(jpe?g|png|webp|avif)$/i.test(next.name)) { setError("@i18n:ui.chooseAJpgPngWebpOrAvifImage@"); return }
-    if (next.size > 30 * 1024 * 1024) { setError("@i18n:ui.imagesMustBe30MbOrSmaller@"); return }
+    if (next.size > PHOTO_UPLOAD_MAX_BYTES) { setError("@i18n:ui.imagesMustBe100MbOrSmaller@"); return }
     setFile(next)
   }
   async function submit(event: FormEvent<HTMLFormElement>) {

@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import type { PayloadRequest } from 'payload'
-import { exifFixture } from './photo-exif-fixture'
+import { exifFixture, hasselbladFixture } from './photo-exif-fixture'
 
 const directory = await mkdtemp(join(tmpdir(), 'merak-equipment-'))
 Object.assign(process.env, { NODE_ENV: 'production', MERAK_AUTO_MIGRATE: '1', PAYLOAD_SECRET: randomUUID(), DATABASE_URL: 'file:' + join(directory, 'test.db'), MEDIA_DIR: join(directory, 'media'), FLIGHT_SYNC_ENABLED: '0' })
@@ -60,6 +60,13 @@ try {
   assert.equal(film.exposure?.camera,'Film camera')
   assert.equal(film.exposure?.filmStock,'Test Film')
   assert.ok(film.exposure?.iso == null)
+  const highResolution = await hasselbladFixture()
+  const hasselblad = await payload.create({collection:'media',data:{alt:'synthetic 100MP photo',visibility:'private'},file:{data:highResolution,name:randomUUID()+'.jpg',mimetype:'image/jpeg',size:highResolution.length}})
+  assert.equal(hasselblad.exposure?.camera,'Hasselblad X2D 100C')
+  assert.equal(hasselblad.exposure?.iso,100)
+  assert.ok(hasselblad.sizes?.thumbnail?.url)
+  assert.ok(hasselblad.sizes?.display?.url)
+  console.log('PASS: media library accepts a 11656×8742 JPEG, reads Hasselblad EXIF and generates thumbnail/display images.')
   console.log('PASS: EXIF automatically fills uploads; manual values, replacement uploads and film settings stay intact.')
   console.log('PASS: saved camera/lens history, deduplication, new models, reuse, authenticated access and no-store responses.')
 } finally { await payload.destroy() }

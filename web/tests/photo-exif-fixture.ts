@@ -7,3 +7,10 @@ export async function exifFixture() {
     IFD3:{GPSLatitudeRef:'N',GPSLatitude:'31/1 12/1 0/1',GPSLongitudeRef:'E',GPSLongitude:'121/1 30/1 0/1'},
   }).jpeg().toBuffer()
 }
+
+export async function hasselbladFixture() {
+  return sharp({create:{width:11656,height:8742,channels:3,background:'#aaccee'}}).withExif({
+    IFD0:{Make:'Hasselblad',Model:'X2D 100C',Artist:'Private author'},
+    IFD2:{LensModel:'XCD 2,5/55V',ExposureTime:'1/250',FNumber:'28/10',FocalLength:'55/1',ISOSpeedRatings:'100',BodySerialNumber:'PRIVATE-SERIAL'},
+  }).withMetadata({orientation:6}).jpeg().toBuffer()
+}
