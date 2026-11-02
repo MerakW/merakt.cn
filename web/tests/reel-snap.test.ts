@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { FLICK_ZETA, OMEGA, WheelIntent, flickZeta, nearest, nextIndex, rubber, settled, stepSpring, type Spring } from '../src/lib/reel-snap'
+import { FLICK_ZETA, OMEGA, WheelIntent, flickZeta, nearest, nextIndex, rubber, settled, stepSpring, touchRelease, type Spring } from '../src/lib/reel-snap'
 
 const run = (spring: Spring, seconds: number, fps = 60) => {
   let peak = spring.x, s = spring, t = 0
@@ -61,4 +61,36 @@ test('wheel intent: a second swipe during the first one\'s inertia turns the nex
   let t = 0, steps = 0
   for (const delta of [20, 60, 110, 90, 60, 35, 20, 12, 8, 18, 40, 80, 60, 30]) { t += 16; const read = intent.read(delta, t); if (!read.tail && intent.push(read.abs) >= 36) { intent.stepped(); steps++ } }
   assert.equal(steps, 2)
+})
+
+
+test('touch release: a held flick settles by distance, cancellation never flings', () => {
+  const snaps = [0, 800, 1600], samples: [number, number][] = [[0, 0], [40, 150]]
+  assert.deepEqual(touchRelease(snaps, 0, 150, samples, 50, false, 800), { index: 1, velocity: 3750 })
+  assert.deepEqual(touchRelease(snaps, 0, 150, samples, 200, false, 800), { index: 0, velocity: 0 })
+  assert.deepEqual(touchRelease(snaps, 0, 150, samples, 50, true, 800), { index: 0, velocity: 0 })
+  assert.deepEqual(touchRelease(snaps, 0, 500, samples, 50, true, 800), { index: 1, velocity: 0 })
+})
+
+
+test('trackpad momentum: tail bumps and tiny reversals never turn another photo', () => {
+  const intent = new WheelIntent()
+  let t = 0, steps = 0
+  for (const delta of [14, 30, 65, 110, 90, 65, 48, 30, 22, 28, 23, 16, 12, 17, 10, 6, -1, 4, -2, 4, 2]) {
+    t += 16
+    const read = intent.read(delta, t)
+    if (!read.tail && intent.push(read.abs) >= 36) { intent.stepped(); steps++ }
+  }
+  assert.equal(steps, 1)
+})
+
+test('trackpad momentum: a sustained new push and deliberate reversal still work', () => {
+  const intent = new WheelIntent()
+  let t = 0, steps = 0
+  for (const delta of [15, 45, 100, 80, 50, 25, 12, 8, 18, 40, 80, 65, 40, -12, -20, -28]) {
+    t += 16
+    const read = intent.read(delta, t)
+    if (!read.tail && intent.push(read.abs) >= 36) { intent.stepped(); steps++ }
+  }
+  assert.equal(steps, 3)
 })

@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, type RefObject } from 'react'
-import { OMEGA, WheelIntent, flickZeta, nearest, nextIndex, rubber, settled, snapAt, stepSpring, type Spring } from '@/lib/reel-snap'
+import { OMEGA, WheelIntent, flickZeta, nearest, nextIndex, rubber, settled, snapAt, stepSpring, touchRelease, type Spring } from '@/lib/reel-snap'
 
 const STEP_PUSH = 36      // px of wheel travel that commits one photo
 const CHAIN_AT = 0.55     // a running step must be this far along before the next one in the same direction
@@ -101,8 +101,9 @@ export function useReelSnap(ref: RefObject<HTMLElement | null>, { enabled = true
       event.preventDefault()
       window.clearTimeout(idle)
       const push = intent.push(read.abs)
-      const ready = !raf || motion() !== read.dir || progress() >= CHAIN_AT
-      if (push >= STEP_PUSH && ready) { intent.stepped(); go(next, { zeta: flickZeta(read.speed) }); return }
+      // A newly recognised push is intentional: retarget immediately and preserve velocity,
+      // even if the previous step has not travelled far yet. Inertia remains suppressed above.
+      if (push >= STEP_PUSH) { intent.stepped(); go(next, { zeta: flickZeta(read.speed) }); return }
       // Below the threshold the page leans toward the next photo, then springs back if the push stops.
       const here = aimed() >= 0 ? targetIndex : snapAt(snaps, x)
       if (here >= 0 && (!raf || preview)) {
@@ -131,9 +132,15 @@ export function useReelSnap(ref: RefObject<HTMLElement | null>, { enabled = true
     type Touch = { y0: number; x0: number; start: number; anchor: number; mode: 'pending' | 'drag' | 'native'; samples: [number, number][] }
     let touch: Touch | null = null
     const onTouchStart = (event: TouchEvent) => {
-      if (blocked() || event.touches.length > 1) { touch = null; return }
+      if (blocked() || event.touches.length > 1) {
+        // A second finger/zoom must relinquish the gesture without flinging a photo.
+        if (touch?.mode === 'drag') go(nearest(snaps, spring.x))
+        touch = null; return
+      }
+      const target = event.target instanceof Element ? event.target : null
+      if (inScroller(target) || target?.closest('input, textarea, select, [contenteditable=""], [contenteditable=true]')) return
       const x = position(), point = event.touches[0]
-      stop(); spring = { ...spring, x, v: 0 }
+      // A tap must not interrupt an in-flight spring; take ownership only after a drag is confirmed.
       touch = { y0: point.clientY, x0: point.clientX, start: x, anchor: nearest(snaps, x), mode: 'pending', samples: [[event.timeStamp, x]] }
     }
     const onTouchMove = (event: TouchEvent) => {
@@ -141,11 +148,17 @@ export function useReelSnap(ref: RefObject<HTMLElement | null>, { enabled = true
       const point = event.touches[0], dy = touch.y0 - point.clientY, dx = touch.x0 - point.clientX
       if (touch.mode === 'pending') {
         if (Math.abs(dy) < 6 && Math.abs(dx) < 6) return
-        touch.mode = Math.abs(dx) <= Math.abs(dy) && captures(touch.start, Math.sign(dy)) ? 'drag' : 'native'
-        if (touch.mode === 'drag') { touch.anchor = nearest(snaps, touch.start); touch.y0 = point.clientY; touch.samples = [[event.timeStamp, touch.start]] }
+        const x = position()
+        touch.mode = event.cancelable && Math.abs(dx) <= Math.abs(dy) && captures(x, Math.sign(dy)) ? 'drag' : 'native'
+        if (touch.mode === 'drag') {
+          stop(); spring = { ...spring, x, v: 0 }
+          touch.start = x; touch.anchor = nearest(snaps, x); touch.y0 = point.clientY; touch.samples = [[event.timeStamp, x]]
+        }
       }
       if (touch.mode !== 'drag') return
-      if (event.cancelable) event.preventDefault()
+      // Never write scroll position while the browser owns a non-cancelable gesture.
+      if (!event.cancelable) { touch.mode = 'native'; return }
+      event.preventDefault()
       // The finger moves the page 1:1 up to the neighbouring photos; beyond them the reel resists.
       const anchor = snaps[touch.anchor], raw = touch.start + (touch.y0 - point.clientY) - anchor
       const low = Math.min(touch.anchor > 0 ? snaps[touch.anchor - 1] - anchor : 0, touch.start - anchor)
@@ -159,11 +172,7 @@ export function useReelSnap(ref: RefObject<HTMLElement | null>, { enabled = true
       if (!touch) return
       const ended = touch; touch = null
       if (ended.mode !== 'drag') { if (ended.mode === 'native') nativeFlingUntil = event.timeStamp + 2500; return }
-      const [first, last] = [ended.samples[0], ended.samples.at(-1)!]
-      const velocity = last[0] - first[0] > 8 ? (last[1] - first[1]) / (last[0] - first[0]) * 1000 : 0
-      const offset = spring.x - snaps[ended.anchor]
-      const dir = Math.abs(velocity) > 320 ? Math.sign(velocity) : Math.abs(offset) > lastGap * 0.2 ? Math.sign(offset) : 0
-      const index = Math.min(snaps.length - 1, Math.max(0, ended.anchor + dir))
+      const { index, velocity } = touchRelease(snaps, ended.anchor, spring.x, ended.samples, event.timeStamp, event.type === 'touchcancel', lastGap)
       go(index, { velocity: Math.sign(snaps[index] - spring.x) === Math.sign(velocity) ? velocity : velocity * 0.3, zeta: flickZeta(velocity, 900, 4200) })
     }
 

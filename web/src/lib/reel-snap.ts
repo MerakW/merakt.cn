@@ -71,15 +71,38 @@ export class WheelIntent {
   private peak = 0
   private dipped = false
   private valley = Infinity
+  private risingEvents = 0
+  private reversePush = 0
   private recent: [number, number][] = []
 
   read(delta: number, time: number) {
     const dir = (delta > 0 ? 1 : -1) as 1 | -1, abs = Math.abs(delta), gap = time - this.lastTime
-    const gesture = gap > 220 || dir !== this.lastDir
+    const reversal = dir !== this.lastDir
+    // A tiny opposite-sign event is common in trackpad momentum. Do not let it
+    // reset the gesture and turn the next photo when the original tail resumes.
+    if (this.spent && reversal && gap <= 220) {
+      this.reversePush += abs
+      if (this.reversePush < 24) {
+        this.lastTime = time
+        return { dir, abs, gesture: false, tail: true, speed: 0 }
+      }
+    }
+    this.reversePush = 0
+    const gesture = gap > 220 || reversal
     let rising = false
-    if (!this.dipped) { this.peak = Math.max(this.peak, abs); if (abs < this.peak * 0.6) { this.dipped = true; this.valley = abs } }
-    else { rising = abs > this.valley + Math.max(4, this.valley * 0.5); this.valley = Math.min(this.valley, abs) }
-    const notch = abs >= 40 && Math.abs(abs - this.lastAbs) < 0.5 && gap > 24
+    if (!gesture && this.spent) {
+      if (!this.dipped) {
+        this.peak = Math.max(this.peak, abs)
+        if (abs < this.peak * 0.6) { this.dipped = true; this.valley = abs }
+      } else {
+        // Require a sustained, substantial new push, not a small bump in the tail.
+        this.risingEvents = abs > this.lastAbs + 2 ? this.risingEvents + 1 : 0
+        this.valley = Math.min(this.valley, abs)
+        rising = this.risingEvents >= 2 && abs >= Math.max(24, this.peak * 0.55, this.valley * 2.5 + 8)
+      }
+    }
+    // Distinct, slower mouse notches may repeat exactly; a trackpad plateau should not.
+    const notch = !gesture && abs >= 80 && Math.abs(abs - this.lastAbs) < 0.5 && gap > 65
     if (gesture) { this.acc = 0; this.recent = [] }
     if (gesture || rising || notch) this.spent = false
     this.lastAbs = abs; this.lastTime = time; this.lastDir = dir
@@ -89,6 +112,16 @@ export class WheelIntent {
   }
   /** Accumulated push since the last step. */
   push(abs: number) { this.acc += abs; return this.acc }
-  stepped() { this.acc = 0; this.spent = true; this.peak = 0; this.dipped = false; this.valley = Infinity }
+  stepped() { this.acc = 0; this.spent = true; this.peak = 0; this.dipped = false; this.valley = Infinity; this.risingEvents = 0; this.reversePush = 0 }
   release() { this.acc = 0 }
+}
+
+/** Resolve a drag release without mistaking a held finger or cancelled gesture for a flick. */
+export function touchRelease(snaps: number[], anchor: number, x: number, samples: [number, number][], time: number, cancelled: boolean, gap: number) {
+  const [first, last] = [samples[0], samples.at(-1)!]
+  const velocity = !cancelled && time - last[0] < 100 && last[0] - first[0] > 8 ? (last[1] - first[1]) / (last[0] - first[0]) * 1000 : 0
+  const offset = x - snaps[anchor]
+  const dir = cancelled ? Math.sign(nearest(snaps, x) - anchor)
+    : Math.abs(velocity) > 320 ? Math.sign(velocity) : Math.abs(offset) > gap * 0.2 ? Math.sign(offset) : 0
+  return { index: Math.min(snaps.length - 1, Math.max(0, anchor + dir)), velocity }
 }
