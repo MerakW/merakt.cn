@@ -4,6 +4,7 @@ import { promisify } from 'node:util'
 import { FRIEND_TYRES, HEX_PATTERN, safeHttpURL, type FriendTyre } from './pit-lane'
 import { readJSON, reply, text, trustedOrigin } from './pit-lane-request'
 import { EMAIL_PATTERN, PASSWORD_MAX, PASSWORD_MIN } from './pit-garage-rules'
+import { garageMail, type GarageMail } from './pit-garage-mail'
 
 /**
  * Garage: optional self-service accounts for Pit Lane friends. Deliberately separate from Payload auth,
@@ -201,25 +202,8 @@ export async function garageReset(req: PayloadRequest) {
   } catch { return reply('pitLane.error.unavailable', 503) }
 }
 
-// ---- mail (sent from the configured no-reply mailbox; see SMTP_* in .env.example) ----
-export type GarageMail = 'approved' | 'invite' | 'reset'
-const escapeHTML = (value: string) => value.replace(/[&<>"']/g, char => `&#${char.charCodeAt(0)};`)
-export function garageMail(kind: GarageMail, friend: Pick<GarageFriend, 'tla' | 'name'>, link: string) {
-  const name = `${friend.name} · ${friend.tla}`
-  const copy = {
-    approved: { subject: `PIT LANE · ${friend.tla} 已获准进站 / Clearance granted`, zh: [`${name}，你的友链申请已通过，维修区卷帘门已拉起。`, '车队后台现已开放，可以用申请时填写的邮箱和密码登录，自行修改简介、留言、涂装色和维修状态。'], en: [`${name}: your Pit Lane application is approved.`, 'Your team garage is now open — sign in with the email and password from your application.'], action: '登录车队后台 / Sign in' },
-    invite: { subject: `PIT LANE · ${friend.tla} 车队后台已开通 / Garage access`, zh: [`${name}，Merak 为你开通了 PIT LANE 车队后台。`, '请在 72 小时内点下面的链接设置密码，之后就能自行管理你的友链卡片。'], en: [`${name}: Merak has opened a Pit Lane team garage for you.`, 'Set your password within 72 hours using the link below.'], action: '设置密码 / Set password' },
-    reset: { subject: `PIT LANE · ${friend.tla} 重置密码 / Password reset`, zh: [`${name}，有人请求重置你的车队后台密码。`, '链接 1 小时内有效；如果不是你本人操作，忽略这封邮件即可。'], en: [`${name}: a password reset was requested for your team garage.`, 'The link is valid for 1 hour; ignore this email if it was not you.'], action: '重置密码 / Reset password' },
-  }[kind]
-  const text = [...copy.zh, '', ...copy.en, '', `${copy.action}: ${link}`, '', '— Merak · 数字围场 · HGH APRON & PIT LANE', '这是一封自动发送的邮件，请勿直接回复。 / This mailbox is not monitored.'].join('\n')
-  const html = `<div style="font:15px/1.7 -apple-system,'PingFang SC',sans-serif;color:#15171c;max-width:520px">
-<p style="font:600 12px/1 ui-monospace,monospace;letter-spacing:.12em;color:#6b7280">HGH APRON &amp; PIT LANE · ${escapeHTML(friend.tla)}</p>
-${copy.zh.map(line => `<p>${escapeHTML(line)}</p>`).join('')}
-<p><a href="${escapeHTML(link)}" style="display:inline-block;background:#15171c;color:#fff;text-decoration:none;padding:10px 18px;border-radius:6px;font-weight:600">${escapeHTML(copy.action)}</a></p>
-${copy.en.map(line => `<p style="color:#6b7280;font-size:13px">${escapeHTML(line)}</p>`).join('')}
-<p style="color:#9ca3af;font-size:12px">— Merak · 数字围场<br>这是一封自动发送的邮件，请勿直接回复。</p></div>`
-  return { subject: copy.subject, text, html }
-}
+// ---- mail (sent from the configured no-reply mailbox; see SMTP_* in .env.example; template in ./pit-garage-mail) ----
+export { garageMail, type GarageMail } from './pit-garage-mail'
 
 /** Invite and reset mails carry a fresh one-time token; approval mails just link to the garage. */
 export async function sendGarageMail(payload: Payload, friend: GarageFriend, kind: GarageMail, req?: PayloadRequest) {

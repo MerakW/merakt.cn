@@ -33,3 +33,14 @@ test('garage mails keep one-time tokens in the fragment and escape names', () =>
   assert.ok(!mail.html.includes('<b>Aster</b>') && mail.html.includes('&#60;b&#62;Aster'))
   assert.match(garageMail('approved', { tla: 'AST', name: 'Aster' }, 'https://merakt.cn/pit-lane/garage').text, /已通过/)
 })
+
+test('garage mails carry the race-control styling, livery and a safe fallback colour', () => {
+  const now = Date.parse('2026-11-08T06:32:00Z')
+  const approved = garageMail('approved', { tla: 'AST', name: 'Aster', teamColor: '#e8303b', bay: 3 }, 'https://merakt.cn/pit-lane/garage', now)
+  assert.match(approved.html, /GREEN FLAG/); assert.match(approved.html, /BAY P03/); assert.match(approved.html, /#e8303b/)
+  assert.match(approved.text, /2026-11-08 14:32 UTC\+8|BAY 车位\s+P03/)
+  assert.ok(approved.html.includes('https://merakt.cn/pit-lane"'))
+  const reset = garageMail('reset', { tla: 'AST', name: 'Aster', teamColor: 'red;background:url(x)' }, 'https://merakt.cn/pit-lane/garage#reset=t', now)
+  assert.match(reset.html, /YELLOW FLAG/); assert.match(reset.text, /2026-11-08 14:32 UTC\+8/)
+  assert.ok(!reset.html.includes('url(x)') && reset.html.includes('#2349ed'))
+})
