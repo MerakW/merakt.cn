@@ -2,7 +2,7 @@ import type { CollectionConfig, FieldHook } from 'payload'
 import { adminField, adminOnly } from '@/lib/access'
 import { HEX_PATTERN, RESERVED_TLAS, TLA_PATTERN, safeHttpURL } from '@/lib/pit-lane'
 import { friendClearance, submitFriendApplication } from '@/lib/pit-lane-submit'
-import { garageForgot, garageLogin, garageLogout, garagePassword, garageReset, garageSession, garageUpdate, normalEmail, sendGarageMail, type GarageFriend, type GarageMail } from '@/lib/pit-garage'
+import { garageForgot, garageLogin, garageLogout, garagePassword, garageReset, garageSession, garageUpdate, normalEmail, sendGarageMail, sendNoticeMail, type GarageFriend, type GarageMail } from '@/lib/pit-garage'
 import { parseCard } from '@/lib/pit-lane-card'
 import { translate, type MessageKey } from '@/lib/i18n/core'
 
@@ -20,7 +20,7 @@ export const Friends: CollectionConfig = {
     { path: '/garage/session', method: 'get', handler: garageSession }, { path: '/garage/login', method: 'post', handler: garageLogin }, { path: '/garage/logout', method: 'post', handler: garageLogout },
     { path: '/garage/update', method: 'post', handler: garageUpdate }, { path: '/garage/password', method: 'post', handler: garagePassword }, { path: '/garage/forgot', method: 'post', handler: garageForgot }, { path: '/garage/reset', method: 'post', handler: garageReset }],
   hooks: { beforeValidate: [({ data, operation }) => {
-    // Paste a clearance card (email, QQ, X, GitHub issue or YAML) to pre-fill an application.
+    // Paste a clearance card (email, GitHub issue, YAML, or an older DM card) to pre-fill an application.
     if (!data || typeof data.importCard !== 'string' || !data.importCard.trim()) return data
     const card = parseCard(data.importCard), filled: Record<string, unknown> = { ...data }
     for (const key of ['tla', 'name', 'url', 'teamColor', 'bio', 'coolingMsg', 'contact', 'backlinkUrl'] as const) if (card[key] && !filled[key]) filled[key] = card[key]
@@ -32,6 +32,9 @@ export const Friends: CollectionConfig = {
   // Garage accounts: approving a card opens its login and mails the team; Merak can also open one by hand.
   beforeChange: [({ data, originalDoc, req, context }) => {
     if (context.garage || !data) return data
+    // Review result for applicants who asked for email updates: only the first decision on a pending card.
+    const previous = (originalDoc || {}) as { status?: string; notify?: boolean | null; contact?: string | null }, decided = data.status ?? previous.status
+    if (previous.status === 'pending' && (decided === 'approved' || decided === 'rejected') && (data.notify ?? previous.notify) && normalEmail(data.contact ?? previous.contact)) req.context.pitNotice = decided === 'approved' ? 'live' : 'rejected'
     if (typeof data.accountEmail === 'string') data.accountEmail = normalEmail(data.accountEmail) || data.accountEmail.trim().toLowerCase() || null
     const before = (originalDoc || {}) as Partial<GarageFriend>, email = 'accountEmail' in data ? data.accountEmail : before.accountEmail
     const emailChanged = 'accountEmail' in data && (data.accountEmail || null) !== (before.accountEmail || null)
@@ -46,12 +49,18 @@ export const Friends: CollectionConfig = {
     return data
   }],
   afterChange: [async ({ doc, req, context }) => {
-    const wanted = req.context.garageMail as 'auto' | 'invite' | undefined
-    if (context.garage || !wanted) return doc
-    req.context.garageMail = undefined
-    const full = await req.payload.findByID({ collection: 'friends', id: doc.id, depth: 0, overrideAccess: true, showHiddenFields: true, req }) as unknown as GarageFriend
-    const kind: GarageMail = wanted === 'invite' || !full.passwordHash ? 'invite' : 'approved'
-    await sendGarageMail(req.payload, full, kind, req).catch(error => req.payload.logger.error({ err: error }, `PIT GARAGE ${full.tla}: ${kind} mail failed`))
+    const wanted = req.context.garageMail as 'auto' | 'invite' | undefined, notice = req.context.pitNotice as 'live' | 'rejected' | undefined
+    if (context.garage || (!wanted && !notice)) return doc
+    req.context.garageMail = undefined; req.context.pitNotice = undefined
+    if (wanted) {
+      const full = await req.payload.findByID({ collection: 'friends', id: doc.id, depth: 0, overrideAccess: true, showHiddenFields: true, req }) as unknown as GarageFriend
+      const kind: GarageMail = wanted === 'invite' || !full.passwordHash ? 'invite' : 'approved'
+      await sendGarageMail(req.payload, full, kind, req).catch(error => req.payload.logger.error({ err: error }, `PIT GARAGE ${full.tla}: ${kind} mail failed`))
+    }
+    // A garage approval mail already tells the team they are in; don't send two.
+    const to = normalEmail(doc.contact)
+    if (notice && to && !(notice === 'live' && wanted)) await sendNoticeMail(req.payload, to, notice, doc, { note: doc.reviewNote })
+      .catch(error => req.payload.logger.error({ err: error }, `PIT LANE ${doc.tla}: ${notice} mail failed`))
     return doc
   }] },
   defaultSort: 'bay',
@@ -83,7 +92,10 @@ export const Friends: CollectionConfig = {
       { name: 'distance', label: 'pitLane.admin.distance', type: 'number', min: 0, max: 20000 },
     ] },
     { name: 'backlinkUrl', label: 'pitLane.admin.backlinkUrl', type: 'text', admin: { description: 'pitLane.admin.backlinkUrlHelp' }, validate: (value: unknown, options: Options) => !value || (typeof value === 'string' && safeHttpURL(value)) ? true : fail('pitLane.error.url', options) },
-    { name: 'contact', label: 'pitLane.admin.contact', type: 'text', maxLength: 80, access: { read: adminField }, admin: { description: 'pitLane.admin.contactHelp' } },
+    { type: 'row', fields: [
+      { name: 'contact', label: 'pitLane.admin.contact', type: 'text', maxLength: 80, access: { read: adminField }, admin: { description: 'pitLane.admin.contactHelp' } },
+      { name: 'notify', label: 'pitLane.admin.notify', type: 'checkbox', defaultValue: false, access: { read: adminField }, admin: { description: 'pitLane.admin.notifyHelp' } },
+    ] },
     { name: 'status', label: 'ui.reviewStatus', type: 'select', required: true, defaultValue: 'pending', index: true, options: [
       { label: 'ui.pendingReview', value: 'pending' }, { label: 'ui.approved2', value: 'approved' }, { label: 'ui.hidden', value: 'rejected' },
     ], admin: { position: 'sidebar' } },

@@ -496,7 +496,7 @@ export interface Checkin {
 export interface Friend {
   id: number;
   /**
-   * Paste a card from email, a QQ / X DM or a GitHub issue; empty fields below are filled on save.
+   * Paste a card from an email or a GitHub issue; empty fields below are filled on save.
    */
   importCard?: string | null;
   tla: string;
@@ -533,9 +533,13 @@ export interface Friend {
    */
   backlinkUrl?: string | null;
   /**
-   * Visible to admins only.
+   * The applicant’s contact email, visible to admins only.
    */
   contact?: string | null;
+  /**
+   * When the applicant opted in, moving the card from pending to approved or hidden emails the result to the contact address.
+   */
+  notify?: boolean | null;
   status: 'pending' | 'approved' | 'rejected';
   source?: ('web' | 'email' | 'social' | 'github' | 'admin') | null;
   /**
@@ -1087,6 +1091,7 @@ export interface FriendsSelect<T extends boolean = true> {
   distance?: T;
   backlinkUrl?: T;
   contact?: T;
+  notify?: T;
   status?: T;
   source?: T;
   backlinkAt?: T;

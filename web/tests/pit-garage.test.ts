@@ -44,3 +44,14 @@ test('garage mails carry the race-control styling, livery and a safe fallback co
   assert.match(reset.html, /YELLOW FLAG/); assert.match(reset.text, /2026-11-08 14:32 UTC\+8/)
   assert.ok(!reset.html.includes('url(x)') && reset.html.includes('#2349ed'))
 })
+
+test('applicant notices: receipt carries the ticket, results reflect the decision', () => {
+  const now = Date.parse('2026-11-08T06:32:00Z'), friend = { tla: 'AST', name: 'Aster', teamColor: '#e8303b' }
+  const received = garageMail('received', friend, 'https://merakt.cn/pit-lane?ticket=PIT-AST-7K3QZ9#stewards', now, { ticket: 'PIT-AST-7K3QZ9', notify: true })
+  assert.match(received.subject, /申请已受理/); assert.ok(received.html.includes('PIT-AST-7K3QZ9') && received.text.includes('PIT-AST-7K3QZ9'))
+  assert.match(received.text, /审核有结果后/)
+  assert.match(garageMail('received', friend, 'https://merakt.cn/pit-lane', now, { account: true }).text, /登录车队后台/)
+  assert.match(garageMail('live', { ...friend, bay: 4 }, 'https://merakt.cn/pit-lane', now).html, /BAY P04/)
+  const rejected = garageMail('rejected', friend, 'https://merakt.cn/pit-lane#stewards', now, { note: '<i>互链未找到</i>' })
+  assert.match(rejected.text, /干事备注：<i>互链未找到<\/i>/); assert.ok(!rejected.html.includes('<i>互链'))
+})

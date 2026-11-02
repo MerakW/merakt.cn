@@ -4,9 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type Ref } from 'react'
 import { FRIEND_TYRES, HEX_PATTERN, RESERVED_TLAS, TLA_PATTERN, buildPitLane, colorTyre, safeHttpURL, type Tyre } from '@/lib/pit-lane'
 import { EMAIL_PATTERN, PASSWORD_MAX, PASSWORD_MIN } from '@/lib/pit-garage-rules'
 import { TICKET_PATTERN, formatCard, githubFileURL, githubIssueURL, mailtoURL, type Application } from '@/lib/pit-lane-card'
-import { profile } from '@/lib/profile'
 import PitBoxCard from './PitBoxCard'
-import { clearanceImage } from './clearanceImage'
 
 const MERAK = { name: 'Merak · 数字围场', url: 'https://merakt.cn', logo: 'https://merakt.cn/images/card/merak-mark.svg', description: 'Aviation · F1 · Fursuit Friday — HGH' }
 const LINK_FORMATS = {
@@ -15,23 +13,24 @@ const LINK_FORMATS = {
   HTML: `<a href="${MERAK.url}" title="${MERAK.description}"><img src="${MERAK.logo}" alt="Merak" width="48" height="48">${MERAK.name}</a>`,
 }
 const TYRE_NAMES: Record<Tyre, string> = { S: 'SOFT', M: 'MEDIUM', H: 'HARD', I: 'INTER', W: 'WET' }
-const SOCIAL_NAMES: Record<string, string> = { '𝕏': 'X', QQ: 'QQ', DY: '抖音' }
 const TICKETS_KEY = 'merak-pit-tickets'
-type Channel = 'web' | 'dm' | 'email' | 'github'
-const CHANNEL_LABELS: Record<Channel, string> = { web: '@i18n:pitLane.channel.web@', dm: '@i18n:pitLane.channel.dm@', email: '@i18n:pitLane.channel.email@', github: '@i18n:pitLane.channel.github@' }
+type Channel = 'web' | 'email' | 'github'
+const CHANNEL_LABELS: Record<Channel, string> = { web: '@i18n:pitLane.channel.web@', email: '@i18n:pitLane.channel.email@', github: '@i18n:pitLane.channel.github@' }
 const STATUS_LABELS: Record<string, string> = { approved: 'pitLane.ticket.approved', rejected: 'pitLane.ticket.rejected', pending: 'pitLane.ticket.pending' }
 type Clearance = { ticket: string; tla?: string; status?: string; backlink?: boolean; note?: string; account?: boolean; error?: string }
 
 const savedTickets = (): { ticket: string; tla: string }[] => { try { return JSON.parse(localStorage.getItem(TICKETS_KEY) || '[]') } catch { return [] } }
 
-/** Stewards' Desk: one application card, four ways to hand it in — none of them needs GitHub. */
+/** Stewards' Desk: one application card, three ways to hand it in — none of them needs GitHub. */
 export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDetailsElement>; taken: string[]; email?: string }) {
   const t = useTranslator()
   const [form, setForm] = useState({ tla: '', name: '', url: '', teamColor: '#2349ed', bio: '', coolingMsg: '', tyre: 'auto', contact: '', backlinkUrl: '' })
   const [channel, setChannel] = useState<Channel>('web'), [format, setFormat] = useState<keyof typeof LINK_FORMATS>('TEXT')
   const [busy, setBusy] = useState(false), [ticket, setTicket] = useState(''), [error, setError] = useState(''), [copied, setCopied] = useState('')
   const [lookup, setLookup] = useState(''), [clearances, setClearances] = useState<Clearance[]>([])
-  const [account, setAccount] = useState({ on: false, email: '', password: '' })
+  const [account, setAccount] = useState({ on: false, password: '' }), [notify, setNotify] = useState(false), [mailed, setMailed] = useState('')
+  // Contact is an optional email; once it is valid the applicant can ask for email updates and/or a garage account.
+  const contactEmail = form.contact.trim(), emailOk = EMAIL_PATTERN.test(contactEmail)
   const set = (name: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm(value => ({ ...value, [name]: name === 'tla' ? event.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) : event.target.value }))
   const validTLA = TLA_PATTERN.test(form.tla) && !RESERVED_TLAS.has(form.tla) && !taken.includes(form.tla)
   const color = HEX_PATTERN.test(form.teamColor) ? form.teamColor : '#2349ed', matched = colorTyre(color)
@@ -76,32 +75,23 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
     event.preventDefault(); if (busy || !ready()) return
     const data = new FormData(event.currentTarget)
     if (data.get('consent') !== 'on') { setError(t('pitLane.error.consent')); return }
-    if (account.on && !EMAIL_PATTERN.test(account.email.trim())) { setError(t('garage.error.email')); return }
-    if (account.on && (account.password.length < PASSWORD_MIN || account.password.length > PASSWORD_MAX)) { setError(t('garage.error.weak')); return }
+    if (contactEmail && !emailOk) { setError(t('garage.error.email')); return }
+    const wantsAccount = emailOk && account.on, wantsNotify = emailOk && notify
+    if (wantsAccount && (account.password.length < PASSWORD_MIN || account.password.length > PASSWORD_MAX)) { setError(t('garage.error.weak')); return }
     setBusy(true)
     try {
-      const response = await fetch('/api/friends/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, tyre: form.tyre === 'auto' ? undefined : form.tyre, consent: true, website: data.get('website'), ...(account.on ? { account: true, accountEmail: account.email.trim(), password: account.password } : {}) }) })
+      const response = await fetch('/api/friends/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, contact: contactEmail, tyre: form.tyre === 'auto' ? undefined : form.tyre, consent: true, notify: wantsNotify, website: data.get('website'), ...(wantsAccount ? { account: true, password: account.password } : {}) }) })
       const result = await response.json().catch(() => ({})) as { error?: string; ticket?: string }
       if (response.ok && result.ticket) {
-        setTicket(result.ticket); setAccount(value => ({ ...value, password: '' }))
+        setTicket(result.ticket); setAccount(value => ({ ...value, password: '' })); setMailed(wantsAccount || wantsNotify ? contactEmail : '')
         try { localStorage.setItem(TICKETS_KEY, JSON.stringify([{ ticket: result.ticket, tla: form.tla }, ...savedTickets()].slice(0, 8))) } catch {}
         void check(result.ticket, form.tla)
-      } else setError(t(result.error?.startsWith('pitLane.') ? result.error : 'pitLane.error.unavailable'))
+      } else setError(t(/^(pitLane|garage)\.error\./.test(result.error || '') ? result.error! : 'pitLane.error.unavailable'))
     } catch { setError(t('pitLane.error.offline')) } finally { setBusy(false) }
   }
 
-  async function saveImage() {
-    if (!ready()) return
-    try {
-      const blob = await clearanceImage(app), file = new File([blob], `pit-lane-${app.tla}.png`, { type: 'image/png' })
-      if (navigator.canShare?.({ files: [file] }) && matchMedia('(hover:none)').matches) { await navigator.share({ files: [file], title: `PIT LANE · ${app.tla}` }).catch(() => {}); return }
-      const href = URL.createObjectURL(blob), link = Object.assign(document.createElement('a'), { href, download: file.name })
-      link.click(); setTimeout(() => URL.revokeObjectURL(href), 4000); flash('image')
-    } catch { setError(t('pitLane.error.unavailable')) }
-  }
   const open = (url: string) => { if (ready()) window.open(url, '_blank', 'noopener') }
-  const channels: Channel[] = email ? ['web', 'dm', 'email', 'github'] : ['web', 'dm', 'github']
-  const socials = profile.socials.filter(([code]) => code !== 'GH')
+  const channels: Channel[] = email ? ['web', 'email', 'github'] : ['web', 'github']
 
   return <Localized><details className="pl-stewards" id="stewards" ref={ref}>
     <summary><span className="pl-k">STEWARDS &amp; CLEARANCE</span><h2>{"@i18n:pitLane.desk.title@"}</h2><span className="pl-t">EFB · OPEN BRIEFING <i/></span></summary>
@@ -132,6 +122,7 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
         {ticket ? <div className="pl-sent" role="status"><b>CLEARANCE REQUESTED · {form.tla}</b><p>{"@i18n:pitLane.desk.sent@"}</p>
           <div className="pl-ticket"><div><span className="pl-k">{"@i18n:pitLane.ticket.title@"}</span><code data-i18n="off">{ticket}</code></div><button type="button" className="pl-copy" onClick={() => copy('ticket', ticket)}>{copied === 'ticket' ? 'COPIED ✓' : 'COPY'}</button></div>
           <p className="pl-note">{"@i18n:pitLane.ticket.save@"}</p>
+          {mailed && <p className="pl-note pl-mailed">{t('pitLane.desk.mailed', [mailed])}</p>}
           <button type="button" onClick={() => { setTicket(''); setForm(value => ({ ...value, tla: '' })) }}>{"@i18n:pitLane.desk.again@"}</button></div>
         : <form onSubmit={submit} noValidate>
           <div className="pl-row">
@@ -157,23 +148,18 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
             <div className="pl-channel" role="tabpanel" data-channel={channel}>
               {channel === 'web' && <>
                 <p>{"@i18n:pitLane.channel.webBody@"}</p>
-                <label><span>{"@i18n:pitLane.form.contact@ "}<small>{"@i18n:pitLane.form.contactHelp@"}</small></span><input name="contact" value={form.contact} onChange={set('contact')} maxLength={80} autoComplete="email"/></label>
-                <label className="pl-consent pl-account-toggle"><input type="checkbox" checked={account.on} onChange={event => setAccount(value => ({ ...value, on: event.target.checked }))}/><span>{"@i18n:pitLane.form.account@"} <small>{"@i18n:pitLane.form.accountHelp@"}</small></span></label>
-                {account.on && <div className="pl-row pl-account">
-                  <label>{"@i18n:pitLane.form.accountEmail@"}<input name="accountEmail" type="email" value={account.email} onChange={event => setAccount(value => ({ ...value, email: event.target.value }))} autoComplete="email" inputMode="email" maxLength={120} required/></label>
-                  <label><span>{"@i18n:pitLane.form.accountPassword@ "}<small>{"@i18n:pitLane.form.accountPasswordHelp@"}</small></span><input name="password" type="password" value={account.password} onChange={event => setAccount(value => ({ ...value, password: event.target.value }))} autoComplete="new-password" minLength={PASSWORD_MIN} maxLength={PASSWORD_MAX} required/></label>
+                <label><span>{"@i18n:pitLane.form.contact@ "}<small>{"@i18n:pitLane.form.contactHelp@"}</small></span><input name="contact" type="email" value={form.contact} onChange={set('contact')} maxLength={120} autoComplete="email" inputMode="email" placeholder="you@example.com" aria-invalid={Boolean(contactEmail) && !emailOk}/></label>
+                {emailOk && <div className="pl-mail-opts">
+                  <label className="pl-consent pl-account-toggle"><input type="checkbox" name="notify" checked={notify} onChange={event => setNotify(event.target.checked)}/><span>{"@i18n:pitLane.form.notify@"} <small>{"@i18n:pitLane.form.notifyHelp@"}</small></span></label>
+                  <label className="pl-consent pl-account-toggle"><input type="checkbox" checked={account.on} onChange={event => setAccount(value => ({ ...value, on: event.target.checked }))}/><span>{"@i18n:pitLane.form.account@"} <small>{"@i18n:pitLane.form.accountHelp@"}</small></span></label>
+                  {account.on && <div className="pl-account">
+                    <input type="email" value={contactEmail} autoComplete="username" readOnly hidden/>
+                    <label><span>{"@i18n:pitLane.form.accountPassword@ "}<small>{"@i18n:pitLane.form.accountPasswordHelp@"}</small></span><input name="password" type="password" value={account.password} onChange={event => setAccount(value => ({ ...value, password: event.target.value }))} autoComplete="new-password" minLength={PASSWORD_MIN} maxLength={PASSWORD_MAX} required/></label>
+                  </div>}
                 </div>}
                 <div className="checkin-trap" aria-hidden="true"><input name="website" tabIndex={-1} autoComplete="off" aria-label="@i18n:ui.website@"/></div>
                 <label className="pl-consent"><input type="checkbox" name="consent" required/>{"@i18n:pitLane.form.consent@"}</label>
                 <button className="pl-submit" disabled={busy}>{busy ? "@i18n:ui.submitting@" : "@i18n:pitLane.form.submit@"}</button>
-              </>}
-              {channel === 'dm' && <>
-                <p>{"@i18n:pitLane.channel.dmBody@"}</p>
-                <div className="pl-actions">
-                  <button type="button" onClick={() => ready() && copy('card', formatCard(app))}>{copied === 'card' ? "@i18n:pitLane.action.copied@" : "@i18n:pitLane.action.copyCard@"}</button>
-                  <button type="button" onClick={() => void saveImage()}>{copied === 'image' ? '✓ PNG' : "@i18n:pitLane.action.saveImage@"}</button>
-                </div>
-                <ul className="pl-socials">{socials.map(([code, handle, , href]) => <li key={code}><a href={href} target="_blank" rel="noopener noreferrer"><b>{SOCIAL_NAMES[code] || code}</b><span data-i18n="off">{handle}</span></a></li>)}</ul>
               </>}
               {channel === 'email' && email && <>
                 <p>{"@i18n:pitLane.channel.emailBody@"}</p>

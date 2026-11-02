@@ -349,11 +349,6 @@ html[data-theme=dark] .pl-sc[data-sc] .pl-state{color:#ffd400}
 .pl-actions button:first-child{background:var(--ink);color:var(--canvas);border-color:var(--ink)}
 .pl-actions button:hover{border-color:var(--blue)}
 .pl-actions button:first-child:hover{background:var(--green);border-color:var(--green)}
-.pl-socials{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.pl-socials a{display:grid;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:4px;color:var(--ink);text-decoration:none;transition:border-color .2s,transform .2s}
-.pl-socials a:hover{border-color:var(--blue);transform:translateY(-1px)}
-.pl-socials b{font:700 15px var(--body);color:var(--blue)}
-.pl-socials span{font:12px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pl-mail{font:13px var(--mono);color:var(--ink);word-break:break-all}
 .pl-card-text{margin:0;padding:12px 14px;font:11px/1.6 var(--mono);background:var(--interior-2);color:#cfdaf0;border-radius:4px;white-space:pre-wrap;overflow-wrap:anywhere}
 .pl-ticket{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px dashed var(--green);border-radius:4px;background:var(--paper)}
@@ -386,7 +381,7 @@ html[data-theme=dark] .pl-sc[data-sc] .pl-state{color:#ffd400}
   .pl-grid{grid-template-columns:1fr}.pl-sc{grid-column:auto}.pl-sc-in{grid-template-columns:minmax(0,1fr)}.pl-sc .pl-bay{min-height:150px}.pl-bay{height:124px}
   .pl-sc .pl-tla,.pl-num{font-size:34px}.pl-p2{display:none}
   .pl-t{display:none}.pl-stewards summary{flex-wrap:wrap;gap:4px 12px}
-  .pl-apply{grid-template-columns:1fr}.pl-row{grid-template-columns:1fr}.pl-code{margin-left:0}.pl-link{margin-left:0}.pl-ticket{flex-wrap:wrap}.pl-socials a{padding:9px 10px}
+  .pl-apply{grid-template-columns:1fr}.pl-row{grid-template-columns:1fr}.pl-code{margin-left:0}.pl-link{margin-left:0}.pl-ticket{flex-wrap:wrap}
   /* Touch: garages open by default. */
   .pl-shutter{transform:translateY(-101%)}
 }
@@ -425,4 +420,6 @@ body:has(.pl) .radio-toggle b{font-size:18px}
 .pl-garage-link a,.pl-lookup li small a{color:var(--blue)}
 .pl-account-toggle small{color:var(--muted);font-size:12px}
 .pl-account{animation:pl-channel .3s ease-out}
+.pl-mail-opts{display:grid;gap:10px;padding:12px 14px;border:1px dashed var(--line);border-radius:4px;animation:pl-channel .3s ease-out}
+.pl-mailed{color:var(--green,#0d8a4b)}
 @media (max-width:720px){.pl-garage .pl-head{grid-template-columns:1fr}.pl-garage-bar{flex-wrap:wrap}.pl-garage-who{order:3;margin-left:0;flex-basis:100%}.pl-garage-bar .pl-copy{margin-left:auto}}

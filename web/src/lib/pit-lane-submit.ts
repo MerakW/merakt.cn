@@ -2,7 +2,7 @@ import type { PayloadRequest } from 'payload'
 import { createHash, randomInt } from 'node:crypto'
 import { FRIEND_TYRES, HEX_PATTERN, RESERVED_TLAS, TLA_PATTERN, safeHttpURL, type FriendTyre } from './pit-lane'
 import { TICKET_PATTERN } from './pit-lane-card'
-import { hashPassword, normalEmail, validPassword } from './pit-garage'
+import { hashPassword, normalEmail, sendNoticeMail, validPassword } from './pit-garage'
 import { readJSON, reply, text, trustedOrigin } from './pit-lane-request'
 
 const recent: number[] = [], lookups: number[] = []
@@ -28,8 +28,12 @@ export async function submitFriendApplication(req: PayloadRequest) {
   if (!teamColor) return reply('pitLane.error.color', 400)
   if (bio === null || coolingMsg === null || contact === null || tyre === undefined || backlinkText === null || backlinkUrl === undefined) return reply('pitLane.error.invalid', 400)
   if (data.consent !== true) return reply('pitLane.error.consent', 400)
+  // Contact is an optional email; it doubles as the garage login and the address for receipts and review results.
+  const email = contact ? normalEmail(contact) : typeof data.accountEmail === 'string' ? normalEmail(data.accountEmail) : null
+  if (contact && !email) return reply('garage.error.email', 400)
+  const notify = data.notify === true && Boolean(email)
   // Optional garage account: created locked, opened only when Merak approves the card.
-  const account = data.account === true, accountEmail = account ? normalEmail(data.accountEmail) : null
+  const account = data.account === true, accountEmail = account ? email : null
   if (account && !accountEmail) return reply('garage.error.email', 400)
   if (account && !validPassword(data.password)) return reply('garage.error.weak', 400)
 
@@ -40,11 +44,14 @@ export async function submitFriendApplication(req: PayloadRequest) {
     if (taken.totalDocs) return reply('pitLane.error.taken', 409)
     if (accountEmail && (await req.payload.count({ collection: 'friends', where: { accountEmail: { equals: accountEmail } }, overrideAccess: true })).totalDocs) return reply('garage.error.emailTaken', 409)
     const ticket = newTicket(tla)
-    const created = await req.payload.create({ collection: 'friends', overrideAccess: true, data: {
-      tla, name, url, teamColor, bio: bio || undefined, coolingMsg: coolingMsg || undefined, contact: contact || undefined, backlinkUrl: backlinkUrl || undefined,
+    await req.payload.create({ collection: 'friends', overrideAccess: true, data: {
+      tla, name, url, teamColor, bio: bio || undefined, coolingMsg: coolingMsg || undefined, contact: email || undefined, notify, backlinkUrl: backlinkUrl || undefined,
       tyreMode: tyre ? 'manual' : 'auto', tyre: tyre || undefined, logoSource: 'auto', status: 'pending', maintenance: false, source: 'web', ticketHash: hashTicket(ticket),
       ...(accountEmail ? { accountEmail, loginEnabled: false, passwordHash: await hashPassword(data.password as string), passwordSetAt: new Date().toISOString() } : {}),
     }, context: { garage: true } })
+    // Receipt for applicants who left an email and asked for updates or an account; never blocks the reply.
+    if (email && (notify || accountEmail)) void sendNoticeMail(req.payload, email, 'received', { tla, name, teamColor }, { ticket, notify, account: Boolean(accountEmail) })
+      .catch(error => req.payload.logger.error({ err: error }, `PIT LANE ${tla}: received mail failed`))
     return Response.json({ accepted: true, tla, ticket }, { status: 202, headers: { 'Cache-Control': 'no-store' } })
   } catch { return reply('pitLane.error.unavailable', 503) }
 }

@@ -5,7 +5,11 @@ import { HEX_PATTERN, cellWidth, oklch, padCells, virtualFrequency } from './pit
  * chequered footer. Table layout + inline styles only, so Gmail / Outlook / QQ Mail / Apple Mail agree.
  */
 export type GarageMail = 'approved' | 'invite' | 'reset'
+/** Applicant notices: receipt after a web application, then the review result for those who asked. */
+export type NoticeMail = 'received' | 'live' | 'rejected'
+export type PitMail = GarageMail | NoticeMail
 export type GarageMailFriend = { tla: string; name: string; teamColor?: string | null; bay?: number | null }
+export type PitMailExtra = { ticket?: string; note?: string | null; account?: boolean; notify?: boolean }
 
 const BODY = `-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei','Segoe UI',Arial,sans-serif`
 const MONO = `'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace`
@@ -13,7 +17,7 @@ const DISPLAY = `Formula1,'Arial Black','Helvetica Neue',Arial,sans-serif`
 const escapeHTML = (value: string) => value.replace(/[&<>"']/g, char => `&#${char.charCodeAt(0)};`)
 const stamp = (now: number) => `${new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now)} UTC+8`
 
-export function garageMail(kind: GarageMail, friend: GarageMailFriend, link: string, now = Date.now()) {
+export function garageMail(kind: PitMail, friend: GarageMailFriend, link: string, now = Date.now(), extra: PitMailExtra = {}) {
   const tla = friend.tla, name = `${friend.name} · ${tla}`, time = stamp(now)
   const livery = friend.teamColor && HEX_PATTERN.test(friend.teamColor) ? friend.teamColor : '#2349ed'
   // Very dark liveries vanish on the night-black hero; keep the stripe, light the lettering.
@@ -43,6 +47,30 @@ export function garageMail(kind: GarageMail, friend: GarageMailFriend, link: str
       en: [`${name}: a password reset was requested for your team garage.`, 'The link is valid for 1 hour; ignore this email if it was not you — your password stays the same.'],
       sheet: [['REQUEST 请求', time], ['VALID 有效期', '1 H'], ['NOT YOU? 非本人', '忽略即可']],
       action: '重置密码 / Reset password',
+    },
+    received: {
+      subject: `PIT LANE · ${tla} 申请已受理 / Application received`, flag: '#e8962a', chip: 'IN REVIEW', banner: 'RACE CONTROL · CLEARANCE REQUESTED',
+      title: 'CLEARANCE REQUESTED', titleZh: '申请已开始受理', radio: 'Copy, request received. 申请已送达干事席。',
+      zh: [`${name}，你的 P 房入驻申请已送达干事席，审核已经开始。`, extra.notify ? '审核有结果后会再发邮件通知你；也可以随时用申请编号查询进度。' : '审核通过后会再发邮件通知你登录车队后台；也可以随时用申请编号查询进度。'],
+      en: [`${name}: your Pit Lane application has reached the stewards and review has started.`, extra.notify ? 'We will email you again once there is a decision; you can also check progress with your ticket at any time.' : 'We will email you when your team garage opens; you can also check progress with your ticket at any time.'],
+      sheet: [['TICKET 申请编号', extra.ticket || '—'], ['STATUS 状态', 'PENDING · 审核中'], ['SUBMITTED 提交', time], ['GARAGE 后台', extra.account ? '已创建 · 通过后开放' : '未创建']],
+      action: '查询进度 / Check status',
+    },
+    live: {
+      subject: `PIT LANE · ${tla} 已获准进站 / Clearance granted`, flag: '#2fd07b', chip: 'GREEN FLAG', banner: 'RACE CONTROL · PIT ENTRY OPEN',
+      title: 'PIT ENTRY CLEARED', titleZh: '已获准进站', radio: 'Box, box. 卷帘门已拉起，欢迎进站。',
+      zh: [`${name}，你的友链申请已通过，P 房已经上线。`, '现在就能在 Pit Lane 发车格上看到你的车队，欢迎常来维修区坐坐。'],
+      en: [`${name}: your Pit Lane application is approved and your garage is live.`, 'Your team is now on the Pit Lane grid — drop by any time.'],
+      sheet: [['STATUS 状态', 'APPROVED · 已通过'], ['BAY 车位', bay], ['LIVE 上线', time]],
+      action: '查看 P 房 / View the grid',
+    },
+    rejected: {
+      subject: `PIT LANE · ${tla} 申请结果 / Application update`, flag: '#e5304a', chip: 'NOT CLEARED', banner: 'RACE CONTROL · STEWARDS DECISION',
+      title: 'NOT CLEARED', titleZh: '本次暂未通过', radio: 'Unlucky this time. 这次没能进站。',
+      zh: [`${name}，很遗憾，你的友链申请这次暂未通过。`, extra.note ? `干事备注：${extra.note}` : '调整后可以随时重新申请。'],
+      en: [`${name}: your Pit Lane application was not approved this time.`, extra.note ? 'See the stewards’ note above; you are welcome to apply again.' : 'You are welcome to adjust and apply again.'],
+      sheet: [['STATUS 状态', 'NOT CLEARED · 暂未通过'], ['DECIDED 审核', time], ...(extra.ticket ? [['TICKET 申请编号', extra.ticket]] : [])],
+      action: '重新申请 / Apply again',
     },
   }[kind]
   const frequency = `${virtualFrequency(tla)} MHz`

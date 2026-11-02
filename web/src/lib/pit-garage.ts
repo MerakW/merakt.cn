@@ -4,7 +4,7 @@ import { promisify } from 'node:util'
 import { FRIEND_TYRES, HEX_PATTERN, safeHttpURL, type FriendTyre } from './pit-lane'
 import { readJSON, reply, text, trustedOrigin } from './pit-lane-request'
 import { EMAIL_PATTERN, PASSWORD_MAX, PASSWORD_MIN } from './pit-garage-rules'
-import { garageMail, type GarageMail } from './pit-garage-mail'
+import { garageMail, type GarageMail, type GarageMailFriend, type NoticeMail, type PitMailExtra } from './pit-garage-mail'
 
 /**
  * Garage: optional self-service accounts for Pit Lane friends. Deliberately separate from Payload auth,
@@ -203,7 +203,7 @@ export async function garageReset(req: PayloadRequest) {
 }
 
 // ---- mail (sent from the configured no-reply mailbox; see SMTP_* in .env.example; template in ./pit-garage-mail) ----
-export { garageMail, type GarageMail } from './pit-garage-mail'
+export { garageMail, type GarageMail, type NoticeMail } from './pit-garage-mail'
 
 /** Invite and reset mails carry a fresh one-time token; approval mails just link to the garage. */
 export async function sendGarageMail(payload: Payload, friend: GarageFriend, kind: GarageMail, req?: PayloadRequest) {
@@ -219,4 +219,12 @@ export async function sendGarageMail(payload: Payload, friend: GarageFriend, kin
   const mail = garageMail(kind, friend, link)
   await payload.sendEmail({ to: friend.accountEmail, ...mail })
   payload.logger.info(`PIT GARAGE ${friend.tla}: ${kind} mail sent`)
+}
+
+/** Applicant notices go to the contact email: the receipt links straight to the ticket lookup. */
+export async function sendNoticeMail(payload: Payload, to: string, kind: NoticeMail, friend: GarageMailFriend, extra: PitMailExtra = {}) {
+  const home = new URL('/pit-lane', payload.config.serverURL).href
+  const link = kind === 'received' && extra.ticket ? `${home}?ticket=${encodeURIComponent(extra.ticket)}#stewards` : kind === 'rejected' ? `${home}#stewards` : home
+  await payload.sendEmail({ to, ...garageMail(kind, friend, link, Date.now(), extra) })
+  payload.logger.info(`PIT LANE ${friend.tla}: ${kind} mail sent`)
 }
