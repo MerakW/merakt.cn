@@ -1,23 +1,38 @@
 import type { Payload } from 'payload'
 import sharp from 'sharp'
 import { isIP } from 'node:net'
+import { request as httpRequest } from 'node:http'
+import { request as httpsRequest } from 'node:https'
+import { Readable } from 'node:stream'
 import { nextHealth, safeHttpURL, type Health, type ProbeResult } from './pit-lane'
 
 /**
  * Pit Lane monitor: every 15 minutes probe approved friends' homepages (health / red flag),
- * every 6 hours look for the reciprocal merakt.cn link, and fetch the site logo when the
- * logo source is automatic. Friends' posts and update times are never tracked. Enabled with PIT_LANE_MONITOR=1.
+ * and fetch the site logo when the logo source is automatic. Reciprocal links are reviewed by hand
+ * (links pages are often script-rendered or block non-browser requests). Friends' posts and update times are never tracked. Enabled with PIT_LANE_MONITOR=1.
  */
-const USER_AGENT = 'MerakPitLane/1.0 (+https://merakt.cn)'
+// Crawler-style UA (like Googlebot's): still names us, but passes guards that only admit Mozilla-compatible agents.
+const USER_AGENT = 'Mozilla/5.0 (compatible; MerakPitLane/1.0; +https://merakt.cn)'
 const TIMEOUT = 8000
 const HEALTH_EVERY = 15 * 60000
-const BACKLINK_EVERY = 6 * 3600000
-const LOGO_EVERY = 30 * 86400000
+const LOGO_EVERY = 30 * 86400000, LOGO_RETRY = 3600000
 const MAX_TEXT = 512 * 1024
 const MAX_IMAGE = 2 * 1024 * 1024
 
 type Fetched = { response: Response; url: string; latencyMs: number }
-type FriendDoc = { id: number; tla: string; name: string; url: string; backlinkUrl?: string | null; logoSource?: string | null; logo?: number | { id: number; filename?: string | null } | null; health?: Health | null; backlinkCheckedAt?: string | null; logoCheckedAt?: string | null }
+/** Cookies from one friend check (homepage → icons). Some sites only serve assets to visitors who opened the homepage. */
+export type CookieJar = Map<string, Map<string, string>>
+function remember(jar: CookieJar | undefined, url: URL, response: Response) {
+  if (!jar) return
+  for (const line of response.headers.getSetCookie?.() || []) {
+    const [pair] = line.split(';'), index = pair.indexOf('=')
+    if (index < 1) continue
+    const host = jar.get(url.hostname) || new Map<string, string>()
+    host.set(pair.slice(0, index).trim(), pair.slice(index + 1).trim()); jar.set(url.hostname, host)
+  }
+}
+const cookieHeader = (jar: CookieJar | undefined, url: URL) => [...(jar?.get(url.hostname) || [])].map(([name, value]) => `${name}=${value}`).join('; ')
+type FriendDoc = { id: number; tla: string; name: string; url: string; logoSource?: string | null; logo?: number | { id: number; filename?: string | null } | null; health?: Health | null; logoCheckedAt?: string | null }
 
 /** Friends are admin-approved, but still refuse loopback/private targets. */
 export function publicTarget(value: string): URL | null {
@@ -31,13 +46,40 @@ export function publicTarget(value: string): URL | null {
   return url
 }
 
-async function fetchFollow(target: string, accept: string): Promise<Fetched> {
+/**
+ * Plain HTTP GET as a web Response. Not global fetch: it always sends `Sec-Fetch-Mode: cors`,
+ * which some friends' bot guards reject for page loads even though a browser visit would pass.
+ */
+function get(url: URL, headers: Record<string, string>): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const send = url.protocol === 'https:' ? httpsRequest : httpRequest
+    const req = send(url, { method: 'GET', headers, timeout: TIMEOUT }, res => {
+      const status = res.statusCode || 502, list = new Headers()
+      for (const [name, value] of Object.entries(res.headers)) for (const item of Array.isArray(value) ? value : value === undefined ? [] : [value]) list.append(name, String(item))
+      const empty = [204, 205, 304].includes(status) || status < 200
+      if (empty) res.resume()
+      resolve(new Response(empty ? null : Readable.toWeb(res) as ReadableStream, { status: Math.min(Math.max(status, 200), 599), headers: list }))
+    })
+    // Idle timeout per socket, plus a hard deadline so a trickling response cannot hold the monitor.
+    const deadline = setTimeout(() => req.destroy(new Error('deadline')), TIMEOUT * 2)
+    req.on('close', () => clearTimeout(deadline))
+    req.on('timeout', () => req.destroy(new Error('timeout')))
+    req.on('error', reject)
+    req.end()
+  })
+}
+
+async function fetchFollow(target: string, accept: string, jar?: CookieJar, referer?: string): Promise<Fetched> {
   const started = performance.now()
   let current = target
   for (let hop = 0; hop <= 3; hop++) {
     const url = publicTarget(current)
     if (!url) throw new Error('blocked target')
-    const response = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(TIMEOUT), headers: { 'User-Agent': USER_AGENT, Accept: accept } })
+    const headers: Record<string, string> = { 'User-Agent': USER_AGENT, Accept: accept }
+    const cookies = cookieHeader(jar, url); if (cookies) headers.Cookie = cookies
+    if (referer) headers.Referer = referer
+    const response = await get(url, headers)
+    remember(jar, url, response)
     const location = response.headers.get('location')
     if (response.status >= 300 && response.status < 400 && location) { await response.body?.cancel(); current = new URL(location, url).href; continue }
     return { response, url: url.href, latencyMs: Math.round(performance.now() - started) }
@@ -45,7 +87,8 @@ async function fetchFollow(target: string, accept: string): Promise<Fetched> {
   throw new Error('too many redirects')
 }
 
-async function readLimited(response: Response, limit: number): Promise<Buffer> {
+/** Read at most `limit` bytes; images over the limit are refused, pages are cut (icons live in <head>). */
+async function readLimited(response: Response, limit: number, truncate = false): Promise<Buffer> {
   const reader = response.body?.getReader()
   if (!reader) return Buffer.alloc(0)
   const chunks: Uint8Array[] = []; let size = 0
@@ -53,17 +96,19 @@ async function readLimited(response: Response, limit: number): Promise<Buffer> {
     const { done, value } = await reader.read()
     if (done) break
     size += value.byteLength
-    if (size > limit) { await reader.cancel(); throw new Error('response too large') }
+    if (size > limit) { await reader.cancel(); if (!truncate) throw new Error('response too large'); chunks.push(value.subarray(0, value.byteLength - (size - limit))); break }
     chunks.push(value)
   }
   return Buffer.concat(chunks)
 }
 
-export async function probe(url: string): Promise<ProbeResult & { html?: string; finalURL?: string }> {
+/** Bot walls (401/403/429) still prove the server is up, so they count as reachable; only 2xx/3xx bodies are read. */
+const REACHABLE = new Set([401, 403, 429])
+export async function probe(url: string, jar?: CookieJar): Promise<ProbeResult & { html?: string; finalURL?: string }> {
   try {
-    const { response, latencyMs, url: finalURL } = await fetchFollow(url, 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.5')
-    const ok = response.status >= 200 && response.status < 400
-    const html = ok && /html/i.test(response.headers.get('content-type') || '') ? (await readLimited(response, MAX_TEXT).catch(() => Buffer.alloc(0))).toString('utf8') : (await response.body?.cancel(), undefined)
+    const { response, latencyMs, url: finalURL } = await fetchFollow(url, 'text/html,application/xhtml+xml;q=0.9,*/*;q=0.5', jar)
+    const served = response.status >= 200 && response.status < 400, ok = served || REACHABLE.has(response.status)
+    const html = served && /html/i.test(response.headers.get('content-type') || '') ? (await readLimited(response, MAX_TEXT, true).catch(() => Buffer.alloc(0))).toString('utf8') : (await response.body?.cancel(), undefined)
     return { ok, status: response.status, latencyMs, retryAfter: response.headers.has('retry-after'), html, finalURL }
   } catch { return { ok: false } }
 }
@@ -97,9 +142,9 @@ export function pngFromIco(data: Buffer): Buffer | null {
   return best?.frame || null
 }
 
-async function fetchImage(url: string): Promise<Buffer | null> {
+async function fetchImage(url: string, jar?: CookieJar, referer?: string): Promise<Buffer | null> {
   try {
-    const { response } = await fetchFollow(url, 'image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8')
+    const { response } = await fetchFollow(url, 'image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8', jar, referer)
     if (!response.ok) { await response.body?.cancel(); return null }
     let data = await readLimited(response, MAX_IMAGE)
     if (data.readUInt16LE(0) === 0 && data.readUInt16LE(2) === 1) data = pngFromIco(data) || Buffer.alloc(0)
@@ -110,46 +155,34 @@ async function fetchImage(url: string): Promise<Buffer | null> {
   } catch { return null }
 }
 
-async function discoverLogo(html: string, base: string): Promise<Buffer | null> {
+async function discoverLogo(html: string, base: string, jar?: CookieJar): Promise<Buffer | null> {
   const { icons, manifest } = discoverIcons(html, base)
   const candidates = [...icons]
   if (manifest) {
     try {
-      const { response } = await fetchFollow(manifest, 'application/manifest+json,application/json')
+      const { response } = await fetchFollow(manifest, 'application/manifest+json,application/json', jar, base)
       const json = JSON.parse((await readLimited(response, 64 * 1024)).toString('utf8')) as { icons?: { src?: string; sizes?: string }[] }
       const sized = (json.icons || []).filter(icon => icon.src).sort((a, b) => (Number(b.sizes?.split('x')[0]) || 0) - (Number(a.sizes?.split('x')[0]) || 0))
       candidates.push(...sized.map(icon => new URL(icon.src!, manifest).href))
     } catch { /* manifest is optional */ }
   }
   candidates.push(new URL('/favicon.ico', base).href)
-  for (const candidate of [...new Set(candidates)].slice(0, 8)) { const image = await fetchImage(candidate); if (image) return image }
+  for (const candidate of [...new Set(candidates)].slice(0, 8)) { const image = await fetchImage(candidate, jar, base); if (image) return image }
   return null
 }
 
 const stale = (value: string | null | undefined, every: number, now: number) => !value || now - Date.parse(value) >= every
-// A real anchor to merakt.cn, not just the word in a sentence.
-const BACKLINK = /<a\b[^>]*\bhref\s*=\s*["']?(?:https?:)?\/\/(?:www\.)?merakt\.cn(?=[\/"'\s>?#:]|$)/i
-/** Does any of these pages (homepage or links page) link to merakt.cn? */
-export async function verifyBacklink(urls: string[], homepageHTML?: string): Promise<boolean> {
-  if (homepageHTML && BACKLINK.test(homepageHTML)) return true
-  for (const url of urls) { const result = await probe(url); if (result.html && BACKLINK.test(result.html)) return true }
-  return false
-}
 
 export async function checkFriend(payload: Payload, friend: FriendDoc, now = Date.now()) {
-  const result = await probe(friend.url)
+  const jar: CookieJar = new Map()
+  const result = await probe(friend.url, jar)
   const health = nextHealth(friend.health, result)
   const data: Record<string, unknown> = { health: { ...health, checkedAt: new Date(now).toISOString() } }
   const base = result.finalURL || friend.url
-  if (result.ok && stale(friend.backlinkCheckedAt, BACKLINK_EVERY, now)) {
-    data.backlinkCheckedAt = new Date(now).toISOString()
-    // Reciprocal link: homepage first, then the links page the friend told us about.
-    data.backlinkAt = await verifyBacklink(friend.backlinkUrl ? [friend.backlinkUrl] : [], result.html) ? new Date(now).toISOString() : null
-  }
   const logoID = typeof friend.logo === 'object' ? friend.logo?.id : friend.logo
-  if (result.ok && friend.logoSource === 'auto' && (!logoID || stale(friend.logoCheckedAt, LOGO_EVERY, now))) {
+  if (result.ok && friend.logoSource === 'auto' && stale(friend.logoCheckedAt, logoID ? LOGO_EVERY : LOGO_RETRY, now)) {
     data.logoCheckedAt = new Date(now).toISOString()
-    const image = await discoverLogo(result.html || '', base)
+    const image = await discoverLogo(result.html || '', base, jar)
     if (image) {
       const media = await payload.create({ collection: 'media', overrideAccess: true, data: { alt: `${friend.name} logo`, altEn: `${friend.name} logo`, source: friend.url, visibility: 'public' },
         file: { data: image, mimetype: 'image/webp', name: `pit-logo-${friend.tla.toLowerCase()}-${now}.webp`, size: image.length } })

@@ -2,6 +2,7 @@ import type { CollectionConfig, FieldHook } from 'payload'
 import { adminField, adminOnly } from '@/lib/access'
 import { HEX_PATTERN, RESERVED_TLAS, TLA_PATTERN, safeHttpURL } from '@/lib/pit-lane'
 import { friendClearance, submitFriendApplication } from '@/lib/pit-lane-submit'
+import { garageForgot, garageLogin, garageLogout, garagePassword, garageReset, garageSession, garageUpdate, normalEmail, sendGarageMail, type GarageFriend, type GarageMail } from '@/lib/pit-garage'
 import { parseCard } from '@/lib/pit-lane-card'
 import { translate, type MessageKey } from '@/lib/i18n/core'
 
@@ -13,9 +14,11 @@ const fail = (key: MessageKey, options?: Options) => translate(key, options?.req
 
 export const Friends: CollectionConfig = {
   slug: 'friends', labels: { singular: 'pitLane.admin.friend', plural: 'pitLane.admin.friends' },
-  admin: { group: 'ui.content', useAsTitle: 'name', defaultColumns: ['tla', 'name', 'status', 'bay', 'url', 'updatedAt'], description: 'pitLane.admin.description' },
+  admin: { group: 'ui.content', useAsTitle: 'name', defaultColumns: ['tla', 'name', 'status', 'backlinkAt', 'url', 'updatedAt'], description: 'pitLane.admin.description' },
   access: { create: adminOnly, update: adminOnly, delete: adminOnly, read: ({ req }) => req.user ? true : { status: { equals: 'approved' } } },
-  endpoints: [{ path: '/apply', method: 'post', handler: submitFriendApplication }, { path: '/clearance', method: 'get', handler: friendClearance }],
+  endpoints: [{ path: '/apply', method: 'post', handler: submitFriendApplication }, { path: '/clearance', method: 'get', handler: friendClearance },
+    { path: '/garage/session', method: 'get', handler: garageSession }, { path: '/garage/login', method: 'post', handler: garageLogin }, { path: '/garage/logout', method: 'post', handler: garageLogout },
+    { path: '/garage/update', method: 'post', handler: garageUpdate }, { path: '/garage/password', method: 'post', handler: garagePassword }, { path: '/garage/forgot', method: 'post', handler: garageForgot }, { path: '/garage/reset', method: 'post', handler: garageReset }],
   hooks: { beforeValidate: [({ data, operation }) => {
     // Paste a clearance card (email, QQ, X, GitHub issue or YAML) to pre-fill an application.
     if (!data || typeof data.importCard !== 'string' || !data.importCard.trim()) return data
@@ -25,6 +28,31 @@ export const Friends: CollectionConfig = {
     if (operation === 'create' && (!data.source || data.source === 'admin')) filled.source = /github|```|^#/im.test(data.importCard) ? 'github' : /@|mailto|subject/i.test(data.importCard) ? 'email' : 'social'
     filled.importCard = undefined
     return filled
+  }],
+  // Garage accounts: approving a card opens its login and mails the team; Merak can also open one by hand.
+  beforeChange: [({ data, originalDoc, req, context }) => {
+    if (context.garage || !data) return data
+    if (typeof data.accountEmail === 'string') data.accountEmail = normalEmail(data.accountEmail) || data.accountEmail.trim().toLowerCase() || null
+    const before = (originalDoc || {}) as Partial<GarageFriend>, email = 'accountEmail' in data ? data.accountEmail : before.accountEmail
+    const emailChanged = 'accountEmail' in data && (data.accountEmail || null) !== (before.accountEmail || null)
+    if (!email) { if (before.loginEnabled || data.loginEnabled) { data.loginEnabled = false; data.sessionVersion = (before.sessionVersion || 0) + 1 } data.sendInvite = undefined; return data }
+    const approved = (data.status ?? before.status) === 'approved'
+    if (approved && before.status !== 'approved') data.loginEnabled = true
+    const enabled = Boolean(data.loginEnabled ?? before.loginEnabled)
+    // A new address or a closed garage signs every device out.
+    if ((before.accountEmail && emailChanged) || (before.loginEnabled && !enabled)) data.sessionVersion = (before.sessionVersion || 0) + 1
+    if (approved && enabled && (data.sendInvite || !before.loginEnabled || before.status !== 'approved' || emailChanged)) req.context.garageMail = data.sendInvite || emailChanged ? 'invite' : 'auto'
+    data.sendInvite = undefined
+    return data
+  }],
+  afterChange: [async ({ doc, req, context }) => {
+    const wanted = req.context.garageMail as 'auto' | 'invite' | undefined
+    if (context.garage || !wanted) return doc
+    req.context.garageMail = undefined
+    const full = await req.payload.findByID({ collection: 'friends', id: doc.id, depth: 0, overrideAccess: true, showHiddenFields: true, req }) as unknown as GarageFriend
+    const kind: GarageMail = wanted === 'invite' || !full.passwordHash ? 'invite' : 'approved'
+    await sendGarageMail(req.payload, full, kind, req).catch(error => req.payload.logger.error({ err: error }, `PIT GARAGE ${full.tla}: ${kind} mail failed`))
+    return doc
   }] },
   defaultSort: 'bay',
   fields: [
@@ -62,7 +90,8 @@ export const Friends: CollectionConfig = {
     { name: 'source', label: 'pitLane.admin.source', type: 'select', defaultValue: 'admin', options: [
       { label: 'pitLane.admin.sourceWeb', value: 'web' }, { label: 'pitLane.admin.sourceEmail', value: 'email' }, { label: 'pitLane.admin.sourceSocial', value: 'social' }, { label: 'GitHub', value: 'github' }, { label: 'pitLane.admin.sourceAdmin', value: 'admin' },
     ], admin: { position: 'sidebar' } },
-    { name: 'backlinkAt', label: 'pitLane.admin.backlinkAt', type: 'date', admin: { position: 'sidebar', readOnly: true, description: 'pitLane.admin.backlinkAtHelp', date: { pickerAppearance: 'dayAndTime' } } },
+    { name: 'backlinkAt', label: 'pitLane.admin.backlinkAt', type: 'date', admin: { position: 'sidebar', description: 'pitLane.admin.backlinkAtHelp', date: { pickerAppearance: 'dayOnly' } } },
+    { name: 'reviewNote', label: 'pitLane.admin.reviewNote', type: 'textarea', maxLength: 120, admin: { position: 'sidebar', rows: 3, description: 'pitLane.admin.reviewNoteHelp' } },
     { name: 'ticketHash', type: 'text', index: true, access: { read: () => false, update: () => false }, admin: { hidden: true } },
     { name: 'maintenance', label: 'pitLane.admin.maintenance', type: 'checkbox', defaultValue: false, admin: { position: 'sidebar', description: 'pitLane.admin.maintenanceHelp' } },
     { name: 'joinedAt', label: 'pitLane.admin.joinedAt', type: 'date', admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly' } } },
@@ -74,7 +103,26 @@ export const Friends: CollectionConfig = {
       { name: 'latencyMs', label: 'pitLane.admin.latency', type: 'number', admin: readOnly },
       { name: 'checkedAt', label: 'pitLane.admin.checkedAt', type: 'date', admin: { ...readOnly, date: { pickerAppearance: 'dayAndTime' } } },
     ] },
-    { name: 'backlinkCheckedAt', type: 'date', admin: { hidden: true } },
+    // Legacy automatic backlink check: no longer read or written.
+    { type: 'collapsible', label: 'garage.admin.title', admin: { initCollapsed: false, description: 'garage.admin.help' }, fields: [
+      { type: 'row', fields: [
+        { name: 'accountEmail', label: 'garage.admin.email', type: 'email', unique: true, index: true, access: { read: adminField } },
+        { name: 'loginEnabled', label: 'garage.admin.enabled', type: 'checkbox', defaultValue: false, access: { read: adminField }, admin: { description: 'garage.admin.enabledHelp' } },
+      ] },
+      { name: 'sendInvite', label: 'garage.admin.invite', type: 'checkbox', virtual: true, admin: { description: 'garage.admin.inviteHelp', condition: data => Boolean(data?.accountEmail) } },
+      { type: 'row', fields: [
+        { name: 'passwordSetAt', label: 'garage.admin.passwordSetAt', type: 'date', access: { read: adminField, create: () => false, update: () => false }, admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },
+        { name: 'lastLoginAt', label: 'garage.admin.lastLoginAt', type: 'date', access: { read: adminField, create: () => false, update: () => false }, admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },
+      ] },
+    ] },
+    // Garage secrets: written only by the garage endpoints (overrideAccess), never readable through the API.
+    { name: 'passwordHash', type: 'text', access: { read: () => false, create: () => false, update: () => false }, admin: { hidden: true } },
+    { name: 'sessionVersion', type: 'number', defaultValue: 0, access: { read: () => false, create: () => false, update: () => false }, admin: { hidden: true } },
+    { name: 'resetTokenHash', type: 'text', index: true, access: { read: () => false, create: () => false, update: () => false }, admin: { hidden: true } },
+    { name: 'resetExpires', type: 'date', access: { read: () => false, create: () => false, update: () => false }, admin: { hidden: true } },
+    { name: 'loginFailures', type: 'number', defaultValue: 0, access: { read: () => false, create: () => false, update: () => false }, admin: { hidden: true } },
+    { name: 'lockedUntil', type: 'date', access: { read: () => false, create: () => false, update: () => false }, admin: { hidden: true } },
+    { name: 'backlinkCheckedAt', type: 'date', access: { read: adminField }, admin: { hidden: true } },
     // Legacy RSS columns: no longer read or written (friends' updates are not tracked); kept so existing data is not dropped.
     { name: 'feedUrl', type: 'text', access: { read: adminField }, admin: { hidden: true } },
     { name: 'lastPostAt', type: 'date', access: { read: adminField }, admin: { hidden: true } },

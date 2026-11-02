@@ -34,10 +34,3 @@ test('repo template parses and tickets have an unambiguous alphabet', () => {
   assert.ok(!TICKET_PATTERN.test('PIT-AST-7K3QZ0'))
   assert.ok(!TICKET_PATTERN.test('PIT-AS-7K3QZ9'))
 })
-
-test('reciprocal link check wants an anchor to merakt.cn', async () => {
-  const { verifyBacklink } = await import('../src/lib/pit-lane-monitor')
-  assert.equal(await verifyBacklink([], '<li><a class="x" href="https://merakt.cn/">Merak</a></li>'), true)
-  assert.equal(await verifyBacklink([], "<a href='//www.merakt.cn'>"), true)
-  assert.equal(await verifyBacklink([], '<p>I like merakt.cn</p><a href="https://merakt.cn.evil.example">'), false)
-})

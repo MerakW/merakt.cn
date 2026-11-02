@@ -94,12 +94,16 @@ export type Standing = {
   interval: string; gap: string; tyre: Tyre; inPit: boolean; pitTo: Tyre | null; pitted: boolean; stops: number; stopMs: number; finished: boolean; retired: boolean
   /** Where the car is on the West Lake map (null: retired, still in the garage). */
   map: MapSpot | null
+  /** 2026 Overtake Mode: within 1.0 s of the car ahead while OT is enabled (replaces DRS). */
+  overtake: boolean
 }
 export type RaceView = {
   raceId: number; phase: RacePhase; lights: number; lap: number; simMs: number; standings: Standing[]; fastest: { tla: string; ms: number } | null; winner: string | null
   weather: Weather; track: Track; leaderDistance: number
   /** This race's safety car plan, and whether it is out now ('out') or coming in at the end of this lap ('in'). */
   sc: SafetyCar | null; safetyCar: 'out' | 'in' | null
+  /** Overtake Mode enabled for the field: from lap 3, and again two laps after a safety-car restart. */
+  overtakeMode: boolean
   /** The safety car on the map while it is leading the field (formation lap or a deployment). */
   scMap: MapSpot | null
 }
@@ -192,6 +196,8 @@ function timeAt(driver: DriverPlan, distance: number): number {
   const lap = Math.floor(distance)
   return lap >= RACE_LAPS ? driver.ends[RACE_LAPS] : driver.ends[lap] + (distance - lap) * driver.laps[lap + 1]
 }
+/** 2026 Overtake Mode detection threshold. */
+export const OT_GAP_MS = 1000
 const seconds = (ms: number) => ms >= 60000 ? `+${formatLap(ms)}` : `+${(ms / 1000).toFixed(3)}`
 
 const LANE = 1 - PIT_IN
@@ -257,8 +263,9 @@ export function raceView(entries: RaceEntry[], now: number): RaceView {
         tla: driver.tla, state: driver.state, position: 0, grid: driver.grid + 1, distance, lap: Math.min(RACE_LAPS, done + (finished ? 0 : 1)),
         lastLap: done >= 1 ? driver.laps[done] : null, bestLap: clean.length ? Math.min(...clean) : null, interval: '', gap: '',
         tyre: driver.tyres[Math.min(RACE_LAPS, finished ? driver.finishLap : done + 1)] ?? driver.tyres[0],
-        inPit: !!stop, pitTo: stop?.to ?? null, pitted: made.length > 0, stops: made.length, stopMs: (stop || made.at(-1))?.ms ?? 0, finished, retired: false, map: spotOf(driver, time, finished, completed),
+        inPit: !!stop, pitTo: stop?.to ?? null, pitted: made.length > 0, stops: made.length, stopMs: (stop || made.at(-1))?.ms ?? 0, finished, retired: false, map: spotOf(driver, time, finished, completed), overtake: false,
       } as Standing,
+      intervalMs: Infinity,
     }
   }).sort((a, b) => b.distance - a.distance || a.driver.finishAt - b.driver.finishAt || a.driver.grid - b.driver.grid)
   rows.forEach((row, index) => {
@@ -270,28 +277,32 @@ export function raceView(entries: RaceEntry[], now: number): RaceView {
       return laps >= 1 ? `+${laps} LAP${laps > 1 ? 'S' : ''}` : seconds(Math.max(0, row.time - timeAt(other.driver, row.distance)))
     }
     row.standing.interval = behind(ahead); row.standing.gap = behind(leader)
+    if (ahead.distance - row.distance < 1) row.intervalMs = Math.max(0, row.time - timeAt(ahead.driver, row.distance))
   })
   const standings = [...rows.map(row => row.standing), ...plan.retired.map((entry): Standing => ({
     tla: entry.tla, state: entry.state, position: null, grid: null, distance: -Infinity, lap: 0, lastLap: null, bestLap: null,
-    interval: 'OUT', gap: 'OUT', tyre: entry.tyre, inPit: false, pitTo: null, pitted: false, stops: 0, stopMs: 0, finished: false, retired: true, map: null,
+    interval: 'OUT', gap: 'OUT', tyre: entry.tyre, inPit: false, pitTo: null, pitted: false, stops: 0, stopMs: 0, finished: false, retired: true, map: null, overtake: false,
   }))]
   let fastest: RaceView['fastest'] = null
   for (const standing of standings) if (standing.bestLap !== null && (!fastest || standing.bestLap < fastest.ms)) fastest = { tla: standing.tla, ms: standing.bestLap }
   const phase: RacePhase = formation ? 'formation' : clock.simMs < 0 ? 'lights' : clock.simMs >= plan.leaderFinish ? 'chequered' : 'green'
   const lap = rows[0]?.standing.lap ?? 0, sc = plan.safetyCar
   const safetyCar = phase === 'green' && sc && lap >= sc.from && lap < sc.to ? lap === sc.to - 1 ? 'in' : 'out' : null
+  // Like DRS before it: armed two laps after the start and after a safety-car restart; detection gap 1.0 s.
+  const overtakeMode = phase === 'green' && !safetyCar && lap >= 3 && !(sc && lap >= sc.from && lap < sc.to + 2)
+  if (overtakeMode) for (const row of rows) row.standing.overtake = (row.standing.position ?? 0) > 1 && row.intervalMs <= OT_GAP_MS && !row.standing.inPit && !row.finished
   let scMap: MapSpot | null = formation?.sc ?? null
   if (safetyCar) {
     const lead = rows[0].standing.map!, at = (lead.lane ? lead.at : wrap(lead.at)) + 0.025
     scMap = safetyCar === 'in' && at >= PIT_IN ? { at: Math.min(at, SC_BOX), lane: true } : { at: wrap(at), lane: false }
   }
   return { raceId: clock.raceId, phase, lights: clock.lights, lap, simMs: clock.simMs, standings, fastest, winner: phase === 'chequered' ? rows[0]?.standing.tla ?? null : null,
-    weather: plan.weather, track: phase === 'chequered' ? trackAt(plan.weather, RACE_LAPS) : trackAt(plan.weather, Math.max(1, lap)), leaderDistance: rows[0]?.distance ?? 0, sc, safetyCar, scMap }
+    weather: plan.weather, track: phase === 'chequered' ? trackAt(plan.weather, RACE_LAPS) : trackAt(plan.weather, Math.max(1, lap)), leaderDistance: rows[0]?.distance ?? 0, sc, safetyCar, scMap, overtakeMode }
 }
 
 /** Monospace live classification for Tower Control `pit --status`. */
 export function raceStatusTable(view: RaceView, names: Record<string, string>): string[] {
-  const status = (row: Standing) => row.retired ? 'RED FLAG · DNF' : row.inPit ? `IN PIT → ${row.pitTo}` : row.finished ? 'FINISHED' : row.state === 'wet' ? 'WET · MAINT' : row.state === 'inter' ? 'INTER · UNSTABLE' : 'ON TRACK'
+  const status = (row: Standing) => row.retired ? 'RED FLAG · DNF' : row.inPit ? `IN PIT → ${row.pitTo}` : row.finished ? 'FINISHED' : row.state === 'wet' ? 'WET · MAINT' : row.state === 'inter' ? 'INTER · UNSTABLE' : row.overtake ? 'ON TRACK · OT' : 'ON TRACK'
   const head = view.phase === 'formation' ? 'FORMATION LAP · SAFETY CAR' : view.phase === 'lights' ? `LIGHTS ${'●'.repeat(view.lights)}${'○'.repeat(5 - view.lights)}` : view.phase === 'chequered' ? `CHEQUERED FLAG · WINNER ${view.winner}` : `LAP ${view.lap}/${RACE_LAPS} · TRACK ${view.track.toUpperCase()}${view.safetyCar ? ' · SAFETY CAR' : ''}`
   return [
     `FRIENDS GP R${String(view.raceId % 1000).padStart(3, '0')} · ${head}${view.fastest ? ` · FASTEST ${view.fastest.tla} ${formatLap(view.fastest.ms)}` : ''}`,

@@ -488,7 +488,7 @@ export interface Checkin {
   createdAt: string;
 }
 /**
- * Friend links for HGH APRON & PIT LANE. Only approved entries are public; health, backlinks and logos are maintained by PIT_LANE_MONITOR; friends' site updates are never tracked.
+ * Friend links for HGH APRON & PIT LANE. Only approved entries are public; health and logos are maintained by PIT_LANE_MONITOR, backlinks are checked by hand; teams with a garage account edit their own card; friends' site updates are never tracked.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "friends".
@@ -529,7 +529,7 @@ export interface Friend {
   bearing?: number | null;
   distance?: number | null;
   /**
-   * Optional page where they link merakt.cn; checked along with the homepage.
+   * Optional page where they link merakt.cn; open it when reviewing.
    */
   backlinkUrl?: string | null;
   /**
@@ -539,9 +539,13 @@ export interface Friend {
   status: 'pending' | 'approved' | 'rejected';
   source?: ('web' | 'email' | 'social' | 'github' | 'admin') | null;
   /**
-   * Last time a merakt.cn link was found on their site; empty means not found yet.
+   * Set a date once you have checked their merakt.cn link by hand; applicants then see "backlink confirmed". Clear it to undo.
    */
   backlinkAt?: string | null;
+  /**
+   * Optional; shown when the applicant looks up their ticket, e.g. what to change.
+   */
+  reviewNote?: string | null;
   ticketHash?: string | null;
   /**
    * Manually fit full wets; the card shows rain.
@@ -556,6 +560,23 @@ export interface Friend {
     latencyMs?: number | null;
     checkedAt?: string | null;
   };
+  accountEmail?: string | null;
+  /**
+   * Ticked automatically on approval; unticking signs the team out immediately.
+   */
+  loginEnabled?: boolean | null;
+  /**
+   * Mails a set-password link valid for 72 hours (card must be approved and sign-in allowed). Also works as a password reset.
+   */
+  sendInvite?: boolean | null;
+  passwordSetAt?: string | null;
+  lastLoginAt?: string | null;
+  passwordHash?: string | null;
+  sessionVersion?: number | null;
+  resetTokenHash?: string | null;
+  resetExpires?: string | null;
+  loginFailures?: number | null;
+  lockedUntil?: string | null;
   backlinkCheckedAt?: string | null;
   feedUrl?: string | null;
   lastPostAt?: string | null;
@@ -1069,6 +1090,7 @@ export interface FriendsSelect<T extends boolean = true> {
   status?: T;
   source?: T;
   backlinkAt?: T;
+  reviewNote?: T;
   ticketHash?: T;
   maintenance?: T;
   joinedAt?: T;
@@ -1082,6 +1104,17 @@ export interface FriendsSelect<T extends boolean = true> {
         latencyMs?: T;
         checkedAt?: T;
       };
+  accountEmail?: T;
+  loginEnabled?: T;
+  sendInvite?: T;
+  passwordSetAt?: T;
+  lastLoginAt?: T;
+  passwordHash?: T;
+  sessionVersion?: T;
+  resetTokenHash?: T;
+  resetExpires?: T;
+  loginFailures?: T;
+  lockedUntil?: T;
   backlinkCheckedAt?: T;
   feedUrl?: T;
   lastPostAt?: T;

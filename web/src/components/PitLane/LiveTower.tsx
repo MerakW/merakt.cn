@@ -53,11 +53,11 @@ export default function LiveTower({ view, colors, active, moves, now, message }:
           <span role="cell" className="pl-pos">{row.position ?? '—'}</span>
           <span className="pl-bar" aria-hidden="true"/>
           <span role="cell" className="pl-tt">{row.tla}{move && <i className="pl-move" data-dir={move} aria-label={move === 'up' ? 'GAINED' : 'LOST'}>{move === 'up' ? '▲' : '▼'}</i>}</span>
-          <span role="cell" className={`pl-gap${row.position === 1 ? ' is-lead' : ''}${row.retired ? ' is-out' : ''}`}>{fastest && <i className="pl-fl" title="FASTEST LAP"/>}{row.inPit ? `PIT→${row.pitTo}` : row.finished && row.position === 1 ? '🏁 WIN' : row.interval}</span>
+          <span role="cell" className={`pl-gap${row.position === 1 ? ' is-lead' : ''}${row.retired ? ' is-out' : ''}`}>{fastest && <i className="pl-fl" title="FASTEST LAP"/>}{row.overtake && <i className="pl-ot" title="OVERTAKE MODE">OT</i>}{row.inPit ? `PIT→${row.pitTo}` : row.finished && row.position === 1 ? '🏁 WIN' : row.interval}</span>
           <span role="cell" className="pl-ty">{row.tyre}</span>
         </div>
       })}
     </div>
-    <footer data-kind={message?.kind ?? (view.safetyCar || view.phase === 'formation' ? 'sc' : undefined)}><i/><FootText key={message?.id || 0} text={message?.text || (view.phase === 'formation' ? 'FORMATION LAP · FOLLOW THE SAFETY CAR' : view.phase === 'lights' ? 'GRID FORMED · STANDING START' : view.phase === 'chequered' ? `${view.winner} WINS · NEXT RACE SOON` : view.safetyCar ? 'SAFETY CAR · NO OVERTAKING' : 'DRS ENABLED')}/></footer>
+    <footer data-kind={message?.kind ?? (view.safetyCar || view.phase === 'formation' ? 'sc' : undefined)}><i/><FootText key={message?.id || 0} text={message?.text || (view.phase === 'formation' ? 'FORMATION LAP · FOLLOW THE SAFETY CAR' : view.phase === 'lights' ? 'GRID FORMED · STANDING START' : view.phase === 'chequered' ? `${view.winner} WINS · NEXT RACE SOON` : view.safetyCar ? 'SAFETY CAR · NO OVERTAKING' : view.overtakeMode ? 'OVERTAKE MODE ENABLED' : 'GREEN FLAG · OVERTAKE MODE DISABLED')}/></footer>
   </div></Localized>
 }

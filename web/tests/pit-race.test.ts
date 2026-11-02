@@ -154,3 +154,17 @@ test('map: formation lap out of the pit lane, standing start, own pit boxes and 
   assert.deepEqual(byTla(raceStart(id + 1) - 1), byTla(raceStart(id) + 10), 'in-lap ends parked back in each box')
   assert.equal(raceView(entries, raceStart(id + 1) - 1).scMap, null)
 })
+
+test('2026 Overtake Mode replaces DRS: armed from lap 3, never under the safety car, only within 1.0 s', () => {
+  let flagged = 0
+  for (let race = 0; race < 12; race++) for (let t = START_MS; t < CYCLE_MS; t += 7000) {
+    const view = raceView(entries, race * CYCLE_MS + t)
+    if (view.phase !== 'green' || view.lap < 3 || view.safetyCar) assert.equal(view.overtakeMode, false)
+    for (const row of view.standings.filter(item => item.overtake)) {
+      flagged++
+      assert.ok(view.overtakeMode && row.position! > 1 && !row.inPit && !row.retired)
+      assert.match(row.interval, /^\+0\.\d{3}$|^\+1\.000$/)
+    }
+  }
+  assert.ok(flagged > 0)
+})

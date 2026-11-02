@@ -118,6 +118,7 @@ html[data-theme=dark] .pl-map[data-sc] .pl-wx-read{color:#ffd400}
 .pl-gap{display:flex;align-items:center;gap:5px;white-space:nowrap}
 .pl-gap.is-lead{color:#e9eef7;font-family:var(--f1);font-size:10px;letter-spacing:.06em}
 .pl-fl{width:7px;height:7px;border-radius:2px;background:#b06cff;box-shadow:0 0 6px #b06cff}
+.pl-ot{display:inline-block;margin-right:5px;padding:1px 3px;border-radius:2px;background:#2fd07b;color:#0b0f17;font:700 8px/1.1 var(--mono);letter-spacing:.04em;vertical-align:1px}
 .pl-tower-rows .is-pit .pl-gap{color:#ffd400;font-weight:700;letter-spacing:.12em}
 .pl-tower-rows .is-pit .pl-bar{opacity:.5}
 .pl-tower-rows .is-out{opacity:.45}.pl-tower-rows .is-out .pl-tt{text-decoration:line-through;text-decoration-color:#ff5a6a}
@@ -167,7 +168,7 @@ html[data-theme=dark] .pl-map[data-sc] .pl-wx-read{color:#ffd400}
 .pl-box:is(:hover,:focus-visible) .pl-lamp{--amber:var(--green)}
 .pl-box:is(:hover,:focus-visible) .pl-state{color:var(--green)}
 .pl-box:is(:hover,:focus-visible) .pl-state::before{content:'ON TRACK'}
-.pl-box:is(:hover,:focus-visible) .pl-r::before{content:'ON TRACK // DRS';color:var(--green)}
+.pl-box:is(:hover,:focus-visible) .pl-r::before{content:'ON TRACK // OT';color:var(--green)}
 .pl-bay{position:relative;height:148px;overflow:hidden;background:linear-gradient(180deg,var(--interior-2),var(--interior) 62%,#000 62.5%,var(--interior) 63%)}
 .pl-bay::before{content:'';position:absolute;inset:0;opacity:.55;transition:opacity .5s;background:radial-gradient(60% 70% at 50% 0%,color-mix(in srgb,var(--team) 38%,transparent),transparent 70%),repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.04) 46px 47px)}
 .pl-bay::after{content:'';position:absolute;left:0;right:0;bottom:0;height:37%;background:linear-gradient(90deg,transparent 0 12%,rgba(255,255,255,.08) 12% 12.6%,transparent 12.6% 87.4%,rgba(255,255,255,.08) 87.4% 88%,transparent 88%),repeating-linear-gradient(-45deg,transparent 0 9px,rgba(255,213,0,.04) 9px 13px)}
@@ -370,6 +371,7 @@ html[data-theme=dark] .pl-sc[data-sc] .pl-state{color:#ffd400}
 .pl-lookup li code{font:11px var(--mono);color:var(--muted)}
 .pl-lookup li b{font:600 12px var(--mono);letter-spacing:.08em}
 .pl-lookup li small{grid-column:1/-1;color:var(--muted);font-size:11.5px}
+.pl-lookup li .pl-review{color:var(--ink);white-space:pre-line;overflow-wrap:anywhere}
 
 /* Tower Control timing table */
 .tower-log-line.is-table{white-space:pre;overflow-x:auto;scrollbar-width:none}
@@ -399,3 +401,28 @@ body:has(.pl) .radio-toggle span{display:none}
 body:has(.pl) .radio-toggle{padding:7px 10px;gap:6px}
 body:has(.pl) .radio-toggle b{font-size:18px}
 @media(prefers-reduced-motion:reduce){.pl-foot-text>span{display:inline;white-space:normal}.pl-tower footer{white-space:normal}.pl-ticker{overflow-x:auto;scrollbar-width:none}.pl-ticker-track{-webkit-animation:none;animation:none}.pl-stewards::details-content{transition:none}}
+
+/* Team garage (/pit-lane/garage): friends maintain their own card */
+.pl-garage .pl-head{grid-template-columns:minmax(0,1fr) auto}
+.pl-garage-back{font:12px var(--mono);letter-spacing:.08em;color:var(--muted);text-decoration:none}
+.pl-garage-back:hover{color:var(--ink)}
+.pl-garage-panel{margin-bottom:48px;border:1px solid var(--line);background:var(--paper);border-radius:6px;overflow:hidden}
+.pl-garage-panel>.pl-note{margin:0;padding:20px}
+.pl-garage-panel.pl-garage-auth{grid-template-columns:minmax(0,420px);max-width:520px}
+.pl-garage-auth h2{margin:-4px 0 0;font-size:20px;font-weight:600}
+.pl-garage-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pl-linkish{border:0;background:none;color:var(--blue);font:13px var(--body);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.pl-ok{margin:0;color:var(--green);font-size:13px}
+.pl-garage-bar{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--line)}
+.pl-garage-who{margin-left:auto;font:12px var(--mono);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.pl-garage-note{margin:0;padding:10px 20px;display:flex;gap:6px;flex-wrap:wrap;font-size:13px;border-bottom:1px dashed var(--line);background:color-mix(in srgb,var(--yellow,#edc534) 8%,var(--paper))}
+.pl-garage-note span{white-space:pre-line;overflow-wrap:anywhere}
+.pl-garage-locked input:disabled{opacity:.65;cursor:not-allowed}
+.pl-garage-password{border-top:1px solid var(--line)}
+.pl-garage-password summary{padding:14px 20px;cursor:pointer;font:600 14px var(--body)}
+.pl-garage-password form{grid-template-columns:minmax(0,560px);padding-top:0}
+.pl-garage-link{margin:0;font-size:13px}
+.pl-garage-link a,.pl-lookup li small a{color:var(--blue)}
+.pl-account-toggle small{color:var(--muted);font-size:12px}
+.pl-account{animation:pl-channel .3s ease-out}
+@media (max-width:720px){.pl-garage .pl-head{grid-template-columns:1fr}.pl-garage-bar{flex-wrap:wrap}.pl-garage-who{order:3;margin-left:0;flex-basis:100%}.pl-garage-bar .pl-copy{margin-left:auto}}

@@ -2,6 +2,7 @@
 import Localized, { useTranslator } from '@/components/Localized'
 import { useCallback, useEffect, useMemo, useState, type Ref } from 'react'
 import { FRIEND_TYRES, HEX_PATTERN, RESERVED_TLAS, TLA_PATTERN, buildPitLane, colorTyre, safeHttpURL, type Tyre } from '@/lib/pit-lane'
+import { EMAIL_PATTERN, PASSWORD_MAX, PASSWORD_MIN } from '@/lib/pit-garage-rules'
 import { TICKET_PATTERN, formatCard, githubFileURL, githubIssueURL, mailtoURL, type Application } from '@/lib/pit-lane-card'
 import { profile } from '@/lib/profile'
 import PitBoxCard from './PitBoxCard'
@@ -19,7 +20,7 @@ const TICKETS_KEY = 'merak-pit-tickets'
 type Channel = 'web' | 'dm' | 'email' | 'github'
 const CHANNEL_LABELS: Record<Channel, string> = { web: '@i18n:pitLane.channel.web@', dm: '@i18n:pitLane.channel.dm@', email: '@i18n:pitLane.channel.email@', github: '@i18n:pitLane.channel.github@' }
 const STATUS_LABELS: Record<string, string> = { approved: 'pitLane.ticket.approved', rejected: 'pitLane.ticket.rejected', pending: 'pitLane.ticket.pending' }
-type Clearance = { ticket: string; tla?: string; status?: string; backlink?: boolean; error?: string }
+type Clearance = { ticket: string; tla?: string; status?: string; backlink?: boolean; note?: string; account?: boolean; error?: string }
 
 const savedTickets = (): { ticket: string; tla: string }[] => { try { return JSON.parse(localStorage.getItem(TICKETS_KEY) || '[]') } catch { return [] } }
 
@@ -30,6 +31,7 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
   const [channel, setChannel] = useState<Channel>('web'), [format, setFormat] = useState<keyof typeof LINK_FORMATS>('TEXT')
   const [busy, setBusy] = useState(false), [ticket, setTicket] = useState(''), [error, setError] = useState(''), [copied, setCopied] = useState('')
   const [lookup, setLookup] = useState(''), [clearances, setClearances] = useState<Clearance[]>([])
+  const [account, setAccount] = useState({ on: false, email: '', password: '' })
   const set = (name: keyof typeof form) => (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm(value => ({ ...value, [name]: name === 'tla' ? event.target.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 3) : event.target.value }))
   const validTLA = TLA_PATTERN.test(form.tla) && !RESERVED_TLAS.has(form.tla) && !taken.includes(form.tla)
   const color = HEX_PATTERN.test(form.teamColor) ? form.teamColor : '#2349ed', matched = colorTyre(color)
@@ -74,12 +76,14 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
     event.preventDefault(); if (busy || !ready()) return
     const data = new FormData(event.currentTarget)
     if (data.get('consent') !== 'on') { setError(t('pitLane.error.consent')); return }
+    if (account.on && !EMAIL_PATTERN.test(account.email.trim())) { setError(t('garage.error.email')); return }
+    if (account.on && (account.password.length < PASSWORD_MIN || account.password.length > PASSWORD_MAX)) { setError(t('garage.error.weak')); return }
     setBusy(true)
     try {
-      const response = await fetch('/api/friends/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, tyre: form.tyre === 'auto' ? undefined : form.tyre, consent: true, website: data.get('website') }) })
+      const response = await fetch('/api/friends/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, tyre: form.tyre === 'auto' ? undefined : form.tyre, consent: true, website: data.get('website'), ...(account.on ? { account: true, accountEmail: account.email.trim(), password: account.password } : {}) }) })
       const result = await response.json().catch(() => ({})) as { error?: string; ticket?: string }
       if (response.ok && result.ticket) {
-        setTicket(result.ticket)
+        setTicket(result.ticket); setAccount(value => ({ ...value, password: '' }))
         try { localStorage.setItem(TICKETS_KEY, JSON.stringify([{ ticket: result.ticket, tla: form.tla }, ...savedTickets()].slice(0, 8))) } catch {}
         void check(result.ticket, form.tla)
       } else setError(t(result.error?.startsWith('pitLane.') ? result.error : 'pitLane.error.unavailable'))
@@ -116,9 +120,12 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
           {clearances.length > 0 && <ul aria-live="polite">{clearances.map(item => <li key={item.ticket} data-status={item.error ? 'error' : item.status}>
             <code>{item.ticket}</code>{item.tla && <b>{item.tla}</b>}
             <span>{item.error ? t(item.error) : t(STATUS_LABELS[item.status || ''] || STATUS_LABELS.pending)}</span>
-            {!item.error && <small>{t(item.backlink ? 'pitLane.ticket.backlinkYes' : 'pitLane.ticket.backlinkNo')}</small>}
+            {!item.error && (item.backlink || item.status === 'pending') && <small>{t(item.backlink ? 'pitLane.ticket.backlinkYes' : 'pitLane.ticket.backlinkNo')}</small>}
+            {!item.error && item.note && <small className="pl-review" data-i18n="off">{t('pitLane.ticket.note')}{item.note}</small>}
+            {!item.error && item.account && (item.status === 'approved' ? <small><a href="/pit-lane/garage">{"@i18n:garage.enter@"} →</a></small> : item.status === 'pending' && <small>{"@i18n:pitLane.ticket.account@"}</small>)}
           </li>)}</ul>}
         </form>
+        <p className="pl-garage-link"><a href="/pit-lane/garage">{"@i18n:garage.enter@"} →</a></p>
         <p className="pl-tower-hint">TOWER CONTROL <kbd>⌘ K</kbd> → <code>pit --status</code> · <code>box {taken[0] || 'TLA'}</code></p>
       </div>
       <div className="pl-apply">
@@ -151,6 +158,11 @@ export default function StewardsDesk({ ref, taken, email }: { ref?: Ref<HTMLDeta
               {channel === 'web' && <>
                 <p>{"@i18n:pitLane.channel.webBody@"}</p>
                 <label><span>{"@i18n:pitLane.form.contact@ "}<small>{"@i18n:pitLane.form.contactHelp@"}</small></span><input name="contact" value={form.contact} onChange={set('contact')} maxLength={80} autoComplete="email"/></label>
+                <label className="pl-consent pl-account-toggle"><input type="checkbox" checked={account.on} onChange={event => setAccount(value => ({ ...value, on: event.target.checked }))}/><span>{"@i18n:pitLane.form.account@"} <small>{"@i18n:pitLane.form.accountHelp@"}</small></span></label>
+                {account.on && <div className="pl-row pl-account">
+                  <label>{"@i18n:pitLane.form.accountEmail@"}<input name="accountEmail" type="email" value={account.email} onChange={event => setAccount(value => ({ ...value, email: event.target.value }))} autoComplete="email" inputMode="email" maxLength={120} required/></label>
+                  <label><span>{"@i18n:pitLane.form.accountPassword@ "}<small>{"@i18n:pitLane.form.accountPasswordHelp@"}</small></span><input name="password" type="password" value={account.password} onChange={event => setAccount(value => ({ ...value, password: event.target.value }))} autoComplete="new-password" minLength={PASSWORD_MIN} maxLength={PASSWORD_MAX} required/></label>
+                </div>}
                 <div className="checkin-trap" aria-hidden="true"><input name="website" tabIndex={-1} autoComplete="off" aria-label="@i18n:ui.website@"/></div>
                 <label className="pl-consent"><input type="checkbox" name="consent" required/>{"@i18n:pitLane.form.consent@"}</label>
                 <button className="pl-submit" disabled={busy}>{busy ? "@i18n:ui.submitting@" : "@i18n:pitLane.form.submit@"}</button>

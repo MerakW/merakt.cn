@@ -8,6 +8,7 @@ import { buildConfig } from 'payload'
 import { en } from '@payloadcms/translations/languages/en'
 import { zh } from '@payloadcms/translations/languages/zh'
 import sharp from 'sharp'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { PHOTO_UPLOAD_MAX_BYTES } from './lib/photo-upload-limits'
 import { Users, Trips, Albums, Posts, Notes, Events, SiteSettings } from './collections/Content'
 import { PaddockSignals } from './collections/PaddockSignals'
@@ -23,6 +24,13 @@ import { flightSyncEndpoints } from './lib/flights/sync-endpoints'
 import { startFlightSyncWorker } from './lib/flights/sync-service'
 import { Friends } from './collections/Friends'
 import { startPitLaneMonitor } from './lib/pit-lane-monitor'
+
+// Outgoing mail (Pit Lane garage invites / approvals / resets) from the no-reply mailbox; logged to the console when unset.
+const smtpPort = Number(process.env.SMTP_PORT) || 465
+const email = process.env.SMTP_HOST ? nodemailerAdapter({
+  defaultFromAddress: process.env.MAIL_FROM || process.env.SMTP_USER || 'noreply@merakt.cn', defaultFromName: process.env.MAIL_FROM_NAME || 'Merak · 数字围场',
+  transportOptions: { host: process.env.SMTP_HOST, port: smtpPort, secure: process.env.SMTP_SECURE ? process.env.SMTP_SECURE === '1' : smtpPort === 465, auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined },
+}) : undefined
 
 const baseDir = dirname(fileURLToPath(import.meta.url))
 if (!process.env.PAYLOAD_SECRET) throw new Error('请设置 PAYLOAD_SECRET；参见 .env.example。')
@@ -45,6 +53,7 @@ export default buildConfig({
   ] })] }),
   db: sqliteAdapter({ prodMigrations: process.env.MERAK_AUTO_MIGRATE === '1' ? migrations : undefined, client: { url: process.env.DATABASE_URL || 'file:./.data/merak.db' }, transactionOptions: { behavior: 'immediate' }, wal: true, busyTimeout: 5000, migrationDir: resolve(baseDir, 'migrations') }),
   sharp,
+  email,
   upload: { limits: { fileSize: PHOTO_UPLOAD_MAX_BYTES } },
   typescript: { outputFile: resolve(baseDir, 'payload-types.ts') },
 })
