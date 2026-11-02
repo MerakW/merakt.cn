@@ -76,3 +76,21 @@ test('monitor discovery: icons, ICO PNG frames and private targets', () => {
   for (const url of ['http://localhost/', 'https://127.0.0.1/', 'https://192.168.1.2/', 'https://[::1]/', 'ftp://a.example/']) assert.equal(publicTarget(url), null, url)
   assert.ok(publicTarget('https://friend.example/'))
 })
+
+test('BMP favicon frames decode to RGBA with the AND mask applied', async () => {
+  const { rgbaFromIcoBmp } = await import('../src/lib/pit-lane-monitor')
+  // 2×2, 24-bit: bottom row blue/green, top row red/white; top-right pixel masked out.
+  const header = Buffer.alloc(40); header.writeUInt32LE(40, 0); header.writeInt32LE(2, 4); header.writeInt32LE(4, 8); header.writeUInt16LE(1, 12); header.writeUInt16LE(24, 14)
+  const rows = Buffer.from([255, 0, 0, 0, 255, 0, 0, 0, /* bottom: blue, green + pad */ 0, 0, 255, 255, 255, 255, 0, 0 /* top: red, white + pad */])
+  const mask = Buffer.from([0, 0, 0, 0, /* bottom row opaque */ 0b01000000, 0, 0, 0 /* top-right transparent */])
+  const out = rgbaFromIcoBmp(Buffer.concat([header, rows, mask]))!
+  assert.equal(out.width, 2); assert.equal(out.height, 2)
+  assert.deepEqual([...out.data.subarray(0, 4)], [255, 0, 0, 255]) // top-left red
+  assert.equal(out.data[7], 0) // top-right masked
+  assert.deepEqual([...out.data.subarray(8, 12)], [0, 0, 255, 255]) // bottom-left blue
+  // 8-bit palette frame: one palette entry, every pixel uses it.
+  const h8 = Buffer.from(header); h8.writeUInt16LE(8, 14); h8.writeUInt32LE(1, 32)
+  const pal = Buffer.from([10, 20, 30, 0]), px = Buffer.alloc(8), m8 = Buffer.alloc(8)
+  assert.deepEqual([...rgbaFromIcoBmp(Buffer.concat([h8, pal, px, m8]))!.data.subarray(0, 4)], [30, 20, 10, 255])
+  assert.equal(rgbaFromIcoBmp(Buffer.alloc(10)), null)
+})

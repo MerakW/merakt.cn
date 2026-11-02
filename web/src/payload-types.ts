@@ -521,6 +521,10 @@ export interface Friend {
    * Fetched by the monitor as 256px WebP; can be replaced manually.
    */
   logo?: (number | null) | Media;
+  /**
+   * Result for each icon candidate, to see why a fetch failed.
+   */
+  logoStatus?: string | null;
   tyreMode: 'auto' | 'manual';
   tyre?: ('S' | 'M' | 'H' | 'I' | 'W') | null;
   /**
@@ -1085,6 +1089,7 @@ export interface FriendsSelect<T extends boolean = true> {
   logoSource?: T;
   avatar?: T;
   logo?: T;
+  logoStatus?: T;
   tyreMode?: T;
   tyre?: T;
   bearing?: T;

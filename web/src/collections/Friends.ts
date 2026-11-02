@@ -1,7 +1,8 @@
-import type { CollectionConfig, FieldHook } from 'payload'
+import type { CollectionConfig, FieldHook, Payload } from 'payload'
 import { adminField, adminOnly } from '@/lib/access'
 import { HEX_PATTERN, RESERVED_TLAS, TLA_PATTERN, safeHttpURL } from '@/lib/pit-lane'
 import { friendClearance, submitFriendApplication } from '@/lib/pit-lane-submit'
+import { inspectLogo, logoSummary, saveLogo } from '@/lib/pit-lane-monitor'
 import { garageForgot, garageLogin, garageLogout, garagePassword, garageReset, garageSession, garageUpdate, normalEmail, sendGarageMail, sendNoticeMail, type GarageFriend, type GarageMail } from '@/lib/pit-garage'
 import { parseCard } from '@/lib/pit-lane-card'
 import { translate, type MessageKey } from '@/lib/i18n/core'
@@ -31,7 +32,9 @@ export const Friends: CollectionConfig = {
   }],
   // Garage accounts: approving a card opens its login and mails the team; Merak can also open one by hand.
   beforeChange: [({ data, originalDoc, req, context }) => {
-    if (context.garage || !data) return data
+    if (context.garage || context.monitor || !data) return data
+    if (data.fetchLogo) req.context.fetchLogo = true
+    data.fetchLogo = undefined
     // Review result for applicants who asked for email updates: only the first decision on a pending card.
     const previous = (originalDoc || {}) as { status?: string; notify?: boolean | null; contact?: string | null }, decided = data.status ?? previous.status
     if (previous.status === 'pending' && (decided === 'approved' || decided === 'rejected') && (data.notify ?? previous.notify) && normalEmail(data.contact ?? previous.contact)) req.context.pitNotice = decided === 'approved' ? 'live' : 'rejected'
@@ -50,7 +53,8 @@ export const Friends: CollectionConfig = {
   }],
   afterChange: [async ({ doc, req, context }) => {
     const wanted = req.context.garageMail as 'auto' | 'invite' | undefined, notice = req.context.pitNotice as 'live' | 'rejected' | undefined
-    if (context.garage || (!wanted && !notice)) return doc
+    if (req.context.fetchLogo && doc.logoSource === 'auto') { req.context.fetchLogo = undefined; fetchLogoNow(req.payload, doc) }
+    if (context.garage || context.monitor || (!wanted && !notice)) return doc
     req.context.garageMail = undefined; req.context.pitNotice = undefined
     if (wanted) {
       const full = await req.payload.findByID({ collection: 'friends', id: doc.id, depth: 0, overrideAccess: true, showHiddenFields: true, req }) as unknown as GarageFriend
@@ -65,7 +69,7 @@ export const Friends: CollectionConfig = {
   }] },
   defaultSort: 'bay',
   fields: [
-    { name: 'importCard', label: 'pitLane.admin.importCard', type: 'textarea', virtual: true, admin: { description: 'pitLane.admin.importCardHelp', condition: data => !data?.id, rows: 6 } },
+    { name: 'importCard', label: 'pitLane.admin.importCard', type: 'textarea', virtual: true, admin: { readOnly: false, description: 'pitLane.admin.importCardHelp', condition: data => !data?.id, rows: 6 } },
     { type: 'row', fields: [
       { name: 'tla', label: 'pitLane.admin.tla', type: 'text', required: true, unique: true, index: true, minLength: 3, maxLength: 3, hooks: { beforeValidate: [upperTLA] },
         validate: (value: unknown, options: Options) => typeof value === 'string' && TLA_PATTERN.test(value.trim().toUpperCase()) && !RESERVED_TLAS.has(value.trim().toUpperCase()) ? true : fail('pitLane.error.tla', options) },
@@ -83,6 +87,9 @@ export const Friends: CollectionConfig = {
     ] },
     { name: 'avatar', label: 'pitLane.admin.avatar', type: 'upload', relationTo: 'media', admin: { description: 'pitLane.admin.avatarHelp', condition: (_, sibling) => sibling?.logoSource === 'upload' } },
     { name: 'logo', label: 'pitLane.admin.logo', type: 'upload', relationTo: 'media', admin: { description: 'pitLane.admin.logoHelp', condition: (_, sibling) => sibling?.logoSource === 'auto' } },
+    // Virtual fields are read-only in the admin unless readOnly is explicitly false.
+    { name: 'fetchLogo', label: 'pitLane.admin.fetchLogo', type: 'checkbox', virtual: true, admin: { readOnly: false, description: 'pitLane.admin.fetchLogoHelp', condition: (_, sibling) => sibling?.logoSource === 'auto' && Boolean(sibling?.url) } },
+    { name: 'logoStatus', label: 'pitLane.admin.logoStatus', type: 'textarea', access: { read: adminField, create: () => false, update: () => false }, admin: { readOnly: true, rows: 4, description: 'pitLane.admin.logoStatusHelp', condition: (_, sibling) => sibling?.logoSource === 'auto' } },
     { type: 'row', fields: [
       { name: 'tyreMode', label: 'pitLane.admin.tyreMode', type: 'select', required: true, defaultValue: 'auto', options: [{ label: 'pitLane.admin.tyreAuto', value: 'auto' }, { label: 'pitLane.admin.tyreManual', value: 'manual' }] },
       { name: 'tyre', label: 'pitLane.admin.tyre', type: 'select', options: [{ label: 'SOFT', value: 'S' }, { label: 'MEDIUM', value: 'M' }, { label: 'HARD', value: 'H' }, { label: 'INTERMEDIATE', value: 'I' }, { label: 'WET', value: 'W' }], admin: { condition: (_, sibling) => sibling?.tyreMode === 'manual' } },
@@ -121,7 +128,7 @@ export const Friends: CollectionConfig = {
         { name: 'accountEmail', label: 'garage.admin.email', type: 'email', unique: true, index: true, access: { read: adminField } },
         { name: 'loginEnabled', label: 'garage.admin.enabled', type: 'checkbox', defaultValue: false, access: { read: adminField }, admin: { description: 'garage.admin.enabledHelp' } },
       ] },
-      { name: 'sendInvite', label: 'garage.admin.invite', type: 'checkbox', virtual: true, admin: { description: 'garage.admin.inviteHelp', condition: data => Boolean(data?.accountEmail) } },
+      { name: 'sendInvite', label: 'garage.admin.invite', type: 'checkbox', virtual: true, admin: { readOnly: false, description: 'garage.admin.inviteHelp', condition: data => Boolean(data?.accountEmail) } },
       { type: 'row', fields: [
         { name: 'passwordSetAt', label: 'garage.admin.passwordSetAt', type: 'date', access: { read: adminField, create: () => false, update: () => false }, admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },
         { name: 'lastLoginAt', label: 'garage.admin.lastLoginAt', type: 'date', access: { read: adminField, create: () => false, update: () => false }, admin: { readOnly: true, date: { pickerAppearance: 'dayAndTime' } } },
@@ -141,4 +148,18 @@ export const Friends: CollectionConfig = {
     { name: 'feedCheckedAt', type: 'date', access: { read: adminField }, admin: { hidden: true } },
     { name: 'logoCheckedAt', type: 'date', admin: { hidden: true } },
   ],
+}
+
+/** Admin "fetch logo now": runs after the save returns (a slow site must not hold the editor), result lands in logoStatus. */
+function fetchLogoNow(payload: Payload, doc: { id: number; tla: string; name: string; url: string; logo?: number | { id: number } | null }) {
+  void (async () => {
+    const now = Date.now(), { image, attempts, page } = await inspectLogo(doc.url)
+    const data: Record<string, unknown> = { logoCheckedAt: new Date(now).toISOString() }
+    try {
+      if (image) data.logo = await saveLogo(payload, doc, image, now)
+      data.logoStatus = logoSummary(now, page, attempts, Boolean(image))
+    } catch (error) { data.logoStatus = logoSummary(now, `${page} · 保存到媒体库失败：${error instanceof Error ? error.message : error}`, attempts, false) }
+    await payload.update({ collection: 'friends', id: doc.id, data, overrideAccess: true, depth: 0, context: { monitor: true } })
+    payload.logger.info(`PIT LANE ${doc.tla}: logo ${image ? 'updated' : 'fetch failed'} (manual)`)
+  })().catch(error => payload.logger.error({ err: error }, `PIT LANE ${doc.tla}: manual logo fetch failed`))
 }

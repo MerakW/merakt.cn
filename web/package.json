@@ -20,7 +20,8 @@
     "i18n:generate": "node --import tsx scripts/generate-i18n.ts",
     "prebuild": "npm run i18n:generate",
     "prebuild:qa": "npm run i18n:generate",
-    "friends:import": "node --import tsx scripts/import-friends.ts"
+    "friends:import": "node --import tsx scripts/import-friends.ts",
+    "pit:logo": "node --import tsx scripts/pit-logo.ts"
   },
   "engines": {
     "node": ">=22.13.0 <25"

@@ -5,6 +5,7 @@ import * as pitLaneClearance from './20261101_120000_pit_lane_clearance';
 import * as pitLaneReviewNote from './20261106_120000_pit_lane_review_note';
 import * as pitGarage from './20261108_120000_pit_garage';
 import * as pitLaneNotify from './20261110_120000_pit_lane_notify';
+import * as pitLogoStatus from './20261112_120000_pit_logo_status';
 import * as migration_20261018_020000_i18n from './20261018_020000_i18n';
 import * as migration_20261002_173728_initial_schema from './20261002_173728_initial_schema';
 import * as migration_20261004_160409_passkeys from './20261004_160409_passkeys';
@@ -82,4 +83,5 @@ export const migrations = [
   { up: pitLaneReviewNote.up, down: pitLaneReviewNote.down, name: '20261106_120000_pit_lane_review_note' },
   { up: pitGarage.up, down: pitGarage.down, name: '20261108_120000_pit_garage' },
   { up: pitLaneNotify.up, down: pitLaneNotify.down, name: '20261110_120000_pit_lane_notify' },
+  { up: pitLogoStatus.up, down: pitLogoStatus.down, name: '20261112_120000_pit_logo_status' },
 ];
