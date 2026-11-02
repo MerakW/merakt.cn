@@ -1,5 +1,7 @@
 import * as maintenance from './20261018_030000_maintenance';
 import * as paidFlightQueries from './20261020_120000_paid_flight_queries';
+import * as pitLane from './20261030_120000_pit_lane';
+import * as pitLaneClearance from './20261101_120000_pit_lane_clearance';
 import * as migration_20261018_020000_i18n from './20261018_020000_i18n';
 import * as migration_20261002_173728_initial_schema from './20261002_173728_initial_schema';
 import * as migration_20261004_160409_passkeys from './20261004_160409_passkeys';
@@ -72,4 +74,6 @@ export const migrations = [
   { up: migration_20261018_020000_i18n.up, down: migration_20261018_020000_i18n.down, name: '20261018_020000_i18n' },
   { up: maintenance.up, down: maintenance.down, name: '20261018_030000_maintenance' },
   { up: paidFlightQueries.up, down: paidFlightQueries.down, name: '20261020_120000_paid_flight_queries' },
+  { up: pitLane.up, down: pitLane.down, name: '20261030_120000_pit_lane' },
+  { up: pitLaneClearance.up, down: pitLaneClearance.down, name: '20261101_120000_pit_lane_clearance' },
 ];

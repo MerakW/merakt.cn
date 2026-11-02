@@ -17,7 +17,7 @@ const actions = [
   ["@i18n:admin.maintenance.title@",'/manage/maintenance'],
   ["@i18n:ui.paddockInteractions@",'/admin/collections/paddock-signals'],["@i18n:ui.postPhotos@",'/manage/fursuitfriday'],["@i18n:ui.writeAPost@",'/admin/collections/posts'],['Team Radio','/admin/collections/notes'],
   ["@i18n:ui.albums@",'/admin/collections/albums'],["@i18n:ui.mediaLibrary@",'/admin/collections/media'],["@i18n:flights.title@",'/admin/collections/flights'],
-  ["@i18n:ui.importFlighty@",'/manage/import'],["@i18n:ui.reviewMessages@",'/admin/collections/checkins'],["@i18n:ui.siteSettings@",'/admin/globals/site-settings'],["@i18n:ui.passkeys@",'/manage/security'],
+  ["@i18n:ui.importFlighty@",'/manage/import'],["@i18n:ui.reviewMessages@",'/admin/collections/checkins'],["@i18n:pitLane.admin.review@",'/admin/collections/friends'],["@i18n:ui.siteSettings@",'/admin/globals/site-settings'],["@i18n:ui.passkeys@",'/manage/security'],
 ]
 export default async function PitWallPage() {
   const locale = await getLocale()

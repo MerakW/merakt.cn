@@ -19,7 +19,8 @@
     "preview:lan": "node scripts/preview-lan.mjs",
     "i18n:generate": "node --import tsx scripts/generate-i18n.ts",
     "prebuild": "npm run i18n:generate",
-    "prebuild:qa": "npm run i18n:generate"
+    "prebuild:qa": "npm run i18n:generate",
+    "friends:import": "node --import tsx scripts/import-friends.ts"
   },
   "engines": {
     "node": ">=22.13.0 <25"

@@ -3,7 +3,7 @@ import Localized, { useLocale } from '@/components/Localized'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLayoutEffect, useRef } from 'react'
-const links = [['/', "@i18n:nav.home@"], ['/flights', "@i18n:nav.flights@"], ['/fursuitfriday', "@i18n:nav.fursuitFriday@"], ['/blog', "@i18n:nav.journal@"], ['/visitors', "@i18n:nav.lounge@"], ['/merak', "@i18n:nav.about@"]]
+const links = [['/', "@i18n:nav.home@"], ['/flights', "@i18n:nav.flights@"], ['/fursuitfriday', "@i18n:nav.fursuitFriday@"], ['/blog', "@i18n:nav.journal@"], ['/visitors', "@i18n:nav.lounge@"], ['/pit-lane', "@i18n:nav.pitLane@"], ['/merak', "@i18n:nav.about@"]]
 export default function SiteNav() {
   const locale = useLocale()
   const pathname = usePathname()

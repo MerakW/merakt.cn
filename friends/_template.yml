@@ -1,0 +1,9 @@
+# HGH PIT LANE · friends/<TLA>.yml
+tla: "AST"
+name: "Aster's Hangar"
+url: "https://example.com"
+color: "#2349ed"
+tyre: auto
+bio: "Cleared for takeoff."
+message: ""
+backlink: "https://example.com/links"

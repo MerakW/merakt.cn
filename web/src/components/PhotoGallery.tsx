@@ -1,6 +1,7 @@
 'use client'
 import Localized, { useLocale, useTranslator } from '@/components/Localized'
 import LoadingImage from './LoadingImage'
+import { useReelSnap } from './useReelSnap'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { creditParts, creditsOf, personKey, withoutCredits, type CreditRole, type GalleryAlbum, type GalleryPhoto } from '@/lib/gallery'
@@ -54,6 +55,7 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
   const [picked, setPicked] = useState(0)
   const [selected, setSelected] = useState<number | null>(null)
   const root = useRef<HTMLDivElement>(null)
+  const reelRef = useRef<HTMLElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
   const opener = useRef<HTMLElement | null>(null)
   const touch = useRef<{ x: number; y: number } | null>(null)
@@ -72,6 +74,8 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
   const sequence = useMemo(() => ordered.flatMap(album => album.photos.map(photo => ({ album, photo }))), [ordered])
   const current = selected === null ? null : sequence[selected]
   const isOpen = selected !== null
+  // The opening reel turns one photograph at a time, with a damped spring between them.
+  useReelSnap(reelRef, { enabled: !isOpen, frames: '.ff-frame', key: reel.map(album => album.id).join(',') })
   const active = reel[shown] || reel[0]
   const still = ordered[picked] || ordered[0]
   const first = ordered.at(-1)
@@ -161,7 +165,7 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
   const indexOf = new Map(ordered.map((album, index) => [album.id, index]))
 
   return <Localized><div className="ff-page" ref={root}>
-    <section id="ff-top" className="ff-reel" aria-labelledby="ff-title">
+    <section id="ff-top" className="ff-reel" ref={reelRef} aria-labelledby="ff-title">
       <h1 id="ff-title" className="ff-sr">Fursuit Friday</h1>
       <div className="ff-side ff-side-start">
         <p className="ff-word" aria-hidden="true">Fursuit</p>

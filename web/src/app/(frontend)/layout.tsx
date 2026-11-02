@@ -7,6 +7,7 @@ import SiteArrival from '@/components/SiteArrival'
 import { getLocale, getTranslator } from '@/lib/i18n/server'
 import FlightDeck from '@/components/FlightDeck'
 import TowerControl from '@/components/TowerControl'
+import { getPitLane } from '@/lib/pit-lane-server'
 import { getFlightPageData } from '@/lib/flights/page-data'
 import { isFlightPublic } from '@/lib/flights/public'
 import TeamRadio from '@/components/TeamRadio'
@@ -32,6 +33,7 @@ import './home-depth.css'
 import './paddock.css'
 import './cockpit.css'
 import './fursuit-friday.css'
+import './pit-lane.css'
 
 const barlow = localFont({ src: [
   { path: '../../../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-500-normal.woff2', weight: '500' },
@@ -56,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Layout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale()
   const payload = await getPayload({ config })
-  const [settings, notes] = await Promise.all([payload.findGlobal({ slug: 'site-settings', overrideAccess: false, depth: 0 }), payload.find({ collection:'notes',limit:1,sort:'-date',depth:0,overrideAccess:false })])
+  const [settings, notes, pitLane] = await Promise.all([payload.findGlobal({ slug: 'site-settings', overrideAccess: false, depth: 0 }), payload.find({ collection:'notes',limit:1,sort:'-date',depth:0,overrideAccess:false }), getPitLane(payload)])
   const flightData = await getFlightPageData()
   const latestFlight = flightData.flights.filter(f=>isFlightPublic(f)&&f.state==='completed').sort((a,b)=>b.date.localeCompare(a.date))[0]
   const commit = process.env.NEXT_PUBLIC_COMMIT_SHA || ''
@@ -65,13 +67,13 @@ export default async function Layout({ children }: { children: React.ReactNode }
     <header className="site-nav"><a className="brand" href="/" aria-label="@i18n:site.homeLabel@"><span className="brand-wings" aria-hidden="true">//</span><span className="brand-word">MERAK</span><span className="brand-caption">DIGITAL<br />PADDOCK</span></a><SiteNav /><div className="nav-tools"><RaceControl mode={settings.trackMode} forza={settings.forzaFerrari} /><ThemeControl /><LanguageControl adminLocaleCookie={`${payload.config.cookiePrefix}-lng`} /></div></header>
     <FlightDeck />
     <main className="site-main" id="main" tabIndex={-1}>{children}</main>
-    <TowerControl latestFlight={latestFlight?.id?{id:latestFlight.id,number:latestFlight.flightNumber||""}:undefined} />
+    <TowerControl latestFlight={latestFlight?.id?{id:latestFlight.id,number:latestFlight.flightNumber||""}:undefined} pitLane={pitLane.map(({tla,name,state,frequency,tyre})=>({tla,name,state,frequency,tyre}))} />
     <TeamRadio note={translatedNote(notes.docs[0], locale)} />
     <footer className="site-footer">
       <div className="footer-identity"><strong>MERAK.</strong><span>{"@i18n:site.motto@"}</span><a className="footer-revision" href="https://github.com/MerakW/merakt.cn"><span className="footer-repo"><img src={imageURL('/images/card/github.svg')} width="13" height="13" alt="" />GitHub</span><span className="footer-build"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h6m8 0h6"/><circle cx="12" cy="12" r="4"/></svg>BUILD / {commit ? commit.slice(0,7).toUpperCase() : 'LOCAL'}</span></a></div>
       <div className="footer-links">
 
-        <a href="/pit-wall">PIT WALL</a><a href="https://status.merakt.cn/status/home">{"@i18n:site.status@ "}<ArrowIcon direction="up-right" /></a><a href="https://beian.miit.gov.cn/">{"@i18n:ui.icp20230067291@"}</a>
+        <a href="/pit-wall">PIT WALL</a><a href="/pit-lane">PIT LANE</a><a href="https://status.merakt.cn/status/home">{"@i18n:site.status@ "}<ArrowIcon direction="up-right" /></a><a href="https://beian.miit.gov.cn/">{"@i18n:ui.icp20230067291@"}</a>
       </div>
     </footer>
   </Localized></LocaleProvider></body></html>

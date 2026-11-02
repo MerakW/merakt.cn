@@ -21,6 +21,8 @@ import { FlightSyncJobs } from './collections/FlightSyncJobs'
 import { FlightProviderQueries } from './collections/FlightProviderQueries'
 import { flightSyncEndpoints } from './lib/flights/sync-endpoints'
 import { startFlightSyncWorker } from './lib/flights/sync-service'
+import { Friends } from './collections/Friends'
+import { startPitLaneMonitor } from './lib/pit-lane-monitor'
 
 const baseDir = dirname(fileURLToPath(import.meta.url))
 if (!process.env.PAYLOAD_SECRET) throw new Error('请设置 PAYLOAD_SECRET；参见 .env.example。')
@@ -33,9 +35,9 @@ export default buildConfig({
   csrf: process.env.LOCAL_PREVIEW === '1' ? ['http://127.0.0.1:3003', 'http://localhost:3003'] : [],
   admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { providers: ['./components/admin/AdminLocaleSync'], beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
   i18n: { supportedLanguages: { zh, en }, fallbackLanguage: 'zh' },
-  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, FlightProviderQueries, Passkeys, PasskeyChallenges].map(bilingualLabels),
+  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, Friends, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, FlightProviderQueries, Passkeys, PasskeyChallenges].map(bilingualLabels),
   endpoints: flightSyncEndpoints,
-  onInit: startFlightSyncWorker,
+  onInit: payload => { startFlightSyncWorker(payload); startPitLaneMonitor(payload) },
   globals: [bilingualLabels(SiteSettings)],
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [
     { slug: 'trip', labels: { singular: '航程', plural: '航程' }, fields: [{ name: 'trip', label: '选择旅行', type: 'relationship', relationTo: 'trips', required: true }] },

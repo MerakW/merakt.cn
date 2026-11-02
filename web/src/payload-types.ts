@@ -76,6 +76,7 @@ export interface Config {
     notes: Note;
     events: Event;
     checkins: Checkin;
+    friends: Friend;
     'paddock-signals': PaddockSignal;
     'flight-sync-jobs': FlightSyncJob;
     'flight-worker-replays': FlightWorkerReplay;
@@ -98,6 +99,7 @@ export interface Config {
     notes: NotesSelect<false> | NotesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     checkins: CheckinsSelect<false> | CheckinsSelect<true>;
+    friends: FriendsSelect<false> | FriendsSelect<true>;
     'paddock-signals': PaddockSignalsSelect<false> | PaddockSignalsSelect<true>;
     'flight-sync-jobs': FlightSyncJobsSelect<false> | FlightSyncJobsSelect<true>;
     'flight-worker-replays': FlightWorkerReplaysSelect<false> | FlightWorkerReplaysSelect<true>;
@@ -486,6 +488,83 @@ export interface Checkin {
   createdAt: string;
 }
 /**
+ * Friend links for HGH APRON & PIT LANE. Only approved entries are public; health, backlinks and logos are maintained by PIT_LANE_MONITOR; friends' site updates are never tracked.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "friends".
+ */
+export interface Friend {
+  id: number;
+  /**
+   * Paste a card from email, a QQ / X DM or a GitHub issue; empty fields below are filled on save.
+   */
+  importCard?: string | null;
+  tla: string;
+  name: string;
+  url: string;
+  teamColor: string;
+  /**
+   * Grid order; empty falls back to join date.
+   */
+  bay?: number | null;
+  bio?: string | null;
+  /**
+   * Shown on hover, up to 24 characters.
+   */
+  coolingMsg?: string | null;
+  logoSource: 'auto' | 'upload' | 'monogram';
+  /**
+   * Media must be public to appear.
+   */
+  avatar?: (number | null) | Media;
+  /**
+   * Fetched by the monitor as 256px WebP; can be replaced manually.
+   */
+  logo?: (number | null) | Media;
+  tyreMode: 'auto' | 'manual';
+  tyre?: ('S' | 'M' | 'H' | 'I' | 'W') | null;
+  /**
+   * Leave empty for a virtual bearing and distance derived from the TLA.
+   */
+  bearing?: number | null;
+  distance?: number | null;
+  /**
+   * Optional page where they link merakt.cn; checked along with the homepage.
+   */
+  backlinkUrl?: string | null;
+  /**
+   * Visible to admins only.
+   */
+  contact?: string | null;
+  status: 'pending' | 'approved' | 'rejected';
+  source?: ('web' | 'email' | 'social' | 'github' | 'admin') | null;
+  /**
+   * Last time a merakt.cn link was found on their site; empty means not found yet.
+   */
+  backlinkAt?: string | null;
+  ticketHash?: string | null;
+  /**
+   * Manually fit full wets; the card shows rain.
+   */
+  maintenance?: boolean | null;
+  joinedAt?: string | null;
+  health?: {
+    state?: ('green' | 'inter' | 'wet' | 'red') | null;
+    failStreak?: number | null;
+    okStreak?: number | null;
+    history?: string | null;
+    latencyMs?: number | null;
+    checkedAt?: string | null;
+  };
+  backlinkCheckedAt?: string | null;
+  feedUrl?: string | null;
+  lastPostAt?: string | null;
+  feedCheckedAt?: string | null;
+  logoCheckedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "paddock-signals".
  */
@@ -673,6 +752,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'checkins';
         value: number | Checkin;
+      } | null)
+    | ({
+        relationTo: 'friends';
+        value: number | Friend;
       } | null)
     | ({
         relationTo: 'paddock-signals';
@@ -958,6 +1041,52 @@ export interface CheckinsSelect<T extends boolean = true> {
   name?: T;
   message?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "friends_select".
+ */
+export interface FriendsSelect<T extends boolean = true> {
+  importCard?: T;
+  tla?: T;
+  name?: T;
+  url?: T;
+  teamColor?: T;
+  bay?: T;
+  bio?: T;
+  coolingMsg?: T;
+  logoSource?: T;
+  avatar?: T;
+  logo?: T;
+  tyreMode?: T;
+  tyre?: T;
+  bearing?: T;
+  distance?: T;
+  backlinkUrl?: T;
+  contact?: T;
+  status?: T;
+  source?: T;
+  backlinkAt?: T;
+  ticketHash?: T;
+  maintenance?: T;
+  joinedAt?: T;
+  health?:
+    | T
+    | {
+        state?: T;
+        failStreak?: T;
+        okStreak?: T;
+        history?: T;
+        latencyMs?: T;
+        checkedAt?: T;
+      };
+  backlinkCheckedAt?: T;
+  feedUrl?: T;
+  lastPostAt?: T;
+  feedCheckedAt?: T;
+  logoCheckedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }
