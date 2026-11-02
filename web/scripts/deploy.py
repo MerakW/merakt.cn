@@ -155,6 +155,9 @@ def main():
                 if Path(member.name).is_absolute() or '..' in Path(member.name).parts or not (member.isfile() or member.isdir()):
                     raise ValueError('Git source contains links or unsafe paths')
             stream.extractall(source)
+        template = source / 'friends/_template.yml'
+        template.parent.mkdir()
+        template.write_text(capture('git', '-C', repo, 'show', commit + ':friends/_template.yml') + '\n')
         script = source / 'scripts/package-linux.sh'
         if not script.is_file():
             raise RuntimeError('该提交缺少打包脚本；请先提交并推送当前应用及脚本。')

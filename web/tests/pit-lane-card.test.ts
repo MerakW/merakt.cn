@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import test from 'node:test'
 import { TICKET_PATTERN, formatCard, githubFileURL, githubIssueURL, mailtoURL, parseCard, toYaml, type Application } from '../src/lib/pit-lane-card'
 
@@ -27,7 +27,8 @@ test('free-form DMs with Chinese aliases are understood, junk is dropped', () =>
 })
 
 test('repo template parses and tickets have an unambiguous alphabet', () => {
-  const template = parseCard(readFileSync(new URL('../../friends/_template.yml', import.meta.url), 'utf8'))
+  const bundled = new URL('../friends/_template.yml', import.meta.url)
+  const template = parseCard(readFileSync(existsSync(bundled) ? bundled : new URL('../../friends/_template.yml', import.meta.url), 'utf8'))
   assert.equal(template.tla, 'AST'); assert.equal(template.teamColor, '#2349ed'); assert.equal(template.coolingMsg, undefined)
   assert.ok(TICKET_PATTERN.test('PIT-AST-7K3QZ9'))
   assert.ok(!TICKET_PATTERN.test('PIT-AST-7K3QZ0'))

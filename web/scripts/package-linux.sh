@@ -59,6 +59,10 @@ def copy_checked(src, dst):
         shutil.copy2(src, dst)
 for name in ['package.json','package-lock.json','next.config.mjs','next-env.d.ts','tsconfig.json','src','scripts','tests']:
     copy_checked(root / name, source / name)
+template = root / 'friends/_template.yml'
+if not template.is_file():
+    template = root.parent / 'friends/_template.yml'
+copy_checked(template, source / 'friends/_template.yml')
 (source / 'public').mkdir(exist_ok=True)
 if sys.argv[3]:
     assets = pathlib.Path(sys.argv[3]).resolve()
