@@ -25,6 +25,15 @@ export const HEX_PATTERN = /^#[0-9a-fA-F]{6}$/
 export type Health = { state?: PitState | null; failStreak?: number | null; okStreak?: number | null; history?: string | null; latencyMs?: number | null; checkedAt?: string | null }
 export type ProbeResult = { ok: boolean; status?: number; latencyMs?: number; retryAfter?: boolean }
 
+/** Auto logos are baked into padded badges by the monitor; their files carry this prefix. */
+export const LOGO_BADGE_PREFIX = 'pit-logo-v2-'
+export type LogoKind = 'badge' | 'plate'
+/** Lettering colour for a livery on dark garage walls: very dark liveries are lifted toward white. */
+export function teamInk(hex: string): string {
+  if (!HEX_PATTERN.test(hex)) return hex
+  const { l } = oklch(hex)
+  return l >= 0.55 ? hex : `color-mix(in oklab, ${hex} ${Math.round(35 + l * 60)}%, #fff)`
+}
 export type FriendInput = {
   id: number | string
   tla: string
@@ -34,6 +43,8 @@ export type FriendInput = {
   bio?: string | null
   coolingMsg?: string | null
   image?: string | null
+  /** 'badge' = composed by the monitor (opaque, padded); 'plate' = manual upload shown on a white plate. */
+  imageKind?: LogoKind | null
   tyreMode?: TyreMode | null
   tyre?: Tyre | null
   maintenance?: boolean | null
@@ -53,6 +64,7 @@ export type PitBox = {
   bio: string
   coolingMsg: string
   image?: string
+  imageKind?: LogoKind
   tyre: Tyre
   state: PitState
   bay: number
@@ -179,7 +191,7 @@ export function buildPitLane(friends: FriendInput[], now = Date.now()): PitBox[]
       return {
         id: String(friend.id), tla: friend.tla, name: friend.name, url: safeHttpURL(friend.url)!,
         color: friend.teamColor && HEX_PATTERN.test(friend.teamColor) ? friend.teamColor : '#2349ed',
-        bio: friend.bio?.trim() || '', coolingMsg: friend.coolingMsg?.trim() || '', image: friend.image || undefined,
+        bio: friend.bio?.trim() || '', coolingMsg: friend.coolingMsg?.trim() || '', image: friend.image || undefined, imageKind: friend.image ? friend.imageKind || 'plate' : undefined,
         tyre: resolveTyre(friend), state, bay, bayLabel: `PIT ${String(bay).padStart(2, '0')} // BAY ${'ABCDEFGHJK'[Math.floor((bay - 1) / 2) % 10]}`,
         bearing, distance, lapMs, lap: formatLap(lapMs), frequency: virtualFrequency(friend.tla),
         position: null, gap: 'OUT', scope: scopePoint(bearing, distance),

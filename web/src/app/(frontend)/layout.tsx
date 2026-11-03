@@ -34,6 +34,7 @@ import './paddock.css'
 import './cockpit.css'
 import './fursuit-friday.css'
 import './pit-lane.css'
+import './site-nav-mobile.css'
 
 const barlow = localFont({ src: [
   { path: '../../../node_modules/@fontsource/barlow-condensed/files/barlow-condensed-latin-500-normal.woff2', weight: '500' },

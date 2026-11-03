@@ -17,12 +17,24 @@ export default function SiteNav() {
       nav.style.setProperty('--marker-x', `${active?.offsetLeft || 0}px`)
       nav.style.setProperty('--marker-width', `${active?.offsetWidth || 0}px`)
       if (header) document.documentElement.style.setProperty('--site-nav-height', `${header.getBoundingClientRect().height}px`)
+      fade()
+    }
+    // On phones the tab row scrolls; fade whichever edge hides more tabs.
+    const fade = () => {
+      const max = nav.scrollWidth - nav.clientWidth
+      const edges = [nav.scrollLeft > 2 && 'start', nav.scrollLeft < max - 2 && 'end'].filter(Boolean).join(' ')
+      if (edges) nav.dataset.fade = edges
+      else delete nav.dataset.fade
     }
     update()
+    const active = nav.querySelector<HTMLElement>('[aria-current="page"]')
+    if (active && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2
+    fade()
+    nav.addEventListener('scroll', fade, { passive: true })
     const observer = new ResizeObserver(update)
     observer.observe(nav)
     if (header) observer.observe(header)
-    return () => { observer.disconnect(); document.documentElement.style.removeProperty('--site-nav-height') }
+    return () => { observer.disconnect(); nav.removeEventListener('scroll', fade); document.documentElement.style.removeProperty('--site-nav-height') }
   }, [pathname,locale])
   return <Localized><nav ref={ref} className="main-tabs" aria-label="@i18n:nav.label@">{links.map(([href,label]) => <Link key={href} href={href} aria-current={(href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(href + '/')) ? 'page' : undefined}>{label}</Link>)}<span className="tab-marker" aria-hidden="true" /></nav></Localized>
 }

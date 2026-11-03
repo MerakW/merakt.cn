@@ -6,6 +6,7 @@ import { request as httpsRequest } from 'node:https'
 import { Readable, type Readable as NodeReadable } from 'node:stream'
 import { createBrotliDecompress, createGunzip, createInflate } from 'node:zlib'
 import { nextHealth, safeHttpURL, type Health, type ProbeResult } from './pit-lane'
+import { BAKED_PREFIX, bakeLogo } from './pit-logo'
 
 /**
  * Pit Lane monitor: every 15 minutes probe approved friends' homepages (health / red flag),
@@ -225,7 +226,7 @@ async function fetchImage(url: string, jar?: CookieJar, referer?: string): Promi
     if (!meta?.width || !meta.height) return { reason: '无法识别的图片格式' }
     const size = Math.min(meta.width, meta.height)
     if (size < MIN_ICON) return { reason: `太小（${meta.width}×${meta.height}）` }
-    const image = await sharp(readable, { density: 300 }).resize(256, 256, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } }).webp({ quality: 88 }).toBuffer()
+    const image = await bakeLogo(readable, size)
     return { image, size: meta.format === 'svg' ? 1024 : size }
   } catch (error) { return { reason: error instanceof Error ? (error.message === 'response too large' ? '文件超过 2 MB' : error.message) : '请求失败' } }
 }
@@ -270,7 +271,7 @@ const stale = (value: string | null | undefined, every: number, now: number) => 
 export async function saveLogo(payload: Payload, friend: LogoFriend, image: Buffer, now: number) {
   const logoID = typeof friend.logo === 'object' ? friend.logo?.id : friend.logo
   const media = await payload.create({ collection: 'media', overrideAccess: true, data: { alt: `${friend.name} logo`, altEn: `${friend.name} logo`, source: friend.url, visibility: 'public' },
-    file: { data: image, mimetype: 'image/webp', name: `pit-logo-${friend.tla.toLowerCase()}-${now}.webp`, size: image.length } })
+    file: { data: image, mimetype: 'image/webp', name: `${BAKED_PREFIX}${friend.tla.toLowerCase()}-${now}.webp`, size: image.length } })
   if (logoID) await payload.delete({ collection: 'media', id: logoID, overrideAccess: true }).catch(() => undefined)
   return media.id
 }
@@ -282,7 +283,9 @@ export async function checkFriend(payload: Payload, friend: FriendDoc, now = Dat
   const data: Record<string, unknown> = { health: { ...health, checkedAt: new Date(now).toISOString() } }
   const base = result.finalURL || friend.url
   const logoID = typeof friend.logo === 'object' ? friend.logo?.id : friend.logo
-  if (result.ok && friend.logoSource === 'auto' && stale(friend.logoCheckedAt, logoID ? LOGO_EVERY : LOGO_RETRY, now)) {
+  // Logos from before the badge pipeline (or any non-baked file) are refreshed once, at the hourly retry pace.
+  const legacy = Boolean(logoID) && !(typeof friend.logo === 'object' && friend.logo?.filename?.startsWith(BAKED_PREFIX))
+  if (result.ok && friend.logoSource === 'auto' && stale(friend.logoCheckedAt, logoID && !legacy ? LOGO_EVERY : LOGO_RETRY, now)) {
     data.logoCheckedAt = new Date(now).toISOString()
     const { image, attempts } = await discoverLogo(result.html || '', base, jar)
     const page = result.html ? `首页 HTTP ${result.status}` : `首页 HTTP ${result.status ?? '?'}（未拿到 HTML，只能试 /favicon.ico）`
@@ -298,7 +301,7 @@ export async function checkFriend(payload: Payload, friend: FriendDoc, now = Dat
 }
 
 export async function runPitLaneMonitor(payload: Payload, now = Date.now()) {
-  const { docs } = await payload.find({ collection: 'friends', where: { status: { equals: 'approved' } }, depth: 0, limit: 200, pagination: false, overrideAccess: true })
+  const { docs } = await payload.find({ collection: 'friends', where: { status: { equals: 'approved' } }, depth: 1, limit: 200, pagination: false, overrideAccess: true })
   const due = (docs as unknown as FriendDoc[]).filter(friend => stale(friend.health?.checkedAt as string | undefined, HEALTH_EVERY - 30000, now))
   for (let index = 0; index < due.length; index += 4) {
     await Promise.all(due.slice(index, index + 4).map(friend => checkFriend(payload, friend, now).catch(() => payload.logger.warn(`PIT LANE ${friend.tla}: 检查未完成，下一轮重试。`))))
