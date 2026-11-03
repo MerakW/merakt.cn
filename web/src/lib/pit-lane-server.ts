@@ -1,7 +1,7 @@
 import 'server-only'
 import type { Payload } from 'payload'
 import { publicPhoto } from './gallery'
-import { buildPitLane, type FriendInput, type PitBox } from './pit-lane'
+import { LOGO_BADGE_PREFIX, buildPitLane, type FriendInput, type PitBox } from './pit-lane'
 import type { Friend } from '@/payload-types'
 
 /** Public pit lane, safe for anonymous rendering; missing schema (pre-migration) yields an empty lane. */
@@ -11,7 +11,8 @@ export async function getPitLane(payload: Payload): Promise<PitBox[]> {
     return buildPitLane((docs as Friend[]).map((friend): FriendInput => {
       const media = friend.logoSource === 'upload' ? friend.avatar : friend.logoSource === 'auto' ? friend.logo : null
       const image = publicPhoto(media ?? null)
-      return { ...friend, image: image?.thumbnail || null, health: friend.health ?? null }
+      const badge = friend.logoSource === 'auto' && typeof media === 'object' && Boolean(media?.filename?.startsWith(LOGO_BADGE_PREFIX))
+      return { ...friend, image: image?.thumbnail || null, imageKind: badge ? 'badge' : 'plate', health: friend.health ?? null }
     }))
   } catch { return [] }
 }

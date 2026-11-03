@@ -1,0 +1,26 @@
+/* Phone header: the tab row scrolls sideways instead of clipping (English labels, large text settings),
+   and the brand row compacts so MERAK never runs under the track pill. */
+@media(max-width:800px){
+  .site-nav{grid-template-columns:minmax(0,1fr) auto}
+  .site-nav .main-tabs{overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-padding-inline:24px;touch-action:pan-x pan-y}
+  .site-nav .main-tabs::-webkit-scrollbar{display:none}
+  .site-nav .main-tabs a{flex:none}
+  .site-nav .main-tabs[data-fade~=start]{-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px);mask-image:linear-gradient(90deg,transparent,#000 28px)}
+  .site-nav .main-tabs[data-fade~=end]{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+  .site-nav .main-tabs[data-fade~=start][data-fade~=end]{-webkit-mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,transparent,#000 28px,#000 calc(100% - 28px),transparent)}
+}
+@media(max-width:420px){
+  .site-nav .brand{font-size:25px;gap:6px}
+  .site-nav .brand-wings{font-size:27px;margin-right:4px}
+  .site-nav{column-gap:12px}
+  .site-nav .nav-tools{gap:6px}
+  /* The track pill keeps only its status light here; the full status sits in the race-control bar below. */
+  .site-nav .track-pill{font-size:0;gap:0;padding:8px}
+  .site-nav .track-pill i{margin:0}
+}
+/* Home boarding pass: the 100 px stub can't hold the English call-to-action on one line; let it wrap
+   instead of pushing the page (and the fixed header with it) past the screen edge. */
+@media(max-width:800px){
+  .home-pass-stub{min-width:0}
+  .home-pass-stub .home-pass-action{white-space:normal;overflow-wrap:anywhere;line-height:1.35}
+}

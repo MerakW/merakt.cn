@@ -63,8 +63,11 @@ export default function PitLane({ boxes, metar, now: serverNow, email }: { boxes
     // Returning through the back/forward cache must not leave a garage mid-launch.
     const reset = () => { if (timer.current) clearTimeout(timer.current); setBoxing(null); setLane(null) }
     window.addEventListener(PIT_BOX_EVENT, listen); window.addEventListener('pageshow', reset)
-    return () => { clearInterval(id); window.removeEventListener(PIT_BOX_EVENT, listen); window.removeEventListener('pageshow', reset); if (timer.current) clearTimeout(timer.current) }
+    return () => { clearInterval(id); window.removeEventListener(PIT_BOX_EVENT, listen); window.removeEventListener('pageshow', reset) }
   }, [boxOut])
+
+  // Rebinding listeners after a render must not cancel an in-flight BOX OUT.
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current) }, [])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search), requested = params.get('box')

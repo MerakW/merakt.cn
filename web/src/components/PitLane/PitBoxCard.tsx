@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react'
 import Localized from '@/components/Localized'
 import { imageURL } from '@/lib/assets'
-import { SAFETY_CAR, TYRE_COLORS, formatLap, pad3, type PitBox } from '@/lib/pit-lane'
+import { SAFETY_CAR, TYRE_COLORS, formatLap, pad3, teamInk, type PitBox } from '@/lib/pit-lane'
 import type { RaceView, Standing } from '@/lib/pit-race'
 
 export { TYRE_COLORS }
@@ -19,9 +19,9 @@ function lapText(fallback: string, live?: Standing, fastest?: boolean) {
   if (!live?.lastLap) return <span>LAP {fallback}</span>
   return <span className={fastest ? 'pl-purple' : undefined}>{fastest ? 'FASTEST' : 'LAST'} {formatLap(fastest && live.bestLap ? live.bestLap : live.lastLap)}</span>
 }
-export function Logo({ box }: { box: Pick<PitBox, 'image' | 'tla'> }) {
+export function Logo({ box }: { box: Pick<PitBox, 'image' | 'imageKind' | 'tla'> }) {
   return box.image
-    ? <div className="pl-logo"><img src={box.image} alt="" width={68} height={68} loading="lazy" decoding="async" referrerPolicy="no-referrer"/></div>
+    ? <div className="pl-logo" data-kind={box.imageKind || 'plate'}><img src={box.image} alt="" width={72} height={72} loading="lazy" decoding="async" referrerPolicy="no-referrer"/></div>
     : <div className="pl-logo pl-mono-mark" aria-hidden="true">{box.tla}<small>AUTO</small></div>
 }
 
@@ -40,7 +40,7 @@ export default function PitBoxCard({ box, preview, boxing, live, fastest, onBox 
       <div className="pl-foot"><div className="pl-def">{lapText(box.lap, live, fastest)}<span>{box.frequency} MHz</span></div><div className="pl-alt"><span>{box.coolingMsg ? <span data-i18n="off">{box.coolingMsg}</span> : red ? "@i18n:pitLane.card.noRadio@" : box.state === 'wet' ? "@i18n:pitLane.card.wet@" : "@i18n:pitLane.card.visit@"}</span><b>{red ? 'NO RADIO ×' : 'BOX OUT ↗'}</b></div></div>
     </div>
   </>
-  const style = { '--team': box.color } as CSSProperties
+  const style = { '--team': box.color, '--team-ink': teamInk(box.color) } as CSSProperties
   if (preview) return <Localized><div className="pl-box is-preview" data-state={box.state} data-tla={box.tla} style={style}>{body}</div></Localized>
   return <Localized><a className={`pl-box${boxing ? ' is-boxing' : ''}`} href={box.url} rel="noopener" data-tla={box.tla} data-state={box.state} style={style}
     aria-label={`${box.tla} · ${box.name} — ${red ? 'RED FLAG' : 'BOX OUT'}`} aria-describedby="pit-lane-hint" onClick={event => onBox?.(event, box)}>{body}</a></Localized>
