@@ -24,11 +24,28 @@ test('mixed albums retain only public photos and drop unsafe source links', () =
   assert.equal(result.date, '2025-01-17')
 })
 
-test('public media uses CDN derivatives and preserves video type', () => {
+test('public uploads use same-origin originals and derivatives and preserve video type', () => {
   const photo = publicPhoto({ ...media, sizes: { thumbnail: { filename: 'small photo.jpg', width: 480 }, display: { filename: 'large.jpg', width: 1440 } } })!
-  assert.equal(photo.thumbnail, 'https://cos.merakt.cn/api/media/file/small%20photo.jpg')
-  assert.equal(photo.srcSet, 'https://cos.merakt.cn/api/media/file/small%20photo.jpg 480w, https://cos.merakt.cn/api/media/file/large.jpg 1440w')
+  assert.equal(photo.src, '/api/media/file/photo.jpg')
+  assert.equal(photo.display, '/api/media/file/large.jpg')
+  assert.equal(photo.thumbnail, '/api/media/file/small%20photo.jpg')
+  assert.equal(photo.srcSet, '/api/media/file/small%20photo.jpg 480w, /api/media/file/large.jpg 1440w')
   assert.equal(publicPhoto({ ...media, mimeType: 'video/mp4' })!.video, true)
+})
+
+test('auto logos without derivatives fall back to the same-origin original', () => {
+  const photo = publicPhoto({ ...media, filename: 'pit-logo-v2-ast-123.webp', sizes: { thumbnail: { filename: null } } })!
+  assert.equal(photo.src, '/api/media/file/pit-logo-v2-ast-123.webp')
+  assert.equal(photo.thumbnail, photo.src)
+  assert.equal(photo.display, photo.src)
+})
+
+test('reviewed legacy gallery files still use their static COS paths', () => {
+  const photo = publicPhoto({ ...media, legacyPath: '/images/fursuitfriday/legacy.jpg' })!
+  assert.equal(photo.src, 'https://cos.merakt.cn/fursuitfriday/legacy.jpg')
+  assert.equal(photo.thumbnail, photo.src)
+  assert.equal(photo.display, photo.src)
+  assert.equal(photo.srcSet, undefined)
 })
 
 test('credits read explicit roles without inventing a photographer', () => {
