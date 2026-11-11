@@ -10,13 +10,17 @@ function today() {
   return ['year', 'month', 'day'].map(type => parts.find(part => part.type === type)!.value).join('-')
 }
 
-export default function PhotoPublish({ configured }: { configured: boolean }) {
+export default function PhotoPublish({ configured, photographers = [] }: { configured: boolean; photographers?: { id: number; name: string }[] }) {
   const input = useRef<HTMLInputElement>(null)
   const submitting = useRef(false)
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState('')
   const [caption, setCaption] = useState('')
+  const [photographerIDs, setPhotographerIDs] = useState<string[]>([])
   const [captionEn, setCaptionEn] = useState('')
+  const [translating, setTranslating] = useState(false)
+  const translatingRef = useRef(false)
+  const [translation, setTranslation] = useState<{ source: string; text: string } | null>(null)
   const [date, setDate] = useState(today)
   const [dragging, setDragging] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -38,11 +42,24 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
     if (next.size > PHOTO_UPLOAD_MAX_BYTES) { setError("@i18n:ui.imagesMustBe100MbOrSmaller@"); return }
     setFile(next)
   }
+  async function translateCaption() {
+    if (translatingRef.current || !caption.trim()) return
+    translatingRef.current = true; setTranslating(true); setError(''); setTranslation(null)
+    const source = caption
+    try {
+      const response = await fetch('/api/translate-draft', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ collection: 'photo-caption', data: { caption: source }, overwrite: true }) })
+      const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Translation failed')
+      setTranslation({ source, text: data.patches[0].value })
+    } catch (error) { setError(error instanceof Error ? error.message : 'Translation failed') }
+    finally { translatingRef.current = false; setTranslating(false) }
+  }
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (submitting.current || !file || !caption.trim()) return
     submitting.current = true; setBusy(true); setError(''); setResult(null)
     const form = new FormData()
+    form.set('photographers', JSON.stringify(photographerIDs));
     form.set('image', file); form.set('caption', caption); form.set('date', date); form.set('captionEn', captionEn)
     try {
       const response = await fetch('/manage/fursuitfriday/submit', { method: 'POST', body: form })
@@ -66,6 +83,14 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
       <div className="photo-publish-copy">
         <label htmlFor="photo-caption">{"@i18n:ui.caption@"}<textarea id="photo-caption" value={caption} onChange={event => { setCaption(event.target.value); setResult(null) }} placeholder="@i18n:ui.pasteYourCaption@" required maxLength={10_000} disabled={busy} /></label>
         <label htmlFor="photo-caption-en">{"@i18n:gallery.englishCaption@"}<textarea id="photo-caption-en" lang="en" value={captionEn} onChange={event => { setCaptionEn(event.target.value); setResult(null) }} placeholder="@i18n:gallery.translationFallback@" maxLength={10_000} disabled={busy} /></label>
+        <button type="button" className="quiet-link" disabled={busy || translating || !caption.trim()} onClick={translateCaption}>{translating ? '@i18n:translation.working@' : '@i18n:translation.generate@'}</button>
+        {translation && <div className="photo-publish-translation">
+          <p lang="en" data-i18n="off" style={{ whiteSpace: 'pre-wrap' }}>{translation.text}</p>
+          <button type="button" disabled={busy || caption !== translation.source} onClick={() => { setCaptionEn(translation.text); setTranslation(null); setResult(null) }}>{"@i18n:translation.apply@"}</button>
+          <button type="button" onClick={() => setTranslation(null)}>{"@i18n:translation.discard@"}</button>
+          {caption !== translation.source && <p role="status">{"@i18n:translation.changed@"}</p>}
+        </div>}
+        <label htmlFor="photo-photographers">{"@i18n:ui.photoCredit@"}<select id="photo-photographers" multiple value={photographerIDs} disabled={busy} onChange={event => setPhotographerIDs(Array.from(event.target.selectedOptions, option => option.value))}>{photographers.map(person => <option key={person.id} value={person.id}>{person.name} · #{person.id}</option>)}</select></label>
         <label htmlFor="photo-date">{"@i18n:ui.date2@"}<input id="photo-date" type="date" value={date} onChange={event => { setDate(event.target.value); setResult(null) }} required disabled={busy} /></label>
         <p className="photo-publish-hint">{"@i18n:ui.orInTheCaptionIsAutomaticallyUsedAs@"}</p>
         <p className="photo-publish-hint">{"@i18n:gallery.exifUploadHint@"}</p>
@@ -73,6 +98,6 @@ export default function PhotoPublish({ configured }: { configured: boolean }) {
       </div>
     </form>
     {error && <p className="photo-publish-error" role="alert">{error}</p>}
-    {result && <div className="photo-publish-success" role="status"><strong>{result.duplicate ? "@i18n:ui.thisFursuitFridayPostIsAlreadyPublished@" : "@i18n:ui.published@"}</strong><a href={result.url}>{"@i18n:ui.viewThisPost@ "}<ArrowIcon direction="up-right" /></a><button type="button" onClick={() => { setFile(null); setCaption(''); setCaptionEn(''); setDate(today()); setResult(null) }}>{"@i18n:ui.postAnother@"}</button></div>}
+    {result && <div className="photo-publish-success" role="status"><strong>{result.duplicate ? "@i18n:ui.thisFursuitFridayPostIsAlreadyPublished@" : "@i18n:ui.published@"}</strong><a href={result.url}>{"@i18n:ui.viewThisPost@ "}<ArrowIcon direction="up-right" /></a><button type="button" onClick={() => { setFile(null); setPhotographerIDs([]); setCaption(''); setCaptionEn(''); setTranslation(null); setDate(today()); setResult(null) }}>{"@i18n:ui.postAnother@"}</button></div>}
   </section></Localized>
 }

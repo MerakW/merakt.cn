@@ -1,3 +1,5 @@
+import { translationEndpoint } from './lib/translation/endpoint'
+import { Photographers } from './collections/Photographers'
 import { bilingualLabels } from './lib/i18n/admin'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -43,8 +45,8 @@ export default buildConfig({
   csrf: process.env.LOCAL_PREVIEW === '1' ? ['http://127.0.0.1:3003', 'http://localhost:3003'] : [],
   admin: { user: 'users', avatar: { Component: './components/admin/RefreshableAvatar#RefreshableAvatar' }, dateFormat: 'yyyy-MM-dd HH:mm', importMap: { baseDir }, meta: { titleSuffix: ' · Merak 管理' }, components: { providers: ['./components/admin/AdminLocaleSync'], beforeLogin: ['./components/admin/FlightImportLink#PasskeyLoginLink'], afterNavLinks: ['./components/admin/FlightImportLink#FlightImportLink', './components/admin/RefreshableAvatar#RefreshAvatarButton'] } },
   i18n: { supportedLanguages: { zh, en }, fallbackLanguage: 'zh' },
-  collections: [Users, Media, Flights, Trips, Albums, Posts, Notes, Events, Checkins, Friends, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, FlightProviderQueries, Passkeys, PasskeyChallenges].map(bilingualLabels),
-  endpoints: flightSyncEndpoints,
+  collections: [Users, Media, Photographers, Flights, Trips, Albums, Posts, Notes, Events, Checkins, Friends, PaddockSignals, FlightSyncJobs, FlightWorkerReplays, FlightProviderQueries, Passkeys, PasskeyChallenges].map(bilingualLabels),
+  endpoints: [...flightSyncEndpoints, { path: '/translate-draft', method: 'post', handler: translationEndpoint }],
   onInit: payload => { startFlightSyncWorker(payload); startPitLaneMonitor(payload) },
   globals: [bilingualLabels(SiteSettings)],
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [

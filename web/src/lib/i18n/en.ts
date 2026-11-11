@@ -11,6 +11,12 @@ import type { MessageKey } from './zh'
  * 4. Typographic standard: Use curly apostrophes (’) and quotation marks (“ ”) in prose; keep `·` as the standard separator.
  */
 export const english: Record<MessageKey, string> = {
+  "translation.working": "Translating…",
+  "translation.generate": "Translate to English",
+  "translation.apply": "Use translation",
+  "translation.discard": "Discard",
+  "translation.changed": "Caption changed. Generate a new translation.",
+
   // ============================================================================
   // 1. Language Switcher & i18n Admin Fields
   // ============================================================================

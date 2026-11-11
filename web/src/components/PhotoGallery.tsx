@@ -24,8 +24,18 @@ type ExposureKey = keyof typeof EXPOSURE_LABELS
 const ROLE_LABELS: Record<CreditRole, string> = {
   suiter: "@i18n:gallery.suiter@", photo: "@i18n:gallery.photo@", light: "@i18n:gallery.lighting@", edit: "@i18n:gallery.retouch@", maker: "@i18n:gallery.maker@",
 }
-const BY_ME: Partial<Record<CreditRole, string>> = { photo: "@i18n:gallery.shotByMe@" }
-const creditsFor = (album: GalleryAlbum, photo: GalleryPhoto) => creditsOf(`${photo.caption}\n${album.description}`, photo.credit)
+const creditsFor = (album: GalleryAlbum, photo: GalleryPhoto) => {
+  const lines = creditsOf(`${photo.caption}\n${album.description}`, photo.credit)
+  if (photo.photographers !== undefined) {
+    const others = lines.filter(line => line.role !== 'photo')
+    return photo.photographers.length ? [...others, { role: 'photo' as const, names: photo.photographers.filter(person => !person.isSelf).map(person => person.name), me: photo.photographers.some(person => person.isSelf) }] : others
+  }
+  return lines
+}
+function PersonName({ name, photo, id }: { name: string; photo: GalleryPhoto; id?: number }) {
+  const person = photo.photographers?.find(person => id !== undefined ? person.id === id : person.name === name || person.isSelf && ['我', 'me', 'Me'].includes(name))
+  return person?.url ? <a href={person.url} target="_blank" rel="noopener noreferrer">{name}</a> : <>{name}</>
+}
 
 /** The camera settings recorded in the CMS for one photo, in the order a photographer reads them. */
 function exposureOf(photo?: GalleryPhoto) {
@@ -82,12 +92,22 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
   // Everyone credited across the posts, most frequent first: who took the photos, and who has worn Merak.
   const people = useMemo(() => {
     const tally = { photo: new Map<string, number>(), suiter: new Map<string, number>() }
-    for (const album of albums) if (album.photos[0]) for (const line of creditsFor(album, album.photos[0])) {
+    for (const album of albums) for (const photo of album.photos) for (const line of creditsFor(album, photo)) {
       if (line.role !== 'photo' && line.role !== 'suiter') continue
-      for (const name of [...line.names, ...(line.me ? [t("@i18n:gallery.me@")] : [])]) { const key = personKey(name); tally[line.role].set(key, (tally[line.role].get(key) || 0) + 1) }
+      for (const name of [...line.names, ...(line.me ? [t("@i18n:gallery.me@")] : [])]) { const key = line.role === 'photo' && photo.photographers?.find(person => person.name === name) ? name : personKey(name); tally[line.role].set(key, (tally[line.role].get(key) || 0) + 1) }
     }
     const rank = (count: Map<string, number>) => [...count].sort((a, b) => b[1] - a[1]).map(([name]) => name)
-    return { photographers: rank(tally.photo), suiters: rank(tally.suiter) }
+    const linked = new Map<number, { id: number; name: string; url?: string; count: number }>()
+    for (const album of albums) for (const photo of album.photos) for (const person of photo.photographers || []) {
+      const entry = linked.get(person.id)
+      if (entry) entry.count++
+      else linked.set(person.id, { ...person, count: 1 })
+    }
+    const linkedNames = new Set([...linked.values()].map(person => person.name))
+    const hasSelf = albums.some(album => album.photos.some(photo => photo.photographers?.some(person => person.isSelf)))
+    const photographers = [...linked.values()].sort((a, b) => b.count - a.count)
+    const legacy = rank(tally.photo).filter(name => !linkedNames.has(name) && !(hasSelf && name === t("@i18n:gallery.me@")))
+    return { photographers: [...photographers, ...legacy.map((name, index) => ({ id: -index - 1, name, url: undefined, count: 0 }))], suiters: rank(tally.suiter) }
   }, [albums, t])
   const intl = locale === 'en' ? 'en-US' : 'zh-CN'
   const longFormat = useMemo(() => new Intl.DateTimeFormat(intl, { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' }), [intl])
@@ -150,17 +170,17 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
   const move = (direction: number) => setSelected(value => value === null ? null : (value + direction + sequence.length) % sequence.length)
 
   const when = (album: GalleryAlbum) => Number.isFinite(dayOf(album.date)) ? <time dateTime={album.date}>{spoken(album.date)} · {weekdayFormat.format(dayOf(album.date))}</time> : null
-  const credit = (album: GalleryAlbum, photo = album.photos[0]) => {
+  const credit = (album: GalleryAlbum, photo = album.photos[0], linked = true) => {
     const lines = creditParts(creditsFor(album, photo))
     return lines.length ? <p className="ff-credit">{lines.map(line => {
       const roles = line.selfPortrait ? ["@i18n:gallery.selfPortrait@", ...(line.roles.includes('edit') ? [ROLE_LABELS.edit] : [])] : line.roles.map(role => role === 'suiter' && line.names.length + Number(line.me) > 1 ? "@i18n:gallery.featuring@" : ROLE_LABELS[role])
       const names = [...line.names, ...(line.me ? [t("@i18n:gallery.me@")] : [])]
-      return <span key={line.role} className="ff-credit-part">{roles.join(locale === 'en' ? ' & ' : ' / ')}{locale === 'en' ? ': ' : '：'}<span data-i18n="off">{names.join(locale === 'en' ? ', ' : '、')}</span></span>
+      return <span key={line.role} className="ff-credit-part">{roles.join(locale === 'en' ? ' & ' : ' / ')}{locale === 'en' ? ': ' : '：'}<span data-i18n="off">{names.map((name, index) => <span key={`${name}-${index}`}>{index ? locale === 'en' ? ', ' : '、' : ''}{line.role === 'photo' && linked ? <PersonName name={name} photo={photo} id={[...(photo.photographers?.filter(person => !person.isSelf) || []), ...(photo.photographers?.filter(person => person.isSelf) || [])][index]?.id} /> : name}</span>)}</span></span>
     })}</p> : null
   }
   const shortCredit = (album: GalleryAlbum) => {
     const photo = creditsFor(album, album.photos[0]).find(line => line.role === 'photo')
-    return !photo ? null : photo.names.length ? <span data-i18n="off">{photo.names.join(' ')}</span> : BY_ME.photo
+    return !photo ? null : photo.names.length ? <span data-i18n="off">{photo.names.map((name, index) => <span key={`${name}-${index}`}>{index ? ' ' : ''}<PersonName name={name} photo={album.photos[0]} id={album.photos[0].photographers?.filter(person => !person.isSelf)[index]?.id} /></span>)}</span> : <PersonName name={t("@i18n:gallery.me@")} photo={album.photos[0]} />
   }
   const indexOf = new Map(ordered.map((album, index) => [album.id, index]))
 
@@ -173,7 +193,7 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
         {active && <div className="ff-side-label" aria-hidden="true" key={active.id}>
           {when(active)}
           {captionOf(active) && <p className="ff-caption" data-i18n="off">{captionOf(active)}</p>}
-          {credit(active)}
+          {credit(active, active.photos[0], false)}
         </div>}
         <div className="ff-side-foot">
           {ordered.length > reel.length && <a className="ff-down" href="#ff-index">{"@i18n:gallery.browseAll@"}</a>}
@@ -217,7 +237,7 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
         <div className="ff-still-text" key={`t${still.id}`}>
           {when(still)}
           {captionOf(still) && <p className="ff-caption" data-i18n="off">{captionOf(still)}</p>}
-          {credit(still)}
+          {credit(still, still.photos[0], false)}
           <Readout photo={still.photos[0]} />
         </div>
       </div>
@@ -229,8 +249,8 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
             <button onClick={e => open(album.slug, e.currentTarget)} onPointerEnter={() => setPicked(index)} onFocus={() => setPicked(index)} aria-label={`${t(photo.video ? "@i18n:ui.play@" : "@i18n:ui.enlarge@")}: ${spoken(album.date)} ${captionOf(album)}`}>
               <time dateTime={album.date}>{fullDate(album.date).slice(5)}</time>
               <span className="ff-row-caption" data-i18n="off">{captionOf(album)}</span>
-              <span className="ff-row-credit">{shortCredit(album)}</span>
             </button>
+            <span className="ff-row-credit">{shortCredit(album)}</span>
           </li>
         })}</ol>
       </section>)}</div>
@@ -244,7 +264,7 @@ export default function PhotoGallery({ albums, initialSlug }: { albums: GalleryA
         </ul>
         {(people.photographers.length > 0 || people.suiters.length > 0) && <div className="ff-thanks">
           {people.photographers.length > 0 && <section aria-labelledby="ff-thanks-photo" {...reveal(0)}><div className="ff-thanks-heading"><span className="ff-thanks-role" aria-hidden="true">01 / PHOTO</span><h3 id="ff-thanks-photo">{"@i18n:gallery.thanks@"}</h3></div>
-            <ul data-i18n="off">{people.photographers.map((name, index) => <li key={name} {...reveal(Math.min(index % 6 * 35, 175))}><span>{name}</span></li>)}</ul></section>}
+            <ul data-i18n="off">{people.photographers.map((person, index) => <li key={person.id} {...reveal(Math.min(index % 6 * 35, 175))}><span>{person.url ? <a href={person.url} target="_blank" rel="noopener noreferrer">{person.name}</a> : person.name}</span></li>)}</ul></section>}
           {people.suiters.length > 0 && <section aria-labelledby="ff-thanks-suit" {...reveal(0)}><div className="ff-thanks-heading"><span className="ff-thanks-role" aria-hidden="true">02 / IN THE SUIT</span><h3 id="ff-thanks-suit">{"@i18n:gallery.suiterThanks@"}</h3></div>
             <ul data-i18n="off">{people.suiters.map((name, index) => <li key={name} {...reveal(Math.min(index % 6 * 35, 175))}><span>{name}</span></li>)}</ul></section>}
         </div>}

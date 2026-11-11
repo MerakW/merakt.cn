@@ -1,3 +1,5 @@
+import { translationField } from '@/lib/translation/field'
+import { photographerLinks } from './Photographers'
 import { savedValueOptions, albumSavedFields } from '@/lib/saved-values'
 import type { CollectionConfig, Field, GlobalConfig } from 'payload'
 import { adminOnly, editingAccess, publishedOnly, visiblePublished } from '@/lib/access'
@@ -34,19 +36,23 @@ export const Trips: CollectionConfig = {
 export const Albums: CollectionConfig = {
   slug: 'albums', labels: { singular: "ui.albums", plural: "ui.fursuitFridayAlbums" }, admin: { group: "ui.content", useAsTitle: 'title' },
   access: { ...editingAccess, read: publishedOnly }, versions,
+  hooks: { beforeValidate: [photographerLinks] },
   endpoints: [{ path: '/saved-values', method: 'get', handler: savedValueOptions('albums', albumSavedFields) }],
   fields: [
+    translationField,
     { name: 'title', label: "ui.albumTitle", type: 'text', required: true }, { ...slugField, defaultValue: () => `photo-${Date.now().toString(36)}` },
     { name: 'date', label: "ui.date2", type: 'text' },
     { name: 'description', label: "ui.caption", type: 'textarea' },
     englishField('title', 'Title'), englishField('description', 'Caption', 'textarea'),
     compoundField,
     { name: 'cover', label: "ui.cover", type: 'upload', relationTo: 'media' },
-    { name: 'photographer', label: "ui.photoCredit", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },
+    { name: 'photographers', label: { zh: '摄影师', en: 'Photographers' }, type: 'relationship', relationTo: 'photographers', hasMany: true },
+    { name: 'photographer', label: "ui.photoCredit", type: 'text', admin: { hidden: true } },
     { name: 'photos', label: "ui.photosAndVideos", type: 'array', fields: [
       { name: 'image', type: 'upload', relationTo: 'media', required: true, label: "ui.uploadPhotoOrVideo" },
       { name: 'caption', type: 'textarea', label: "ui.caption" }, englishField('caption', 'Caption', 'textarea'),
-      { name: 'credit', type: 'text', label: "ui.photoCredit" },
+      { name: 'photographers', label: { zh: '摄影师', en: 'Photographers' }, type: 'relationship', relationTo: 'photographers', hasMany: true },
+      { name: 'credit', type: 'text', label: "ui.photoCredit", admin: { hidden: true } },
       { name: 'source', type: 'text', label: "ui.originalSource" },
     ] },
     { name: 'trip', label: "ui.relatedTrips", type: 'relationship', relationTo: 'trips' },
@@ -58,6 +64,7 @@ export const Posts: CollectionConfig = {
   slug: 'posts', labels: { singular: "ui.article", plural: "ui.blog" }, admin: { group: "ui.content", useAsTitle: 'title', defaultColumns: ['title', 'date', '_status'] },
   access: { ...editingAccess, read: publishedOnly }, versions,
   fields: [
+    translationField,
     { name: 'title', label: "ui.title", type: 'text', required: true }, slugField,
     { name: 'date', label: "ui.articleDate", type: 'date', required: true },
     { name: 'excerpt', label: "ui.excerpt", type: 'textarea' },
@@ -75,6 +82,7 @@ export const Notes: CollectionConfig = {
   slug: 'notes', labels: { singular: "ui.statusUpdate", plural: "ui.recentUpdates" }, admin: { group: "ui.content", useAsTitle: 'text', defaultColumns: ['text', 'date', '_status'], description: "ui.theLatestPublishedUpdateAppearsInTeamRadio" },
   access: { ...editingAccess, read: publishedOnly }, versions,
   fields: [
+    translationField,
     { name: 'text', label: "ui.statusText", type: 'textarea', required: true, admin: { description: "ui.homePageStatusTextUsedAsTheDrivers" } },
     englishField('text', 'Status', 'textarea'),
     { name: 'teamReply', type: 'textarea', admin: { hidden: true } },
