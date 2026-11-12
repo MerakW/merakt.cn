@@ -30,3 +30,8 @@
 .flight-provider-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .flight-provider-leg { padding: 12px 0; border-top: 1px solid var(--theme-elevation-100); }
 @media (max-width: 600px) { .flight-provider-heading { flex-direction: column; } .flight-provider-lookup { padding: 16px; } }
+
+.translation-action { margin-bottom: 24px; }
+.translation-action label { display: flex; align-items: center; gap: 6px; }
+.translation-preview { margin-top: 16px; padding: 16px; border: 1px solid var(--theme-elevation-200); max-height: 60vh; overflow: auto; }
+.translation-preview p { white-space: pre-wrap; overflow-wrap: anywhere; }

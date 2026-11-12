@@ -8,6 +8,12 @@
  * 4. 双语并列标签统一采用「中文 / ENGLISH」或「ENGLISH / 中文」（斜杠两侧保留半角空格）。
  */
 export const chinese = {
+  "translation.working": "正在翻译…",
+  "translation.generate": "翻译为英文",
+  "translation.apply": "使用译文",
+  "translation.discard": "丢弃",
+  "translation.changed": "配文已更改，请重新翻译。",
+
   // ============================================================================
   // 1. 语言切换与后台多语言表单 (Language & i18n Admin)
   // ============================================================================

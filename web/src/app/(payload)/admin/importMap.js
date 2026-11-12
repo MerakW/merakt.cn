@@ -1,3 +1,4 @@
+import { default as default_88a6b012bb191b03150e8f4b1e6ca884 } from '../../../components/admin/TranslationAction'
 import { default as default_43afa593f13a91343d32b0f9f13a2e6c } from '../../../components/admin/SavedValueField'
 import { FlightImportReview as FlightImportReview_8223d63bcb097d658212492048e4c910 } from '../../../components/admin/FlightImportReview'
 import { FlightImportReviewCell as FlightImportReviewCell_8223d63bcb097d658212492048e4c910 } from '../../../components/admin/FlightImportReview'
@@ -37,6 +38,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "./components/admin/TranslationAction#default": default_88a6b012bb191b03150e8f4b1e6ca884,
   "./components/admin/SavedValueField#default": default_43afa593f13a91343d32b0f9f13a2e6c,
   "./components/admin/FlightImportReview#FlightImportReview": FlightImportReview_8223d63bcb097d658212492048e4c910,
   "./components/admin/FlightImportReview#FlightImportReviewCell": FlightImportReviewCell_8223d63bcb097d658212492048e4c910,

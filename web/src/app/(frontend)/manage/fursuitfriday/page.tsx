@@ -14,5 +14,6 @@ export default async function PhotoPublishPage() {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await headers() })
   if (!user) redirect('/manage/login')
-  return <Localized><PhotoPublish configured={cosConfigured()} /></Localized>
+  const photographers = await payload.find({ collection: 'photographers', user, overrideAccess: false, pagination: false, sort: 'name', depth: 0 })
+  return <Localized><PhotoPublish configured={cosConfigured()} photographers={photographers.docs.map(({ id, name }) => ({ id, name }))} /></Localized>
 }

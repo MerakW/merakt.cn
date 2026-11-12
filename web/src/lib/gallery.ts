@@ -1,13 +1,14 @@
 import { manualTranslation, type Locale } from './i18n/core'
 import { legacyImageURL } from './assets'
-import type { Album, Media } from '@/payload-types'
+import type { Album, Media, Photographer } from '@/payload-types'
 
 export interface GalleryPhoto {
   id: number; src: string; display: string; thumbnail: string; srcSet?: string; width: number; height: number;
+  photographers?: { id: number; name: string; url?: string; isSelf?: boolean }[];
   exposure?: Media['exposure']; alt: string; caption: string; credit?: string; source?: string; video: boolean;
 }
 export interface GalleryAlbum { id: number; slug: string; title: string; date: string; description: string; compound?: string | null; photos: GalleryPhoto[] }
-export function safeLink(value?: string | null) { return value && /^https?:\/\//i.test(value) ? value : undefined }
+export function safeLink(value?: string | null) { try { const url = new URL(value || ''); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? url.href : undefined } catch { return undefined } }
 /** Payload uploads are served by this site; only reviewed legacy paths live on COS. */
 const mediaPath = (filename: string) => `/api/media/file/${encodeURIComponent(filename)}`
 
@@ -29,9 +30,13 @@ export function publicAlbum(album: Album, locale: Locale = 'zh-CN'): GalleryAlbu
   if (album._status !== 'published') return null
   const photos = (album.photos || []).flatMap(photo => {
     const image = publicPhoto(photo.image, manualTranslation(photo.caption, photo.captionEn, locale), photo.credit || album.photographer, photo.source)
-    return image ? [{ ...image, alt: typeof photo.image === 'object' && photo.image ? manualTranslation(image.alt, photo.image.altEn, locale) : image.alt }] : []
+    const photographers = (photo.photographers?.length ? photo.photographers : album.photographers || []).filter((person): person is Photographer => typeof person === 'object' && person !== null).map(person => ({ id: person.id, name: person.name, url: safeLink(person.url), isSelf: Boolean(person.isSelf) }))
+    return image ? [{ ...image, ...(photo.photographers !== undefined || album.photographers !== undefined ? { photographers, credit: photographers.map(person => person.name).join(' ') || undefined } : {}), alt: typeof photo.image === 'object' && photo.image ? manualTranslation(image.alt, photo.image.altEn, locale) : image.alt }] : []
   })
-  if (!photos.length) { const cover = publicPhoto(album.cover, manualTranslation(album.description, album.descriptionEn, locale), album.photographer); if (cover) photos.push({ ...cover, alt: typeof album.cover === 'object' && album.cover ? manualTranslation(cover.alt, album.cover.altEn, locale) : cover.alt }) }
+  if (!photos.length) { const cover = publicPhoto(album.cover, manualTranslation(album.description, album.descriptionEn, locale), album.photographer); if (cover) {
+    const photographers = (album.photographers || []).filter((person): person is Photographer => typeof person === 'object' && person !== null).map(person => ({ id: person.id, name: person.name, url: safeLink(person.url), isSelf: Boolean(person.isSelf) }))
+    photos.push({ ...cover, ...(album.photographers !== undefined ? { photographers, credit: photographers.map(person => person.name).join(' ') || undefined } : {}), alt: typeof album.cover === 'object' && album.cover ? manualTranslation(cover.alt, album.cover.altEn, locale) : cover.alt })
+  } }
   return photos.length ? { id: album.id, slug: album.slug, title: manualTranslation(album.title, album.titleEn, locale), date: album.date?.slice(0, 10) || '', description: manualTranslation(album.description, album.descriptionEn, locale) || '', compound: album.compound, photos } : null
 }
 

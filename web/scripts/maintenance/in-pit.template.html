@@ -143,7 +143,7 @@ button,a{font:inherit;color:inherit}
           <span data-i18n="common.reconnect">重新连接</span>
         </a>
         <a class="link" id="admin-entry" href="/manage/maintenance" hidden><span data-i18n="maintenance.admin">管理员入口</span></a>
-        <a class="link" id="status" href="https://status.merakt.cn/status/home" target="_blank" rel="noopener"><span data-i18n="maintenance.status">查看服务状态</span></a>
+        <a class="link" id="status" href="https://status.merakt.cn/status/main" target="_blank" rel="noopener"><span data-i18n="maintenance.status">查看服务状态</span></a>
       </div>
       <p class="radio" id="radio" aria-live="polite"></p>
     </div>
@@ -212,7 +212,7 @@ var MERAK_MESSAGES = {
 var CONFIG = {
   manual: false,
   preview: false,
-  statusUrl: "https://status.merakt.cn/status/home",
+  statusUrl: "https://status.merakt.cn/status/main",
   probeUrl: "/",                 // checked to see whether the site is back
   retrySeconds: 30,
   maxRetrySeconds: 120,

@@ -1,3 +1,4 @@
+import * as photographers from './20261114_120000_photographers';
 import * as maintenance from './20261018_030000_maintenance';
 import * as paidFlightQueries from './20261020_120000_paid_flight_queries';
 import * as pitLane from './20261030_120000_pit_lane';
@@ -84,4 +85,5 @@ export const migrations = [
   { up: pitGarage.up, down: pitGarage.down, name: '20261108_120000_pit_garage' },
   { up: pitLaneNotify.up, down: pitLaneNotify.down, name: '20261110_120000_pit_lane_notify' },
   { up: pitLogoStatus.up, down: pitLogoStatus.down, name: '20261112_120000_pit_logo_status' },
+  { up: photographers.up, down: photographers.down, name: '20261114_120000_photographers' },
 ];

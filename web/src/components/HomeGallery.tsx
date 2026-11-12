@@ -47,11 +47,11 @@ export default function HomeGallery({ albums, total }: { albums: GalleryAlbum[];
     <div ref={rail} className="home-gallery-rail" onScroll={update} onPointerDown={event => { suppressClick.current=false; if (event.pointerType === 'mouse' && event.button === 0) drag.current = { x: event.clientX, left: event.currentTarget.scrollLeft, moved: false } }} onPointerMove={move} onPointerUp={stop} onPointerLeave={event => { if (!event.currentTarget.hasPointerCapture(event.pointerId)) drag.current=null }} onPointerCancel={event => { stop(event); suppressClick.current=false }} onClickCapture={event => { if (suppressClick.current) { event.preventDefault(); suppressClick.current=false } }}>
       {albums.map((album, index) => {
         const photo = album.photos[0]
-        return <a className="home-gallery-card" key={album.id} href={`/fursuitfriday?album=${album.slug}`} draggable={false} style={{ '--photo-ratio': photo.width / photo.height } as CSSProperties}>
-          <div className="home-gallery-visual"><LoadingImage data-i18n="off" src={photo.display} srcSet={photo.srcSet} sizes="(max-width:650px) 80vw, 60vw" width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" draggable={false}/><span className="home-gallery-number" aria-hidden="true">{String(index + 1).padStart(2,'0')}</span></div>
-          <div className="home-gallery-caption"><p data-i18n="off" title={album.title}>{album.title}</p><time dateTime={album.date}>{album.date.slice(5).replace('-', '.')}</time></div>
-          {photo.credit && <span className="home-gallery-credit">{"@i18n:ui.photoBy@ "}{photo.credit}</span>}
-        </a>
+        return <div className="home-gallery-card" key={album.id} style={{ '--photo-ratio': photo.width / photo.height } as CSSProperties}>
+          <a href={`/fursuitfriday?album=${album.slug}`} draggable={false} style={{ display: 'contents' }}><div className="home-gallery-visual"><LoadingImage data-i18n="off" src={photo.display} srcSet={photo.srcSet} sizes="(max-width:650px) 80vw, 60vw" width={photo.width} height={photo.height} alt={photo.alt} loading="lazy" draggable={false}/><span className="home-gallery-number" aria-hidden="true">{String(index + 1).padStart(2,'0')}</span></div>
+          <div className="home-gallery-caption"><p data-i18n="off" title={album.title}>{album.title}</p><time dateTime={album.date}>{album.date.slice(5).replace('-', '.')}</time></div></a>
+          {photo.credit && <span className="home-gallery-credit">{"@i18n:ui.photoBy@ "}{photo.photographers?.length ? photo.photographers.map((person, index) => <span key={person.id}>{index ? '、' : ''}{person.url ? <a href={person.url} target="_blank" rel="noopener noreferrer">{person.name}</a> : person.name}</span>) : photo.credit}</span>}
+        </div>
       })}
       <a className="home-gallery-all" href="/fursuitfriday"><span>ALL {total}</span><b aria-hidden="true"><ArrowIcon /></b><small>{"@i18n:ui.exploreAllPhotos@"}</small></a>
     </div>

@@ -1,3 +1,4 @@
+import { translationField } from '@/lib/translation/field'
 import { captureUploadExif, fillUploadExposure } from '@/lib/photo-exif'
 import { legacyImageURL } from '@/lib/assets'
 import { resolve } from 'node:path'
@@ -22,6 +23,7 @@ export const Media: CollectionConfig = {
     focalPoint: true,
   },
   fields: [
+    translationField,
     { name: 'alt', label: "ui.imageDescription", type: 'text', required: true },
     { name: 'altEn', label: 'admin.translation.imageDescription', type: 'text' },
     { name: 'credit', label: "ui.photoCredit", type: 'text', admin: { components: { Field: './components/admin/SavedValueField' } } },

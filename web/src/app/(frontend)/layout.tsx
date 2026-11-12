@@ -74,7 +74,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
       <div className="footer-identity"><strong>MERAK.</strong><span>{"@i18n:site.motto@"}</span><a className="footer-revision" href="https://github.com/MerakW/merakt.cn"><span className="footer-repo"><img src={imageURL('/images/card/github.svg')} width="13" height="13" alt="" />GitHub</span><span className="footer-build"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12h6m8 0h6"/><circle cx="12" cy="12" r="4"/></svg>BUILD / {commit ? commit.slice(0,7).toUpperCase() : 'LOCAL'}</span></a></div>
       <div className="footer-links">
 
-        <a href="/pit-wall">PIT WALL</a><a href="/pit-lane">PIT LANE</a><a href="https://status.merakt.cn/status/home">{"@i18n:site.status@ "}<ArrowIcon direction="up-right" /></a><a href="https://beian.miit.gov.cn/">{"@i18n:ui.icp20230067291@"}</a>
+        <a href="/pit-wall">PIT WALL</a><a href="/pit-lane">PIT LANE</a><a href="https://status.merakt.cn/status/main">{"@i18n:site.status@ "}<ArrowIcon direction="up-right" /></a><a href="https://beian.miit.gov.cn/">{"@i18n:ui.icp20230067291@"}</a>
       </div>
     </footer>
   </Localized></LocaleProvider></body></html>

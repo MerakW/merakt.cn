@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    photographers: Photographer;
     flights: Flight;
     trips: Trip;
     albums: Album;
@@ -92,6 +93,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    photographers: PhotographersSelect<false> | PhotographersSelect<true>;
     flights: FlightsSelect<false> | FlightsSelect<true>;
     trips: TripsSelect<false> | TripsSelect<true>;
     albums: AlbumsSelect<false> | AlbumsSelect<true>;
@@ -239,6 +241,20 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photographers".
+ */
+export interface Photographer {
+  id: number;
+  name: string;
+  isSelf?: boolean | null;
+  url?: string | null;
+  aliases?: string | null;
+  key: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "flights".
  */
 export interface Flight {
@@ -335,6 +351,7 @@ export interface Album {
   descriptionEn?: string | null;
   compound?: ('auto' | 'S' | 'M' | 'H' | 'I') | null;
   cover?: (number | null) | Media;
+  photographers?: (number | Photographer)[] | null;
   photographer?: string | null;
   photos?:
     | {
@@ -344,6 +361,7 @@ export interface Album {
          * Optional. Leave blank to fall back to the original Chinese text in English mode.
          */
         captionEn?: string | null;
+        photographers?: (number | Photographer)[] | null;
         credit?: string | null;
         source?: string | null;
         id?: string | null;
@@ -521,6 +539,10 @@ export interface Friend {
    * Fetched by the monitor as 256px WebP; can be replaced manually.
    */
   logo?: (number | null) | Media;
+  /**
+   * Skip the hourly retry. Runs in the background after saving; refresh in a few seconds to see the result.
+   */
+  fetchLogo?: boolean | null;
   /**
    * Result for each icon candidate, to see why a fetch failed.
    */
@@ -755,6 +777,10 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
+        relationTo: 'photographers';
+        value: number | Photographer;
+      } | null)
+    | ({
         relationTo: 'flights';
         value: number | Flight;
       } | null)
@@ -917,6 +943,19 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "photographers_select".
+ */
+export interface PhotographersSelect<T extends boolean = true> {
+  name?: T;
+  isSelf?: T;
+  url?: T;
+  aliases?: T;
+  key?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "flights_select".
  */
 export interface FlightsSelect<T extends boolean = true> {
@@ -981,6 +1020,7 @@ export interface AlbumsSelect<T extends boolean = true> {
   descriptionEn?: T;
   compound?: T;
   cover?: T;
+  photographers?: T;
   photographer?: T;
   photos?:
     | T
@@ -988,6 +1028,7 @@ export interface AlbumsSelect<T extends boolean = true> {
         image?: T;
         caption?: T;
         captionEn?: T;
+        photographers?: T;
         credit?: T;
         source?: T;
         id?: T;
@@ -1089,6 +1130,7 @@ export interface FriendsSelect<T extends boolean = true> {
   logoSource?: T;
   avatar?: T;
   logo?: T;
+  fetchLogo?: T;
   logoStatus?: T;
   tyreMode?: T;
   tyre?: T;
